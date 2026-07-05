@@ -1,6 +1,5 @@
 import {
   LayoutDashboard,
-  Home,
   Users,
   Rewind,
   Swords,
@@ -19,11 +18,13 @@ export interface NavItem {
 }
 
 /**
- * Single source of truth for the app navigation.
- * The sidebar, topbar and router all derive their links from here.
+ * Single source of truth for the in-app navigation (the pages rendered
+ * inside the app shell). The landing page (`/`) lives outside the shell
+ * and is reached via the sidebar brand logo, so it is intentionally not
+ * listed here.
+ * The sidebar and topbar both derive their links/titles from this list.
  */
 export const NAV_ITEMS: NavItem[] = [
-  { label: 'Home', to: '/', icon: Home, group: 'main' },
   { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard, group: 'main' },
   {
     label: 'Confronto Piloti',

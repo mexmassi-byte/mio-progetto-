@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, Link } from 'react-router-dom'
 import { X, Gauge } from 'lucide-react'
 import { NAV_ITEMS, NAV_GROUPS } from '@/config/navigation'
 import { Badge } from '@/components/ui'
@@ -11,8 +11,13 @@ interface SidebarProps {
 }
 
 function BrandMark() {
+  // Clicking the brand returns to the standalone landing page.
   return (
-    <div className="flex items-center gap-2.5">
+    <Link
+      to="/"
+      className="flex items-center gap-2.5 rounded-lg transition-opacity hover:opacity-80"
+      aria-label="ThePaddockView — vai alla home"
+    >
       <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent shadow-glow">
         <Gauge className="h-5 w-5 text-white" />
       </div>
@@ -24,7 +29,7 @@ function BrandMark() {
           Telemetry
         </p>
       </div>
-    </div>
+    </Link>
   )
 }
 

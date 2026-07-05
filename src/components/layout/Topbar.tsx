@@ -9,9 +9,7 @@ interface TopbarProps {
 
 function useCurrentTitle(): string {
   const { pathname } = useLocation()
-  const match = NAV_ITEMS.find((item) =>
-    item.to === '/' ? pathname === '/' : pathname.startsWith(item.to),
-  )
+  const match = NAV_ITEMS.find((item) => pathname.startsWith(item.to))
   return match?.label ?? 'ThePaddockView'
 }
 
