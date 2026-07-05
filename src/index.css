@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-base-950 text-zinc-200 font-sans antialiased;
+  }
+
+  /* Cockpit scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #2a2a34 transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-base-600;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-200 to-zinc-500;
+  }
+
+  /* Monospaced telemetry-style numerals */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    @apply font-mono;
+  }
+}
