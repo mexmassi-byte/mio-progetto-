@@ -9,12 +9,14 @@ import { AIRaceEngineer } from '@/pages/AIRaceEngineer'
 import { NotFound } from '@/pages/NotFound'
 
 export const router = createBrowserRouter([
+  // Standalone premium landing — no app shell (sidebar/topbar).
+  { path: '/', element: <Home />, errorElement: <NotFound /> },
+
+  // Application shell wraps every in-product page.
   {
-    path: '/',
     element: <Layout />,
     errorElement: <NotFound />,
     children: [
-      { index: true, element: <Home /> },
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'confronto-piloti', element: <DriverComparison /> },
       { path: 'race-replay', element: <RaceReplay /> },
