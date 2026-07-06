@@ -20,26 +20,18 @@ import {
   Select,
 } from '@/components/ui'
 import { CircuitMap } from '@/components/replay/CircuitMap'
-import {
-  DRIVERS,
-  GRANDS_PRIX,
-  SESSIONS,
-  DRIVER_COLORS,
-  generateDriverData,
-  type SessionType,
-} from '@/data/comparison'
-import {
-  getTrack,
-  sampleFrame,
-  SPEED_OPTIONS,
-  type PlaybackSpeed,
-  type DriverFrame,
-} from '@/data/replay'
+import { raceService } from '@/services/raceService'
+import type {
+  SessionType,
+  PlaybackSpeed,
+  ReplayFrame,
+} from '@/domain/models'
 import { cn } from '@/lib/cn'
 
-const MARK_A = DRIVER_COLORS.A
-const MARK_B = DRIVER_COLORS.B
+const MARK_A = raceService.driverColors.A
+const MARK_B = raceService.driverColors.B
 const COLORS = [MARK_A, MARK_B]
+const SPEED_OPTIONS = raceService.getPlaybackSpeeds()
 const SECONDS_PER_LAP = 0.9 // wall-clock seconds per lap at 1× speed
 
 function fmtGap(sec: number, isLeader: boolean): string {
@@ -76,7 +68,7 @@ function StatRow({
   )
 }
 
-function DriverStatsCard({ frame, color }: { frame: DriverFrame; color: string }) {
+function DriverStatsCard({ frame, color }: { frame: ReplayFrame; color: string }) {
   return (
     <Card className="overflow-hidden">
       <div
@@ -136,9 +128,8 @@ export function RaceReplay() {
   useEffect(() => void (playingRef.current = playing), [playing])
   useEffect(() => void (speedRef.current = speed), [speed])
 
-  const gp = GRANDS_PRIX.find((g) => g.id === gpId)!
-  const trackIndex = GRANDS_PRIX.findIndex((g) => g.id === gpId)
-  const trackD = getTrack(trackIndex)
+  const gp = raceService.getGrandsPrix().find((g) => g.id === gpId)!
+  const trackD = raceService.getTrack(gpId)
   useEffect(() => void (totalLapsRef.current = gp.laps), [gp])
 
   const selectedIds = useMemo(
@@ -146,10 +137,10 @@ export function RaceReplay() {
     [driver1Id, driver2Id],
   )
   const dataList = useMemo(
-    () => selectedIds.map((id) => generateDriverData(id, gpId, session)),
+    () => selectedIds.map((id) => raceService.getDriverStats(id, gpId, session)),
     [selectedIds, gpId, session],
   )
-  const frame = useMemo(() => sampleFrame(dataList, gp, t), [dataList, gp, t])
+  const frame = useMemo(() => raceService.sampleReplay(dataList, gpId, t), [dataList, gpId, t])
 
   // Playback loop.
   useEffect(() => {
@@ -193,20 +184,23 @@ export function RaceReplay() {
   const currentLap = Math.min(gp.laps, Math.floor(t * gp.laps) + 1)
 
   // Driver option lists with the same-driver guard.
-  const d1Options = DRIVERS.map((d) => ({
+  const drivers = raceService.getDrivers()
+  const d1Options = drivers.map((d) => ({
     value: d.id,
     label: `${d.code} · ${d.name}`,
     disabled: d.id === driver2Id,
   }))
   const d2Options = [
     { value: '', label: '— nessuno —' },
-    ...DRIVERS.map((d) => ({
+    ...drivers.map((d) => ({
       value: d.id,
       label: `${d.code} · ${d.name}`,
       disabled: d.id === driver1Id,
     })),
   ]
-  const gpOptions = GRANDS_PRIX.map((g) => ({ value: g.id, label: `${g.name} — ${g.circuit}` }))
+  const gpOptions = raceService
+    .getGrandsPrix()
+    .map((g) => ({ value: g.id, label: `${g.name} — ${g.circuit}` }))
 
   return (
     <div className="space-y-6">
@@ -226,7 +220,7 @@ export function RaceReplay() {
               Sessione
             </span>
             <div className="flex rounded-lg border border-line bg-base-900 p-0.5">
-              {SESSIONS.map((s) => (
+              {raceService.getSessions().map((s) => (
                 <button
                   key={s}
                   onClick={() => setSession(s)}
@@ -282,7 +276,12 @@ export function RaceReplay() {
               }
             />
             <CardBody>
-              <CircuitMap trackD={trackD} frames={frame.frames} colors={COLORS} />
+              <CircuitMap
+                trackD={trackD}
+                frames={frame.frames}
+                colors={COLORS}
+                sectorBounds={raceService.sectorBounds}
+              />
             </CardBody>
           </Card>
 

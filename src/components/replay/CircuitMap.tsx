@@ -1,10 +1,12 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { SECTOR_BOUNDS, type DriverFrame } from '@/data/replay'
+import type { ReplayFrame } from '@/domain/models'
 
 interface CircuitMapProps {
   trackD: string
-  frames: DriverFrame[]
+  frames: ReplayFrame[]
   colors: string[]
+  /** Sector boundaries as lap fractions (from the data service). */
+  sectorBounds: readonly number[]
 }
 
 /**
@@ -13,7 +15,7 @@ interface CircuitMapProps {
  * cars' progress. A real feed would swap the path geometry and feed true
  * positions — the moving-marker mechanism stays the same.
  */
-export function CircuitMap({ trackD, frames, colors }: CircuitMapProps) {
+export function CircuitMap({ trackD, frames, colors, sectorBounds }: CircuitMapProps) {
   const pathRef = useRef<SVGPathElement>(null)
   const [len, setLen] = useState(0)
 
@@ -56,7 +58,7 @@ export function CircuitMap({ trackD, frames, colors }: CircuitMapProps) {
         />
 
         {/* sector boundary ticks */}
-        {SECTOR_BOUNDS.map((b, i) => {
+        {sectorBounds.map((b, i) => {
           const p = pointAt(b)
           return p ? (
             <circle key={i} cx={p.x} cy={p.y} r={3} fill="#52525b" />

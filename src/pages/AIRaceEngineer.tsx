@@ -1,28 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Bot, Send, Sparkles, User, Radio, Swords } from 'lucide-react'
 import { PageHeader, Card, Badge, Select } from '@/components/ui'
-import {
-  DRIVERS,
-  GRANDS_PRIX,
-  SESSIONS,
-  DRIVER_COLORS,
-  generateDriverData,
-  deriveGap,
-  type SessionType,
-} from '@/data/comparison'
-import {
-  buildInsight,
-  detectKind,
-  pickRival,
-  QUICK_ACTIONS,
-  type Insight,
-  type InsightKind,
-  type MetricTone,
-} from '@/data/engineer'
+import { raceService } from '@/services/raceService'
+import type {
+  SessionType,
+  Insight,
+  InsightKind,
+  MetricTone,
+} from '@/domain/models'
 import { cn } from '@/lib/cn'
 
-const MARK_A = DRIVER_COLORS.A
-const MARK_B = DRIVER_COLORS.B
+const MARK_A = raceService.driverColors.A
+const MARK_B = raceService.driverColors.B
 
 function fmtLap(sec: number): string {
   const m = Math.floor(sec / 60)
@@ -163,20 +152,24 @@ export function AIRaceEngineer() {
   const listRef = useRef<HTMLDivElement>(null)
 
   const me = useMemo(
-    () => generateDriverData(driverId, gpId, session),
+    () => raceService.getDriverStats(driverId, gpId, session),
     [driverId, gpId, session],
   )
   const rival = useMemo(
-    () => pickRival(driverId, gpId, session),
+    () => raceService.getRival(driverId, gpId, session),
     [driverId, gpId, session],
   )
-  const gap = deriveGap(me, rival)
+  const gap = useMemo(() => raceService.compareDrivers(me, rival).gap, [me, rival])
 
   // Fresh briefing whenever the selection changes.
   useEffect(() => {
     setTyping(false)
     setMessages([
-      { id: idRef.current++, role: 'engineer', insight: buildInsight('briefing', driverId, gpId, session) },
+      {
+        id: idRef.current++,
+        role: 'engineer',
+        insight: raceService.getInsight('briefing', driverId, gpId, session),
+      },
     ])
   }, [driverId, gpId, session])
 
@@ -192,7 +185,11 @@ export function AIRaceEngineer() {
     window.setTimeout(() => {
       setMessages((m) => [
         ...m,
-        { id: idRef.current++, role: 'engineer', insight: buildInsight(kind, driverId, gpId, session) },
+        {
+          id: idRef.current++,
+          role: 'engineer',
+          insight: raceService.getInsight(kind, driverId, gpId, session),
+        },
       ])
       setTyping(false)
     }, 650)
@@ -202,11 +199,15 @@ export function AIRaceEngineer() {
     const text = input.trim()
     if (!text) return
     setInput('')
-    respond(detectKind(text), text)
+    respond(raceService.detectInsightKind(text), text)
   }
 
-  const driverOptions = DRIVERS.map((d) => ({ value: d.id, label: `${d.code} · ${d.name}` }))
-  const gpOptions = GRANDS_PRIX.map((g) => ({ value: g.id, label: `${g.name} — ${g.circuit}` }))
+  const driverOptions = raceService
+    .getDrivers()
+    .map((d) => ({ value: d.id, label: `${d.code} · ${d.name}` }))
+  const gpOptions = raceService
+    .getGrandsPrix()
+    .map((g) => ({ value: g.id, label: `${g.name} — ${g.circuit}` }))
 
   return (
     <div className="space-y-6">
@@ -238,7 +239,7 @@ export function AIRaceEngineer() {
               Sessione
             </span>
             <div className="flex rounded-lg border border-line bg-base-900 p-0.5">
-              {SESSIONS.map((s) => (
+              {raceService.getSessions().map((s) => (
                 <button
                   key={s}
                   onClick={() => setSession(s)}
@@ -281,7 +282,7 @@ export function AIRaceEngineer() {
 
           {/* Quick actions */}
           <div className="flex flex-wrap gap-2 border-t border-line px-5 py-3">
-            {QUICK_ACTIONS.map((q) => (
+            {raceService.getQuickActions().map((q) => (
               <button
                 key={q.kind}
                 onClick={() => respond(q.kind, q.label)}

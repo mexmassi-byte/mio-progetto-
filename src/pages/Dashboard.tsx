@@ -26,20 +26,12 @@ import {
 import { LapTimeChart } from '@/components/comparison/LapTimeChart'
 import { ChartSkeleton } from '@/components/comparison/ChartSkeleton'
 import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
-import {
-  DRIVERS,
-  GRANDS_PRIX,
-  SESSIONS,
-  DRIVER_COLORS,
-  generateDriverData,
-  buildBattle,
-  type SessionType,
-} from '@/data/comparison'
-import { buildInsight } from '@/data/engineer'
+import { raceService } from '@/services/raceService'
+import type { SessionType } from '@/domain/models'
 import { cn } from '@/lib/cn'
 
-const MARK_A = DRIVER_COLORS.A
-const MARK_B = DRIVER_COLORS.B
+const MARK_A = raceService.driverColors.A
+const MARK_B = raceService.driverColors.B
 
 function fmtLap(sec: number): string {
   const m = Math.floor(sec / 60)
@@ -51,29 +43,27 @@ export function Dashboard() {
   const [gpId, setGpId] = useState('ita')
   const [session, setSession] = useState<SessionType>('Race')
 
-  const gp = GRANDS_PRIX.find((g) => g.id === gpId)!
+  const gp = raceService.getGrandsPrix().find((g) => g.id === gpId)!
 
-  const allData = useMemo(
-    () => DRIVERS.map((d) => generateDriverData(d.id, gpId, session)),
+  // All session data comes from the service — the page performs no data
+  // derivation of its own.
+  const kpis = useMemo(() => raceService.getSessionKpis(gpId, session), [gpId, session])
+  const leaderboard = useMemo(
+    () => raceService.getSessionLeaderboard(gpId, session),
     [gpId, session],
   )
-  const ranked = useMemo(
-    () => [...allData].sort((a, b) => a.lapTime - b.lapTime),
-    [allData],
+  const championship = useMemo(
+    () => raceService.getChampionship(gpId, session),
+    [gpId, session],
   )
-  const leader = ranked[0]
-  const second = ranked[1]
-  const fastestSpeed = useMemo(
-    () => [...allData].sort((a, b) => b.topSpeed - a.topSpeed)[0],
-    [allData],
-  )
-  const battle = useMemo(() => buildBattle(leader, second), [leader, second])
+  const leader = leaderboard[0].stats
+  const second = leaderboard[1].stats
+  const battle = useMemo(() => raceService.battle(leader, second), [leader, second])
   const insight = useMemo(
-    () => buildInsight('strategy', leader.driver.id, gpId, session),
+    () => raceService.getInsight('strategy', leader.driver.id, gpId, session),
     [leader, gpId, session],
   )
 
-  const gapP2 = second.lapTime - leader.lapTime
   const chartLoading = useSimulatedFetch([gpId, session])
 
   const quickAccess = [
@@ -120,7 +110,9 @@ export function Dashboard() {
         <div className="grid gap-4 md:grid-cols-2">
           <Select
             label="Gran Premio"
-            options={GRANDS_PRIX.map((g) => ({ value: g.id, label: `${g.name} — ${g.circuit}` }))}
+            options={raceService
+              .getGrandsPrix()
+              .map((g) => ({ value: g.id, label: `${g.name} — ${g.circuit}` }))}
             value={gpId}
             onChange={(e) => setGpId(e.target.value)}
           />
@@ -129,7 +121,7 @@ export function Dashboard() {
               Sessione
             </span>
             <div className="flex rounded-lg border border-line bg-base-900 p-0.5">
-              {SESSIONS.map((s) => (
+              {raceService.getSessions().map((s) => (
                 <button
                   key={s}
                   onClick={() => setSession(s)}
@@ -150,23 +142,23 @@ export function Dashboard() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Giro veloce"
-          value={fmtLap(leader.lapTime)}
+          value={fmtLap(kpis.fastestLap.seconds)}
           icon={Timer}
-          delta={leader.driver.code}
+          delta={kpis.fastestLap.driver.code}
           trend="up"
-          hint={leader.driver.team}
+          hint={kpis.fastestLap.driver.team}
         />
         <StatCard
           label="Top speed"
-          value={`${fastestSpeed.topSpeed} km/h`}
+          value={`${kpis.topSpeed.value} km/h`}
           icon={Gauge}
-          delta={fastestSpeed.driver.code}
+          delta={kpis.topSpeed.driver.code}
           trend="up"
           hint="trappola DRS"
         />
         <StatCard
           label="Gap P1–P2"
-          value={`+${gapP2.toFixed(3)}s`}
+          value={`+${kpis.gapP1P2.toFixed(3)}s`}
           icon={TrendingUp}
           delta={second.driver.code}
           trend="flat"
@@ -174,7 +166,7 @@ export function Dashboard() {
         />
         <StatCard
           label="Piloti in sessione"
-          value={`${DRIVERS.length}`}
+          value={`${kpis.driverCount}`}
           icon={Flag}
           hint={`${gp.circuit} · ${gp.laps} giri`}
         />
@@ -242,30 +234,29 @@ export function Dashboard() {
           <CardHeader title="Classifica sessione" subtitle="Per miglior giro" />
           <CardBody className="px-0 py-0">
             <ul className="divide-y divide-line">
-              {ranked.slice(0, 8).map((d, i) => {
-                const gap = d.lapTime - leader.lapTime
-                return (
-                  <li key={d.driver.id} className="flex items-center gap-3 px-5 py-2.5">
-                    <span className="tabular w-5 text-sm font-semibold text-zinc-500">
-                      {i + 1}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-zinc-200">
-                        {d.driver.name}
-                      </p>
-                      <p className="truncate text-[11px] text-zinc-600">{d.driver.team}</p>
-                    </div>
-                    <span
-                      className={cn(
-                        'tabular text-xs font-semibold',
-                        i === 0 ? 'text-accent-soft' : 'text-zinc-500',
-                      )}
-                    >
-                      {i === 0 ? fmtLap(d.lapTime) : `+${gap.toFixed(3)}`}
-                    </span>
-                  </li>
-                )
-              })}
+              {leaderboard.slice(0, 8).map((row) => (
+                <li key={row.stats.driver.id} className="flex items-center gap-3 px-5 py-2.5">
+                  <span className="tabular w-5 text-sm font-semibold text-zinc-500">
+                    {row.rank}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-zinc-200">
+                      {row.stats.driver.name}
+                    </p>
+                    <p className="truncate text-[11px] text-zinc-600">
+                      {row.stats.driver.team}
+                    </p>
+                  </div>
+                  <span
+                    className={cn(
+                      'tabular text-xs font-semibold',
+                      row.rank === 1 ? 'text-accent-soft' : 'text-zinc-500',
+                    )}
+                  >
+                    {row.rank === 1 ? fmtLap(row.stats.lapTime) : `+${row.gap.toFixed(3)}`}
+                  </span>
+                </li>
+              ))}
             </ul>
           </CardBody>
         </Card>
@@ -379,22 +370,26 @@ export function Dashboard() {
         />
         <CardBody className="px-0 py-0">
           <ul className="divide-y divide-line sm:grid sm:grid-cols-2 sm:divide-y-0">
-            {ranked.slice(0, 6).map((d, i) => (
+            {championship.map((entry) => (
               <li
-                key={d.driver.id}
+                key={entry.driver.id}
                 className="flex items-center gap-3 px-5 py-3 sm:odd:border-r sm:odd:border-line"
               >
-                {i === 0 ? (
+                {entry.rank === 1 ? (
                   <Trophy className="h-4 w-4 text-signal-amber" />
                 ) : (
                   <CircleDot className="h-3.5 w-3.5 text-zinc-600" />
                 )}
-                <span className="tabular w-5 text-sm font-semibold text-zinc-500">{i + 1}</span>
+                <span className="tabular w-5 text-sm font-semibold text-zinc-500">
+                  {entry.rank}
+                </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-zinc-200">{d.driver.name}</p>
+                  <p className="truncate text-sm font-medium text-zinc-200">
+                    {entry.driver.name}
+                  </p>
                 </div>
                 <span className="tabular text-sm font-semibold text-zinc-100">
-                  {Math.max(0, 300 - i * 24 - (d.position % 5) * 3)}
+                  {entry.points}
                 </span>
                 <span className="text-[11px] text-zinc-600">pt</span>
               </li>

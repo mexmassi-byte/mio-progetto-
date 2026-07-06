@@ -9,20 +9,17 @@ import {
   Badge,
 } from '@/components/ui'
 import { MatchControls } from '@/components/comparison/MatchControls'
-import {
-  GRANDS_PRIX,
-  DRIVER_COLORS,
-  generateDriverData,
-  buildBattle,
-  type SessionType,
-  type DriverData,
-  type MetricRow,
-  type Winner,
-} from '@/data/comparison'
+import { raceService } from '@/services/raceService'
+import type {
+  SessionType,
+  DriverStats,
+  MetricRow,
+  Winner,
+} from '@/domain/models'
 import { cn } from '@/lib/cn'
 
-const MARK_A = DRIVER_COLORS.A
-const MARK_B = DRIVER_COLORS.B
+const MARK_A = raceService.driverColors.A
+const MARK_B = raceService.driverColors.B
 
 const winnerText: Record<Winner, string> = {
   A: 'text-accent-soft',
@@ -38,7 +35,7 @@ function CombatantCard({
   score,
   isOverall,
 }: {
-  data: DriverData
+  data: DriverStats
   side: 'A' | 'B'
   score: number
   isOverall: boolean
@@ -155,14 +152,14 @@ export function BattleMode() {
   const [session, setSession] = useState<SessionType>('Race')
 
   const dataA = useMemo(
-    () => generateDriverData(driverAId, gpId, session),
+    () => raceService.getDriverStats(driverAId, gpId, session),
     [driverAId, gpId, session],
   )
   const dataB = useMemo(
-    () => generateDriverData(driverBId, gpId, session),
+    () => raceService.getDriverStats(driverBId, gpId, session),
     [driverBId, gpId, session],
   )
-  const battle = useMemo(() => buildBattle(dataA, dataB), [dataA, dataB])
+  const battle = useMemo(() => raceService.battle(dataA, dataB), [dataA, dataB])
 
   // Light mount animation for the battle bars.
   const [animated, setAnimated] = useState(false)
@@ -171,7 +168,7 @@ export function BattleMode() {
     return () => cancelAnimationFrame(t)
   }, [])
 
-  const gp = GRANDS_PRIX.find((g) => g.id === gpId)!
+  const gp = raceService.getGrandsPrix().find((g) => g.id === gpId)!
   const swap = () => {
     setDriverAId(driverBId)
     setDriverBId(driverAId)

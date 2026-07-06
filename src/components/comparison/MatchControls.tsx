@@ -1,12 +1,9 @@
 import { Card, Select } from '@/components/ui'
-import {
-  DRIVERS,
-  GRANDS_PRIX,
-  SESSIONS,
-  DRIVER_COLORS,
-  type SessionType,
-} from '@/data/comparison'
+import { raceService } from '@/services/raceService'
+import type { SessionType } from '@/domain/models'
 import { cn } from '@/lib/cn'
+
+const DRIVER_COLORS = raceService.driverColors
 
 export interface MatchControlsProps {
   driverAId: string
@@ -39,12 +36,12 @@ export function MatchControls({
   onSession,
 }: MatchControlsProps) {
   const driverOptionsExcept = (otherId: string) =>
-    DRIVERS.map((d) => ({
+    raceService.getDrivers().map((d) => ({
       value: d.id,
       label: `${d.code} · ${d.name}`,
       disabled: d.id === otherId,
     }))
-  const gpOptions = GRANDS_PRIX.map((g) => ({
+  const gpOptions = raceService.getGrandsPrix().map((g) => ({
     value: g.id,
     label: `${g.name} — ${g.circuit}`,
   }))
@@ -77,7 +74,7 @@ export function MatchControls({
             Sessione
           </span>
           <div className="flex rounded-lg border border-line bg-base-900 p-0.5">
-            {SESSIONS.map((s) => (
+            {raceService.getSessions().map((s) => (
               <button
                 key={s}
                 onClick={() => onSession(s)}
