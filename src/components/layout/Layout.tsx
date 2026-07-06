@@ -23,7 +23,12 @@ export function Layout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar onOpenSidebar={() => setSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto bg-grid-faint [background-size:32px_32px]">
-          <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          {/* Keyed on the route so each navigation replays a light enter
+              animation — a smooth page transition without a router library. */}
+          <div
+            key={pathname}
+            className="mx-auto w-full max-w-7xl animate-page-in px-4 py-6 sm:px-6 lg:px-8"
+          >
             <Outlet />
           </div>
         </main>

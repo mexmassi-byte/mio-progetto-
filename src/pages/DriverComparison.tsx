@@ -18,7 +18,9 @@ import {
   Badge,
 } from '@/components/ui'
 import { LapTimeChart } from '@/components/comparison/LapTimeChart'
+import { ChartSkeleton } from '@/components/comparison/ChartSkeleton'
 import { MatchControls } from '@/components/comparison/MatchControls'
+import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import {
   GRANDS_PRIX,
   DRIVER_COLORS,
@@ -322,6 +324,7 @@ export function DriverComparison() {
     [driverBId, gpId, session],
   )
   const comparison = useMemo(() => buildComparison(dataA, dataB), [dataA, dataB])
+  const chartLoading = useSimulatedFetch([driverAId, driverBId, gpId, session])
 
   const gp = GRANDS_PRIX.find((g) => g.id === gpId)!
 
@@ -367,14 +370,18 @@ export function DriverComparison() {
         <Card className="lg:col-span-2">
           <CardHeader title="Lap Time" subtitle="Andamento sul giro" />
           <CardBody>
-            <LapTimeChart
-              seriesA={dataA.lapSeries}
-              seriesB={dataB.lapSeries}
-              codeA={dataA.driver.code}
-              codeB={dataB.driver.code}
-              colorA={MARK_A}
-              colorB={MARK_B}
-            />
+            {chartLoading ? (
+              <ChartSkeleton />
+            ) : (
+              <LapTimeChart
+                seriesA={dataA.lapSeries}
+                seriesB={dataB.lapSeries}
+                codeA={dataA.driver.code}
+                codeB={dataB.driver.code}
+                colorA={MARK_A}
+                colorB={MARK_B}
+              />
+            )}
           </CardBody>
         </Card>
 

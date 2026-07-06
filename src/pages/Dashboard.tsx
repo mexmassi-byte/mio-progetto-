@@ -24,6 +24,8 @@ import {
   Select,
 } from '@/components/ui'
 import { LapTimeChart } from '@/components/comparison/LapTimeChart'
+import { ChartSkeleton } from '@/components/comparison/ChartSkeleton'
+import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import {
   DRIVERS,
   GRANDS_PRIX,
@@ -72,6 +74,7 @@ export function Dashboard() {
   )
 
   const gapP2 = second.lapTime - leader.lapTime
+  const chartLoading = useSimulatedFetch([gpId, session])
 
   const quickAccess = [
     {
@@ -220,14 +223,18 @@ export function Dashboard() {
             action={<Badge tone="cyan">demo</Badge>}
           />
           <CardBody>
-            <LapTimeChart
-              seriesA={leader.lapSeries}
-              seriesB={second.lapSeries}
-              codeA={leader.driver.code}
-              codeB={second.driver.code}
-              colorA={MARK_A}
-              colorB={MARK_B}
-            />
+            {chartLoading ? (
+              <ChartSkeleton />
+            ) : (
+              <LapTimeChart
+                seriesA={leader.lapSeries}
+                seriesB={second.lapSeries}
+                codeA={leader.driver.code}
+                codeB={second.driver.code}
+                colorA={MARK_A}
+                colorB={MARK_B}
+              />
+            )}
           </CardBody>
         </Card>
 

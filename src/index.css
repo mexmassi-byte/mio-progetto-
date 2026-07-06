@@ -13,8 +13,31 @@
     height: 100%;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-base-950 text-zinc-200 font-sans antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgba(225, 6, 0, 0.32);
+    color: #fff;
+  }
+
+  /* Respect users who prefer reduced motion — keeps the app snappy and
+     accessible without the decorative transitions. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   /* Cockpit scrollbars */

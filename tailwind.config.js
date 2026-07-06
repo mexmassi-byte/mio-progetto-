@@ -7,13 +7,14 @@ export default {
         // Cockpit / data-platform dark palette
         base: {
           950: '#050506',
-          900: '#0a0a0c',
-          850: '#101014',
-          800: '#16161c',
-          700: '#1e1e26',
-          600: '#2a2a34',
+          900: '#0b0b0e',
+          850: '#111116',
+          800: '#17171e',
+          700: '#20202a',
+          600: '#2d2d38',
         },
-        line: '#23232c',
+        line: '#282833',
+        'line-strong': '#33333f',
         accent: {
           DEFAULT: '#e10600', // F1 red
           soft: '#ff2b26',
@@ -55,12 +56,21 @@ export default {
           '0%': { transform: 'translateY(-100%)' },
           '100%': { transform: 'translateY(100%)' },
         },
+        'page-in': {
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'shimmer': {
+          '100%': { transform: 'translateX(100%)' },
+        },
       },
       animation: {
         'fade-up': 'fade-up 0.7s cubic-bezier(0.16,1,0.3,1) both',
         'fade-in': 'fade-in 0.9s ease-out both',
         'glow-pulse': 'glow-pulse 5s ease-in-out infinite',
         'scan': 'scan 6s linear infinite',
+        'page-in': 'page-in 0.35s cubic-bezier(0.16,1,0.3,1) both',
+        'shimmer': 'shimmer 1.6s infinite',
       },
     },
   },

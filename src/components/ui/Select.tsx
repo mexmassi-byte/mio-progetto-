@@ -37,7 +37,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             id={id}
             className={cn(
-              'w-full appearance-none rounded-lg border border-line bg-base-900 py-2.5 pr-9 text-sm text-zinc-100 transition-colors hover:border-base-600 focus:border-accent/60 focus:outline-none focus:ring-1 focus:ring-accent/40',
+              'w-full cursor-pointer appearance-none rounded-lg border border-line bg-base-900 py-2.5 pr-9 text-sm text-zinc-100 transition-colors hover:border-line-strong focus:border-accent/60 focus:outline-none focus:ring-1 focus:ring-accent/40',
               accent ? 'pl-8' : 'pl-3',
               className,
             )}
