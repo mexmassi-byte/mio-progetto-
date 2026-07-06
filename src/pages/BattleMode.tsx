@@ -1,117 +1,325 @@
-import { Swords, Zap, Radar, ArrowLeftRight } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Swords, ArrowLeftRight, Crown, Check, Trophy, Minus } from 'lucide-react'
 import {
   PageHeader,
   Card,
   CardHeader,
   CardBody,
-  Badge,
   Button,
-  EmptyState,
+  Badge,
 } from '@/components/ui'
+import { MatchControls } from '@/components/comparison/MatchControls'
+import {
+  GRANDS_PRIX,
+  DRIVER_COLORS,
+  generateDriverData,
+  buildBattle,
+  type SessionType,
+  type DriverData,
+  type MetricRow,
+  type Winner,
+} from '@/data/comparison'
+import { cn } from '@/lib/cn'
 
-function Combatant({
-  name,
-  team,
-  gap,
+const MARK_A = DRIVER_COLORS.A
+const MARK_B = DRIVER_COLORS.B
+
+const winnerText: Record<Winner, string> = {
+  A: 'text-accent-soft',
+  B: 'text-signal',
+  tie: 'text-zinc-400',
+}
+
+// --- Versus hero card -------------------------------------------------------
+
+function CombatantCard({
+  data,
   side,
+  score,
+  isOverall,
 }: {
-  name: string
-  team: string
-  gap: string
-  side: 'left' | 'right'
+  data: DriverData
+  side: 'A' | 'B'
+  score: number
+  isOverall: boolean
 }) {
+  const color = side === 'A' ? MARK_A : MARK_B
+  const alignRight = side === 'B'
   return (
     <div
-      className={
-        side === 'left'
-          ? 'flex items-center gap-4'
-          : 'flex flex-row-reverse items-center gap-4 text-right'
-      }
+      className={cn(
+        'relative flex flex-col gap-3 rounded-xl border p-5 transition-colors',
+        isOverall ? 'bg-base-850' : 'bg-base-900',
+      )}
+      style={{ borderColor: isOverall ? color : '#23232c' }}
     >
+      {isOverall && (
+        <Crown
+          className="absolute -top-3 left-1/2 h-6 w-6 -translate-x-1/2 animate-fade-up"
+          style={{ color }}
+          fill={color}
+        />
+      )}
       <div
-        className={
-          side === 'left'
-            ? 'flex h-14 w-14 items-center justify-center rounded-xl bg-accent text-lg font-bold text-white shadow-glow'
-            : 'flex h-14 w-14 items-center justify-center rounded-xl bg-signal text-lg font-bold text-base-950'
-        }
+        className={cn(
+          'flex items-center gap-3',
+          alignRight && 'flex-row-reverse text-right',
+        )}
       >
-        {name.split(' ').pop()?.slice(0, 3).toUpperCase()}
+        <div
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl text-base font-bold text-white"
+          style={{ backgroundColor: color }}
+        >
+          {data.driver.code}
+        </div>
+        <div className="min-w-0">
+          <p className="truncate text-base font-semibold text-white">
+            {data.driver.name}
+          </p>
+          <p className="truncate text-xs text-zinc-500">{data.driver.team}</p>
+        </div>
       </div>
-      <div>
-        <p className="text-base font-semibold text-white">{name}</p>
-        <p className="text-xs text-zinc-500">{team}</p>
-        <p className="tabular mt-1 text-sm font-medium text-zinc-300">{gap}</p>
+      <div className={cn('flex items-baseline gap-2', alignRight && 'justify-end')}>
+        <span className="tabular text-3xl font-bold" style={{ color }}>
+          {score}
+        </span>
+        <span className="text-xs uppercase tracking-wider text-zinc-600">
+          {score === 1 ? 'categoria vinta' : 'categorie vinte'}
+        </span>
+      </div>
+      <Badge
+        tone={side === 'A' ? 'accent' : 'cyan'}
+        className={cn('w-fit', alignRight && 'self-end')}
+      >
+        Driver {side}
+      </Badge>
+    </div>
+  )
+}
+
+// --- Battle bar (animated tug-of-war) ---------------------------------------
+
+function BattleBar({ row, animated }: { row: MetricRow; animated: boolean }) {
+  const widthA = animated ? row.shareA : 0.5
+  return (
+    <div className="px-5 py-3.5">
+      <p className="mb-2 text-center text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+        {row.label}
+      </p>
+      <div className="flex items-center gap-3">
+        <span
+          className={cn(
+            'tabular flex w-24 shrink-0 items-center justify-end gap-1 text-sm font-semibold',
+            row.winner === 'A' ? winnerText.A : 'text-zinc-500',
+          )}
+        >
+          {row.winner === 'A' && <Check className="h-3.5 w-3.5" />}
+          {row.displayA}
+        </span>
+
+        <div className="flex h-2.5 flex-1 items-center gap-[2px]">
+          <div className="flex h-full flex-1 justify-end overflow-hidden rounded-l-full bg-base-700">
+            <div
+              className="h-full rounded-l-full transition-[width] duration-700 ease-out"
+              style={{ width: `${widthA * 100}%`, backgroundColor: MARK_A }}
+            />
+          </div>
+          <div className="flex h-full flex-1 overflow-hidden rounded-r-full bg-base-700">
+            <div
+              className="h-full rounded-r-full transition-[width] duration-700 ease-out"
+              style={{ width: `${(1 - widthA) * 100}%`, backgroundColor: MARK_B }}
+            />
+          </div>
+        </div>
+
+        <span
+          className={cn(
+            'tabular flex w-24 shrink-0 items-center gap-1 text-sm font-semibold',
+            row.winner === 'B' ? winnerText.B : 'text-zinc-500',
+          )}
+        >
+          {row.displayB}
+          {row.winner === 'B' && <Check className="h-3.5 w-3.5" />}
+        </span>
       </div>
     </div>
   )
 }
 
+// --- Page -------------------------------------------------------------------
+
 export function BattleMode() {
+  const [driverAId, setDriverAId] = useState('ver')
+  const [driverBId, setDriverBId] = useState('lec')
+  const [gpId, setGpId] = useState('ita')
+  const [session, setSession] = useState<SessionType>('Race')
+
+  const dataA = useMemo(
+    () => generateDriverData(driverAId, gpId, session),
+    [driverAId, gpId, session],
+  )
+  const dataB = useMemo(
+    () => generateDriverData(driverBId, gpId, session),
+    [driverBId, gpId, session],
+  )
+  const battle = useMemo(() => buildBattle(dataA, dataB), [dataA, dataB])
+
+  // Light mount animation for the battle bars.
+  const [animated, setAnimated] = useState(false)
+  useEffect(() => {
+    const t = requestAnimationFrame(() => setAnimated(true))
+    return () => cancelAnimationFrame(t)
+  }, [])
+
+  const gp = GRANDS_PRIX.find((g) => g.id === gpId)!
+  const swap = () => {
+    setDriverAId(driverBId)
+    setDriverBId(driverAId)
+  }
+
+  const overallWinner =
+    battle.overall === 'A' ? dataA : battle.overall === 'B' ? dataB : null
+
   return (
     <div className="space-y-6">
       <PageHeader
         icon={Swords}
         title="Battle Mode"
         badge="anteprima"
-        description="Duelli testa a testa: gap, DRS e finestre di sorpasso. Contenuti dimostrativi."
+        description={`Duello testa a testa · ${gp.name} · ${session}. Dati segnaposto, nessuna telemetria reale collegata.`}
         actions={
-          <Button size="sm">
+          <Button size="sm" variant="outline" onClick={swap}>
             <ArrowLeftRight className="h-4 w-4" />
-            Cambia duello
+            Scambia
           </Button>
         }
       />
 
+      <MatchControls
+        driverAId={driverAId}
+        driverBId={driverBId}
+        gpId={gpId}
+        session={session}
+        onDriverA={setDriverAId}
+        onDriverB={setDriverBId}
+        onGp={setGpId}
+        onSession={setSession}
+      />
+
+      {/* Versus hero */}
       <Card className="overflow-hidden">
-        <div className="relative grid grid-cols-1 items-center gap-6 p-6 sm:grid-cols-[1fr_auto_1fr]">
+        <div className="relative grid grid-cols-1 items-center gap-4 p-6 md:grid-cols-[1fr_auto_1fr]">
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-accent/5 via-transparent to-signal/5" />
-          <Combatant
-            name="M. Verstappen"
-            team="Red Bull Racing"
-            gap="Leader"
-            side="left"
+          <CombatantCard
+            data={dataA}
+            side="A"
+            score={battle.scoreA}
+            isOverall={battle.overall === 'A'}
           />
-          <div className="relative flex items-center justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-line bg-base-800">
-              <Swords className="h-5 w-5 text-zinc-400" />
+          <div className="relative flex flex-col items-center gap-2 py-2">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-line bg-base-800 shadow-glow animate-glow-pulse">
+              <Swords className="h-6 w-6 text-zinc-300" />
+            </div>
+            <div className="tabular flex items-center gap-2 text-lg font-bold">
+              <span style={{ color: MARK_A }}>{battle.scoreA}</span>
+              <span className="text-zinc-600">–</span>
+              <span style={{ color: MARK_B }}>{battle.scoreB}</span>
             </div>
           </div>
-          <Combatant
-            name="L. Norris"
-            team="McLaren"
-            gap="+0.412s"
-            side="right"
+          <CombatantCard
+            data={dataB}
+            side="B"
+            score={battle.scoreB}
+            isOverall={battle.overall === 'B'}
           />
         </div>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader
-            title="Gap dinamico"
-            subtitle="Distacco giro per giro"
-            action={<Badge tone="cyan">demo</Badge>}
-          />
-          <CardBody>
-            <EmptyState
-              icon={Radar}
-              title="Grafico duello in arrivo"
-              description="L'evoluzione del gap e le zone DRS saranno tracciate con i dati reali."
-            />
-          </CardBody>
-        </Card>
+      {/* Category battle */}
+      <Card>
+        <CardHeader
+          title="Head to Head"
+          subtitle="8 categorie · vincitore evidenziato"
+          action={
+            <div className="flex items-center gap-3 text-xs">
+              <span className="flex items-center gap-1.5 text-zinc-400">
+                <span className="h-2.5 w-2.5 rounded-full" style={{ background: MARK_A }} />
+                {dataA.driver.code}
+              </span>
+              <span className="flex items-center gap-1.5 text-zinc-400">
+                <span className="h-2.5 w-2.5 rounded-full" style={{ background: MARK_B }} />
+                {dataB.driver.code}
+              </span>
+            </div>
+          }
+        />
+        <CardBody className="px-0 py-0">
+          <div className="divide-y divide-line">
+            {battle.rows.map((row) => (
+              <BattleBar key={row.key} row={row} animated={animated} />
+            ))}
+          </div>
+        </CardBody>
+      </Card>
 
-        <Card>
-          <CardHeader title="Finestre DRS" subtitle="Segnaposto" />
-          <CardBody>
-            <EmptyState
-              icon={Zap}
-              title="In arrivo"
-              description="Le opportunità di sorpasso verranno evidenziate qui."
-            />
-          </CardBody>
-        </Card>
-      </div>
+      {/* Final verdict */}
+      <Card>
+        <CardHeader title="Verdetto" subtitle="Pilota complessivamente migliore" action={<Badge tone="cyan">demo</Badge>} />
+        <CardBody>
+          <div className="flex flex-col items-center gap-3 rounded-lg border border-line bg-base-850 p-6 text-center animate-fade-up">
+            {overallWinner ? (
+              <>
+                <Trophy className="h-7 w-7 text-signal-amber" />
+                <p className="text-sm text-zinc-400">Vince il duello</p>
+                <p className="text-xl font-semibold text-white">
+                  {overallWinner.driver.name}
+                </p>
+                <div className="tabular flex items-center gap-3 text-2xl font-bold">
+                  <span style={{ color: MARK_A }}>{battle.scoreA}</span>
+                  <span className="text-xs uppercase tracking-wider text-zinc-600">
+                    vs
+                  </span>
+                  <span style={{ color: MARK_B }}>{battle.scoreB}</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <Minus className="h-7 w-7 text-zinc-500" />
+                <p className="text-xl font-semibold text-white">Duello in parità</p>
+                <p className="text-sm text-zinc-500">
+                  {battle.scoreA} – {battle.scoreB} tra i due piloti
+                </p>
+              </>
+            )}
+          </div>
+
+          {/* Per-category winner chips */}
+          <ul className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {battle.rows.map((r) => {
+              const code =
+                r.winner === 'A'
+                  ? dataA.driver.code
+                  : r.winner === 'B'
+                    ? dataB.driver.code
+                    : '—'
+              const color =
+                r.winner === 'A' ? MARK_A : r.winner === 'B' ? MARK_B : '#3f3f46'
+              return (
+                <li
+                  key={r.key}
+                  className="flex items-center justify-between gap-2 rounded-lg border border-line bg-base-900 px-3 py-2"
+                >
+                  <span className="truncate text-xs text-zinc-400">{r.label}</span>
+                  <span className="flex shrink-0 items-center gap-1.5 text-xs font-semibold text-zinc-200">
+                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
+                    {code}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        </CardBody>
+      </Card>
     </div>
   )
 }

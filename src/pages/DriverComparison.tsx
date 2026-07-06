@@ -16,13 +16,11 @@ import {
   CardBody,
   Button,
   Badge,
-  Select,
 } from '@/components/ui'
 import { LapTimeChart } from '@/components/comparison/LapTimeChart'
+import { MatchControls } from '@/components/comparison/MatchControls'
 import {
-  DRIVERS,
   GRANDS_PRIX,
-  SESSIONS,
   DRIVER_COLORS,
   generateDriverData,
   buildComparison,
@@ -332,16 +330,6 @@ export function DriverComparison() {
     setDriverBId(driverAId)
   }
 
-  // Build the driver options, disabling whoever is already picked in the
-  // other menu so the same driver can't be selected on both sides.
-  const driverOptionsExcept = (otherId: string) =>
-    DRIVERS.map((d) => ({
-      value: d.id,
-      label: `${d.code} · ${d.name}`,
-      disabled: d.id === otherId,
-    }))
-  const gpOptions = GRANDS_PRIX.map((g) => ({ value: g.id, label: `${g.name} — ${g.circuit}` }))
-
   return (
     <div className="space-y-6">
       <PageHeader
@@ -357,54 +345,16 @@ export function DriverComparison() {
         }
       />
 
-      {/* Controls */}
-      <Card className="p-5">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Select
-            label="Driver A"
-            accent={MARK_A}
-            options={driverOptionsExcept(driverBId)}
-            value={driverAId}
-            // Ignore a pick that equals the other driver (controlled select
-            // snaps the value back), so the two can never match.
-            onChange={(e) => e.target.value !== driverBId && setDriverAId(e.target.value)}
-          />
-          <Select
-            label="Driver B"
-            accent={MARK_B}
-            options={driverOptionsExcept(driverAId)}
-            value={driverBId}
-            onChange={(e) => e.target.value !== driverAId && setDriverBId(e.target.value)}
-          />
-          <Select
-            label="Gran Premio"
-            options={gpOptions}
-            value={gpId}
-            onChange={(e) => setGpId(e.target.value)}
-          />
-          <div>
-            <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-zinc-500">
-              Sessione
-            </span>
-            <div className="flex rounded-lg border border-line bg-base-900 p-0.5">
-              {SESSIONS.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSession(s)}
-                  className={cn(
-                    'flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
-                    session === s
-                      ? 'bg-base-700 text-white'
-                      : 'text-zinc-500 hover:text-zinc-300',
-                  )}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Card>
+      <MatchControls
+        driverAId={driverAId}
+        driverBId={driverBId}
+        gpId={gpId}
+        session={session}
+        onDriverA={setDriverAId}
+        onDriverB={setDriverBId}
+        onGp={setGpId}
+        onSession={setSession}
+      />
 
       {/* Two driver columns */}
       <div className="grid gap-4 lg:grid-cols-2">

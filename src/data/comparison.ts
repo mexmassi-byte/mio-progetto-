@@ -103,6 +103,10 @@ export interface DriverData {
   position: number
   /** Lap-by-lap best sector-normalised lap times, for the trend chart. */
   lapSeries: number[]
+  // --- derived performance scores (used by Battle Mode) ---
+  consistency: number // 0-100, higher = steadier lap times
+  tyreManagement: number // 0-100, higher = better deg control
+  racePace: number // seconds, average lap (lower = faster)
 }
 
 export function generateDriverData(
@@ -141,6 +145,19 @@ export function generateDriverData(
     return round(lapTime + drift + pit + (rnd() * 0.5 - 0.2), 3)
   })
 
+  // Derived scores. Consistency comes from lap-time spread (excluding the
+  // pit lap); race pace is the average lap; tyre management is seeded.
+  const green = lapSeries.filter((_, i) => i !== Math.floor(points * 0.55))
+  const mean = green.reduce((s, v) => s + v, 0) / green.length
+  const variance = green.reduce((s, v) => s + (v - mean) ** 2, 0) / green.length
+  const stdev = Math.sqrt(variance)
+  const consistency = round(Math.max(60, Math.min(99.5, 100 - stdev * 55)), 1)
+  const racePace = round(
+    lapSeries.reduce((s, v) => s + v, 0) / lapSeries.length,
+    3,
+  )
+  const tyreManagement = round(68 + rnd() * 31, 1)
+
   return {
     driver,
     lapTime,
@@ -152,6 +169,9 @@ export function generateDriverData(
     tyreAge,
     position,
     lapSeries,
+    consistency,
+    tyreManagement,
+    racePace,
   }
 }
 
@@ -169,6 +189,9 @@ export type MetricKey =
   | 'tyreAge'
   | 'gap'
   | 'position'
+  | 'consistency'
+  | 'tyreManagement'
+  | 'racePace'
 
 export type Winner = 'A' | 'B' | 'tie'
 
@@ -338,4 +361,99 @@ export function buildComparison(a: DriverData, b: DriverData): Comparison {
   const scoreB = rows.filter((r) => r.winner === 'B').length
 
   return { rows, scoreA, scoreB, gap }
+}
+
+// ---------------------------------------------------------------------------
+// Battle Mode — a leaner, performance-oriented head-to-head
+// ---------------------------------------------------------------------------
+
+export interface BattleResult {
+  rows: MetricRow[]
+  scoreA: number
+  scoreB: number
+  /** Overall winner across all categories. */
+  overall: Winner
+}
+
+export function buildBattle(a: DriverData, b: DriverData): BattleResult {
+  const rows: MetricRow[] = [
+    toRow({
+      key: 'lapTime',
+      label: 'Lap Time',
+      a: a.lapTime,
+      b: b.lapTime,
+      higherBetter: false,
+      displayA: fmtLap(a.lapTime),
+      displayB: fmtLap(b.lapTime),
+    }),
+    toRow({
+      key: 'topSpeed',
+      label: 'Top Speed',
+      a: a.topSpeed,
+      b: b.topSpeed,
+      higherBetter: true,
+      displayA: `${a.topSpeed} km/h`,
+      displayB: `${b.topSpeed} km/h`,
+    }),
+    toRow({
+      key: 's1',
+      label: 'Sector 1',
+      a: a.s1,
+      b: b.s1,
+      higherBetter: false,
+      displayA: `${a.s1.toFixed(3)}s`,
+      displayB: `${b.s1.toFixed(3)}s`,
+    }),
+    toRow({
+      key: 's2',
+      label: 'Sector 2',
+      a: a.s2,
+      b: b.s2,
+      higherBetter: false,
+      displayA: `${a.s2.toFixed(3)}s`,
+      displayB: `${b.s2.toFixed(3)}s`,
+    }),
+    toRow({
+      key: 's3',
+      label: 'Sector 3',
+      a: a.s3,
+      b: b.s3,
+      higherBetter: false,
+      displayA: `${a.s3.toFixed(3)}s`,
+      displayB: `${b.s3.toFixed(3)}s`,
+    }),
+    toRow({
+      key: 'consistency',
+      label: 'Consistency',
+      a: a.consistency,
+      b: b.consistency,
+      higherBetter: true,
+      displayA: `${a.consistency.toFixed(1)}%`,
+      displayB: `${b.consistency.toFixed(1)}%`,
+    }),
+    toRow({
+      key: 'tyreManagement',
+      label: 'Tyre Management',
+      a: a.tyreManagement,
+      b: b.tyreManagement,
+      higherBetter: true,
+      displayA: `${a.tyreManagement.toFixed(1)}%`,
+      displayB: `${b.tyreManagement.toFixed(1)}%`,
+    }),
+    toRow({
+      key: 'racePace',
+      label: 'Race Pace',
+      a: a.racePace,
+      b: b.racePace,
+      higherBetter: false,
+      displayA: fmtLap(a.racePace),
+      displayB: fmtLap(b.racePace),
+    }),
+  ]
+
+  const scoreA = rows.filter((r) => r.winner === 'A').length
+  const scoreB = rows.filter((r) => r.winner === 'B').length
+  const overall: Winner = scoreA === scoreB ? 'tie' : scoreA > scoreB ? 'A' : 'B'
+
+  return { rows, scoreA, scoreB, overall }
 }
