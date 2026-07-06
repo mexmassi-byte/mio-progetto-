@@ -43,9 +43,9 @@ import type {
   SessionType,
 } from '@/domain/models'
 
-// Base URL for the future API. Wire it to an env var at build time, e.g.
-//   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-const API_BASE_URL = '/api/v1'
+// Base URL for the future API, from an env var at build time (see
+// .env.example). Falls back to the same-origin "/api/v1" when unset.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api/v1'
 
 /**
  * Thin fetch wrapper — the template every data method would use. It is not
