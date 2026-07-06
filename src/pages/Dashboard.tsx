@@ -1,12 +1,18 @@
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   LayoutDashboard,
   Timer,
-  Flag,
   Gauge,
   TrendingUp,
-  BarChart3,
+  Users,
+  Rewind,
+  Swords,
+  Bot,
+  ArrowRight,
+  Trophy,
   CircleDot,
-  Download,
+  Flag,
 } from 'lucide-react'
 import {
   PageHeader,
@@ -15,144 +21,380 @@ import {
   CardHeader,
   CardBody,
   Badge,
-  Button,
-  EmptyState,
+  Select,
 } from '@/components/ui'
+import { LapTimeChart } from '@/components/comparison/LapTimeChart'
+import {
+  DRIVERS,
+  GRANDS_PRIX,
+  SESSIONS,
+  DRIVER_COLORS,
+  generateDriverData,
+  buildBattle,
+  type SessionType,
+} from '@/data/comparison'
+import { buildInsight } from '@/data/engineer'
+import { cn } from '@/lib/cn'
 
-const STANDINGS = [
-  { pos: 1, driver: 'M. Verstappen', team: 'Red Bull', pts: 285, tone: 'accent' },
-  { pos: 2, driver: 'L. Norris', team: 'McLaren', pts: 241, tone: 'amber' },
-  { pos: 3, driver: 'C. Leclerc', team: 'Ferrari', pts: 217, tone: 'accent' },
-  { pos: 4, driver: 'O. Piastri', team: 'McLaren', pts: 203, tone: 'amber' },
-  { pos: 5, driver: 'C. Sainz', team: 'Ferrari', pts: 190, tone: 'accent' },
-] as const
+const MARK_A = DRIVER_COLORS.A
+const MARK_B = DRIVER_COLORS.B
+
+function fmtLap(sec: number): string {
+  const m = Math.floor(sec / 60)
+  const s = (sec - m * 60).toFixed(3).padStart(6, '0')
+  return `${m}:${s}`
+}
 
 export function Dashboard() {
+  const [gpId, setGpId] = useState('ita')
+  const [session, setSession] = useState<SessionType>('Race')
+
+  const gp = GRANDS_PRIX.find((g) => g.id === gpId)!
+
+  const allData = useMemo(
+    () => DRIVERS.map((d) => generateDriverData(d.id, gpId, session)),
+    [gpId, session],
+  )
+  const ranked = useMemo(
+    () => [...allData].sort((a, b) => a.lapTime - b.lapTime),
+    [allData],
+  )
+  const leader = ranked[0]
+  const second = ranked[1]
+  const fastestSpeed = useMemo(
+    () => [...allData].sort((a, b) => b.topSpeed - a.topSpeed)[0],
+    [allData],
+  )
+  const battle = useMemo(() => buildBattle(leader, second), [leader, second])
+  const insight = useMemo(
+    () => buildInsight('strategy', leader.driver.id, gpId, session),
+    [leader, gpId, session],
+  )
+
+  const gapP2 = second.lapTime - leader.lapTime
+
+  const quickAccess = [
+    {
+      to: '/confronto-piloti',
+      icon: Users,
+      title: 'Driver Comparison',
+      desc: 'Confronto testa a testa su giro e settori',
+      stat: `${leader.driver.code} vs ${second.driver.code}`,
+    },
+    {
+      to: '/race-replay',
+      icon: Rewind,
+      title: 'Race Replay',
+      desc: 'Rivivi la gara con la mappa del circuito',
+      stat: `${gp.laps} giri`,
+    },
+    {
+      to: '/battle-mode',
+      icon: Swords,
+      title: 'Battle Mode',
+      desc: 'Duello a categorie tra due piloti',
+      stat: `${battle.scoreA}–${battle.scoreB}`,
+    },
+    {
+      to: '/ai-race-engineer',
+      icon: Bot,
+      title: 'AI Race Engineer',
+      desc: 'Analisi strategica e suggerimenti gomme',
+      stat: 'Insight pronti',
+    },
+  ]
+
   return (
     <div className="space-y-6">
       <PageHeader
         icon={LayoutDashboard}
         title="Dashboard"
-        description="Panoramica del weekend di gara. I valori mostrati sono segnaposto dimostrativi."
-        actions={
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4" />
-            Esporta
-          </Button>
-        }
+        description={`Overview sessione · ${gp.name} · ${session}. Dati segnaposto coerenti, nessuna telemetria reale collegata.`}
       />
+
+      {/* Session selector */}
+      <Card className="p-5">
+        <div className="grid gap-4 md:grid-cols-2">
+          <Select
+            label="Gran Premio"
+            options={GRANDS_PRIX.map((g) => ({ value: g.id, label: `${g.name} — ${g.circuit}` }))}
+            value={gpId}
+            onChange={(e) => setGpId(e.target.value)}
+          />
+          <div>
+            <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+              Sessione
+            </span>
+            <div className="flex rounded-lg border border-line bg-base-900 p-0.5">
+              {SESSIONS.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setSession(s)}
+                  className={cn(
+                    'flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
+                    session === s ? 'bg-base-700 text-white' : 'text-zinc-500 hover:text-zinc-300',
+                  )}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Card>
 
       {/* KPI row */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Giro veloce"
-          value="1:18.442"
+          value={fmtLap(leader.lapTime)}
           icon={Timer}
-          delta="-0.212s"
+          delta={leader.driver.code}
           trend="up"
-          hint="vs. pole provvisoria"
-        />
-        <StatCard
-          label="Gap al leader"
-          value="+3.8s"
-          icon={TrendingUp}
-          delta="-1.2s"
-          trend="up"
-          hint="ultimi 5 giri"
-        />
-        <StatCard
-          label="Giri completati"
-          value="41 / 58"
-          icon={Flag}
-          delta="70%"
-          trend="flat"
-          hint="stint corrente: Medium"
+          hint={leader.driver.team}
         />
         <StatCard
           label="Top speed"
-          value="327 km/h"
+          value={`${fastestSpeed.topSpeed} km/h`}
           icon={Gauge}
-          delta="+4 km/h"
+          delta={fastestSpeed.driver.code}
           trend="up"
-          hint="trappola DRS S2"
+          hint="trappola DRS"
+        />
+        <StatCard
+          label="Gap P1–P2"
+          value={`+${gapP2.toFixed(3)}s`}
+          icon={TrendingUp}
+          delta={second.driver.code}
+          trend="flat"
+          hint="miglior giro"
+        />
+        <StatCard
+          label="Piloti in sessione"
+          value={`${DRIVERS.length}`}
+          icon={Flag}
+          hint={`${gp.circuit} · ${gp.laps} giri`}
         />
       </div>
 
-      {/* Main grid */}
+      {/* Quick access */}
+      <div>
+        <div className="mb-3 flex items-center gap-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
+            Accesso rapido
+          </h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {quickAccess.map((q) => {
+            const Icon = q.icon
+            return (
+              <Link key={q.to} to={q.to} className="group">
+                <Card interactive className="h-full p-5">
+                  <div className="flex items-start justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-base-800 text-accent-soft">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <Badge tone="neutral" className="tabular">
+                      {q.stat}
+                    </Badge>
+                  </div>
+                  <h3 className="mt-4 text-sm font-semibold text-zinc-100">{q.title}</h3>
+                  <p className="mt-1 text-xs text-zinc-500">{q.desc}</p>
+                  <span className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-zinc-500 transition-colors group-hover:text-accent-soft">
+                    Apri
+                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                  </span>
+                </Card>
+              </Link>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Main grid: pace chart + session leaderboard */}
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader
-            title="Andamento pace"
-            subtitle="Tempo sul giro per stint"
+            title="Andamento sessione"
+            subtitle={`Passo dei due piloti di vertice · ${gp.name}`}
             action={<Badge tone="cyan">demo</Badge>}
           />
           <CardBody>
-            <EmptyState
-              icon={BarChart3}
-              title="Grafico non ancora collegato"
-              description="Qui comparirà il grafico dei tempi sul giro quando i dati di telemetria verranno integrati."
+            <LapTimeChart
+              seriesA={leader.lapSeries}
+              seriesB={second.lapSeries}
+              codeA={leader.driver.code}
+              codeB={second.driver.code}
+              colorA={MARK_A}
+              colorB={MARK_B}
             />
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader title="Classifica" subtitle="Campionato piloti" />
+          <CardHeader title="Classifica sessione" subtitle="Per miglior giro" />
           <CardBody className="px-0 py-0">
             <ul className="divide-y divide-line">
-              {STANDINGS.map((row) => (
-                <li
-                  key={row.pos}
-                  className="flex items-center gap-3 px-5 py-3"
-                >
-                  <span className="tabular w-5 text-sm font-semibold text-zinc-500">
-                    {row.pos}
-                  </span>
-                  <CircleDot
-                    className={
-                      row.tone === 'amber'
-                        ? 'h-3.5 w-3.5 text-signal-amber'
-                        : 'h-3.5 w-3.5 text-accent-soft'
-                    }
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-zinc-200">
-                      {row.driver}
-                    </p>
-                    <p className="truncate text-xs text-zinc-600">{row.team}</p>
-                  </div>
-                  <span className="tabular text-sm font-semibold text-zinc-100">
-                    {row.pts}
-                  </span>
-                </li>
-              ))}
+              {ranked.slice(0, 8).map((d, i) => {
+                const gap = d.lapTime - leader.lapTime
+                return (
+                  <li key={d.driver.id} className="flex items-center gap-3 px-5 py-2.5">
+                    <span className="tabular w-5 text-sm font-semibold text-zinc-500">
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-zinc-200">
+                        {d.driver.name}
+                      </p>
+                      <p className="truncate text-[11px] text-zinc-600">{d.driver.team}</p>
+                    </div>
+                    <span
+                      className={cn(
+                        'tabular text-xs font-semibold',
+                        i === 0 ? 'text-accent-soft' : 'text-zinc-500',
+                      )}
+                    >
+                      {i === 0 ? fmtLap(d.lapTime) : `+${gap.toFixed(3)}`}
+                    </span>
+                  </li>
+                )
+              })}
             </ul>
           </CardBody>
         </Card>
       </div>
 
-      {/* Secondary row */}
+      {/* Secondary: featured battle + AI insight teaser */}
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <CardHeader title="Strategia gomme" subtitle="Finestra pit stop" />
+          <CardHeader
+            title="Duello in evidenza"
+            subtitle="I due piloti più veloci"
+            action={
+              <Link
+                to="/battle-mode"
+                className="flex items-center gap-1 text-xs font-medium text-zinc-500 transition-colors hover:text-accent-soft"
+              >
+                Battle Mode
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            }
+          />
           <CardBody>
-            <EmptyState
-              icon={CircleDot}
-              title="Modulo strategia in arrivo"
-              description="Degrado, undercut e finestre di sosta verranno calcolati dai dati reali."
-            />
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex h-11 w-11 items-center justify-center rounded-lg text-sm font-bold text-white"
+                  style={{ backgroundColor: MARK_A }}
+                >
+                  {leader.driver.code}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-zinc-100">{leader.driver.name}</p>
+                  <p className="text-xs text-zinc-600">{leader.driver.team}</p>
+                </div>
+              </div>
+              <div className="tabular flex items-center gap-2 text-lg font-bold">
+                <span style={{ color: MARK_A }}>{battle.scoreA}</span>
+                <Swords className="h-4 w-4 text-zinc-600" />
+                <span style={{ color: MARK_B }}>{battle.scoreB}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-zinc-100">{second.driver.name}</p>
+                  <p className="text-xs text-zinc-600">{second.driver.team}</p>
+                </div>
+                <div
+                  className="flex h-11 w-11 items-center justify-center rounded-lg text-sm font-bold text-base-950"
+                  style={{ backgroundColor: MARK_B }}
+                >
+                  {second.driver.code}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 flex h-2 overflow-hidden rounded-full bg-base-700">
+              <div style={{ width: `${(battle.scoreA / 8) * 100}%`, backgroundColor: MARK_A }} />
+              <div style={{ width: `${(battle.scoreB / 8) * 100}%`, backgroundColor: MARK_B }} />
+            </div>
           </CardBody>
         </Card>
+
         <Card>
-          <CardHeader title="Settori" subtitle="Delta per micro-settore" />
-          <CardBody>
-            <EmptyState
-              icon={BarChart3}
-              title="Analisi settori in arrivo"
-              description="Il confronto per settore sarà disponibile con la telemetria collegata."
-            />
+          <CardHeader
+            title="Insight del giorno"
+            subtitle="Dal tuo AI Race Engineer"
+            action={
+              <Link
+                to="/ai-race-engineer"
+                className="flex items-center gap-1 text-xs font-medium text-zinc-500 transition-colors hover:text-accent-soft"
+              >
+                Apri
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            }
+          />
+          <CardBody className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/15 text-accent-soft">
+                <Bot className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-zinc-100">{insight.title}</p>
+                <p className="text-xs text-zinc-500">
+                  {leader.driver.name} · {gp.name}
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-zinc-400">{insight.summary}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {insight.metrics.slice(0, 3).map((m) => (
+                <span
+                  key={m.label}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-line bg-base-800 px-2 py-1"
+                >
+                  <span className="text-[10px] uppercase tracking-wider text-zinc-500">
+                    {m.label}
+                  </span>
+                  <span className="tabular text-xs font-semibold text-zinc-200">{m.value}</span>
+                </span>
+              ))}
+            </div>
           </CardBody>
         </Card>
       </div>
+
+      {/* Championship snapshot */}
+      <Card>
+        <CardHeader
+          title="Snapshot campionato"
+          subtitle="Vertice classifica piloti"
+          action={<Badge tone="cyan">demo</Badge>}
+        />
+        <CardBody className="px-0 py-0">
+          <ul className="divide-y divide-line sm:grid sm:grid-cols-2 sm:divide-y-0">
+            {ranked.slice(0, 6).map((d, i) => (
+              <li
+                key={d.driver.id}
+                className="flex items-center gap-3 px-5 py-3 sm:odd:border-r sm:odd:border-line"
+              >
+                {i === 0 ? (
+                  <Trophy className="h-4 w-4 text-signal-amber" />
+                ) : (
+                  <CircleDot className="h-3.5 w-3.5 text-zinc-600" />
+                )}
+                <span className="tabular w-5 text-sm font-semibold text-zinc-500">{i + 1}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-zinc-200">{d.driver.name}</p>
+                </div>
+                <span className="tabular text-sm font-semibold text-zinc-100">
+                  {Math.max(0, 300 - i * 24 - (d.position % 5) * 3)}
+                </span>
+                <span className="text-[11px] text-zinc-600">pt</span>
+              </li>
+            ))}
+          </ul>
+        </CardBody>
+      </Card>
     </div>
   )
 }
