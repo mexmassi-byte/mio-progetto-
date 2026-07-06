@@ -5,6 +5,8 @@ import { cn } from '@/lib/cn'
 export interface SelectOption {
   value: string
   label: string
+  /** Renders the option as non-selectable (e.g. already picked elsewhere). */
+  disabled?: boolean
 }
 
 export interface SelectProps
@@ -42,7 +44,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             {...props}
           >
             {options.map((o) => (
-              <option key={o.value} value={o.value} className="bg-base-850 text-zinc-100">
+              <option
+                key={o.value}
+                value={o.value}
+                disabled={o.disabled}
+                className="bg-base-850 text-zinc-100 disabled:text-zinc-600"
+              >
                 {o.label}
               </option>
             ))}

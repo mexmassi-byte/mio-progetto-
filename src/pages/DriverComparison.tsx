@@ -332,7 +332,14 @@ export function DriverComparison() {
     setDriverBId(driverAId)
   }
 
-  const driverOptions = DRIVERS.map((d) => ({ value: d.id, label: `${d.code} · ${d.name}` }))
+  // Build the driver options, disabling whoever is already picked in the
+  // other menu so the same driver can't be selected on both sides.
+  const driverOptionsExcept = (otherId: string) =>
+    DRIVERS.map((d) => ({
+      value: d.id,
+      label: `${d.code} · ${d.name}`,
+      disabled: d.id === otherId,
+    }))
   const gpOptions = GRANDS_PRIX.map((g) => ({ value: g.id, label: `${g.name} — ${g.circuit}` }))
 
   return (
@@ -356,16 +363,18 @@ export function DriverComparison() {
           <Select
             label="Driver A"
             accent={MARK_A}
-            options={driverOptions}
+            options={driverOptionsExcept(driverBId)}
             value={driverAId}
-            onChange={(e) => setDriverAId(e.target.value)}
+            // Ignore a pick that equals the other driver (controlled select
+            // snaps the value back), so the two can never match.
+            onChange={(e) => e.target.value !== driverBId && setDriverAId(e.target.value)}
           />
           <Select
             label="Driver B"
             accent={MARK_B}
-            options={driverOptions}
+            options={driverOptionsExcept(driverAId)}
             value={driverBId}
-            onChange={(e) => setDriverBId(e.target.value)}
+            onChange={(e) => e.target.value !== driverAId && setDriverBId(e.target.value)}
           />
           <Select
             label="Gran Premio"
