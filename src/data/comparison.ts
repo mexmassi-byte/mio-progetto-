@@ -21,18 +21,95 @@ export interface Driver {
   team: string
 }
 
-export const DRIVERS: Driver[] = [
-  { id: 'ver', code: 'VER', name: 'Max Verstappen', team: 'Red Bull Racing' },
-  { id: 'nor', code: 'NOR', name: 'Lando Norris', team: 'McLaren' },
-  { id: 'lec', code: 'LEC', name: 'Charles Leclerc', team: 'Ferrari' },
-  { id: 'ham', code: 'HAM', name: 'Lewis Hamilton', team: 'Mercedes' },
-  { id: 'pia', code: 'PIA', name: 'Oscar Piastri', team: 'McLaren' },
-  { id: 'sai', code: 'SAI', name: 'Carlos Sainz', team: 'Williams' },
-  { id: 'rus', code: 'RUS', name: 'George Russell', team: 'Mercedes' },
-  { id: 'per', code: 'PER', name: 'Sergio Pérez', team: 'Red Bull Racing' },
-  { id: 'alo', code: 'ALO', name: 'Fernando Alonso', team: 'Aston Martin' },
-  { id: 'gas', code: 'GAS', name: 'Pierre Gasly', team: 'Alpine' },
+/**
+ * Team performance model.
+ *
+ * `pace` is the car's deficit in seconds to the fastest reference car;
+ * `topSpeed` is a km/h delta. Together they create a realistic pecking order:
+ * top teams within a few tenths, a clear midfield, and backmarkers well over a
+ * second off. `tier` is used only to reason about the grid — it is not shown.
+ */
+type Tier = 'top' | 'midfield' | 'backmarker'
+interface TeamPerf {
+  name: string
+  tier: Tier
+  pace: number // seconds off the ultimate pace
+  topSpeed: number // km/h delta vs. circuit reference
+}
+
+const TEAMS = {
+  mclaren: { name: 'McLaren', tier: 'top', pace: 0.0, topSpeed: 1 },
+  redbull: { name: 'Red Bull Racing', tier: 'top', pace: 0.16, topSpeed: 2 },
+  ferrari: { name: 'Ferrari', tier: 'top', pace: 0.24, topSpeed: 0 },
+  mercedes: { name: 'Mercedes', tier: 'top', pace: 0.32, topSpeed: 3 },
+  williams: { name: 'Williams', tier: 'midfield', pace: 0.72, topSpeed: 2 },
+  rb: { name: 'Racing Bulls', tier: 'midfield', pace: 0.84, topSpeed: 1 },
+  aston: { name: 'Aston Martin', tier: 'midfield', pace: 0.95, topSpeed: -1 },
+  haas: { name: 'Haas', tier: 'midfield', pace: 1.05, topSpeed: 0 },
+  alpine: { name: 'Alpine', tier: 'backmarker', pace: 1.28, topSpeed: -2 },
+  sauber: { name: 'Kick Sauber', tier: 'backmarker', pace: 1.46, topSpeed: -3 },
+} satisfies Record<string, TeamPerf>
+
+type TeamId = keyof typeof TEAMS
+
+/**
+ * Grid definition: [id, code, name, teamId, skill].
+ * `skill` is the driver's intra-team pace delta in seconds (0 = team leader),
+ * producing plausible team-mate gaps. Order roughly follows competitiveness.
+ */
+const GRID: [string, string, string, TeamId, number][] = [
+  ['pia', 'PIA', 'Oscar Piastri', 'mclaren', 0.0],
+  ['nor', 'NOR', 'Lando Norris', 'mclaren', 0.03],
+  ['ver', 'VER', 'Max Verstappen', 'redbull', 0.0],
+  ['tsu', 'TSU', 'Yuki Tsunoda', 'redbull', 0.32],
+  ['lec', 'LEC', 'Charles Leclerc', 'ferrari', 0.0],
+  ['ham', 'HAM', 'Lewis Hamilton', 'ferrari', 0.12],
+  ['rus', 'RUS', 'George Russell', 'mercedes', 0.0],
+  ['ant', 'ANT', 'Kimi Antonelli', 'mercedes', 0.22],
+  ['alb', 'ALB', 'Alex Albon', 'williams', 0.0],
+  ['sai', 'SAI', 'Carlos Sainz', 'williams', 0.07],
+  ['had', 'HAD', 'Isack Hadjar', 'rb', 0.0],
+  ['law', 'LAW', 'Liam Lawson', 'rb', 0.1],
+  ['alo', 'ALO', 'Fernando Alonso', 'aston', 0.0],
+  ['str', 'STR', 'Lance Stroll', 'aston', 0.2],
+  ['oco', 'OCO', 'Esteban Ocon', 'haas', 0.0],
+  ['bea', 'BEA', 'Oliver Bearman', 'haas', 0.1],
+  ['gas', 'GAS', 'Pierre Gasly', 'alpine', 0.0],
+  ['col', 'COL', 'Franco Colapinto', 'alpine', 0.24],
+  ['hul', 'HUL', 'Nico Hülkenberg', 'sauber', 0.0],
+  ['bor', 'BOR', 'Gabriel Bortoleto', 'sauber', 0.19],
 ]
+
+export const DRIVERS: Driver[] = GRID.map(([id, code, name, teamId]) => ({
+  id,
+  code,
+  name,
+  team: TEAMS[teamId].name,
+}))
+
+/** Internal per-driver performance profile (not part of the public model). */
+interface Profile {
+  paceDelta: number // total pace deficit (team + skill), seconds
+  topSpeedDelta: number
+  rating: number // 0..1, 1 = fastest reference (drives consistency/tyre mgmt)
+}
+
+const clamp01 = (n: number) => Math.min(1, Math.max(0, n))
+
+const PROFILES: Record<string, Profile> = Object.fromEntries(
+  GRID.map(([id, , , teamId, skill]): [string, Profile] => {
+    const team = TEAMS[teamId]
+    const paceDelta = team.pace + skill
+    return [
+      id,
+      {
+        paceDelta,
+        topSpeedDelta: team.topSpeed,
+        rating: clamp01(1 - paceDelta / 1.9),
+      },
+    ]
+  }),
+)
 
 export interface GrandPrix {
   id: string
@@ -87,6 +164,29 @@ function mulberry32(seed: number): () => number {
 
 const round = (n: number, d = 2) => Number(n.toFixed(d))
 
+// Sessions have slightly different pace envelopes (qualy is the fastest).
+const SESSION_PACE: Record<SessionType, number> = {
+  Practice: 0.9,
+  Qualifying: -0.4,
+  Sprint: 0.3,
+  Race: 0.6,
+}
+
+/**
+ * Small, deterministic per-(driver, gp, session) variation added on top of the
+ * static team+driver pace. Uses its own seed namespace so the ordering it
+ * produces is identical whether we compute a lap time or a grid position.
+ */
+function paceNoise(driverId: string, gpId: string, session: SessionType): number {
+  const rnd = mulberry32(hashString(`pace|${driverId}|${gpId}|${session}`))
+  return (rnd() * 2 - 1) * 0.06 // ±0.06s
+}
+
+/** A driver's effective pace deficit for a session (team + skill + variation). */
+function effectivePace(driverId: string, gpId: string, session: SessionType): number {
+  return (PROFILES[driverId]?.paceDelta ?? 1) + paceNoise(driverId, gpId, session)
+}
+
 // ---------------------------------------------------------------------------
 // Per-driver placeholder metrics
 // ---------------------------------------------------------------------------
@@ -116,47 +216,48 @@ export function generateDriverData(
 ): DriverData {
   const driver = DRIVERS.find((d) => d.id === driverId) ?? DRIVERS[0]
   const gp = GRANDS_PRIX.find((g) => g.id === gpId) ?? GRANDS_PRIX[0]
-  const rnd = mulberry32(hashString(`${driverId}|${gpId}|${session}`))
+  const profile = PROFILES[driver.id] ?? { paceDelta: 1, topSpeedDelta: 0, rating: 0.4 }
+  const rnd = mulberry32(hashString(`${driver.id}|${gpId}|${session}`))
 
-  // Sessions have slightly different pace envelopes.
-  const sessionPace: Record<SessionType, number> = {
-    Practice: 0.9,
-    Qualifying: -0.4,
-    Sprint: 0.3,
-    Race: 0.6,
-  }
+  // Lap time = circuit base + session envelope + this car/driver's real deficit.
+  const pace = effectivePace(driver.id, gpId, session)
+  const lapTime = round(gp.baseLap + SESSION_PACE[session] + pace, 3)
+  const topSpeed = Math.round(gp.baseTopSpeed + profile.topSpeedDelta + (rnd() * 6 - 3))
 
-  const lapTime = round(gp.baseLap + sessionPace[session] + (rnd() * 1.4 - 0.5), 3)
-  const topSpeed = Math.round(gp.baseTopSpeed + (rnd() * 12 - 5))
-
-  const s1 = round(lapTime * 0.3 + (rnd() * 0.3 - 0.15), 3)
-  const s2 = round(lapTime * 0.41 + (rnd() * 0.3 - 0.15), 3)
+  const s1 = round(lapTime * 0.3 + (rnd() * 0.2 - 0.1), 3)
+  const s2 = round(lapTime * 0.41 + (rnd() * 0.2 - 0.1), 3)
   const s3 = round(lapTime - s1 - s2, 3)
 
   const tyreCompound = TYRE_COMPOUNDS[Math.floor(rnd() * TYRE_COMPOUNDS.length)]
   const tyreAge = Math.floor(rnd() * 24)
-  const position = 1 + Math.floor(rnd() * 10)
 
+  // Grid position = rank across the whole field by effective pace, so top
+  // teams line up at the front and backmarkers at the rear (with a little mix).
+  const position =
+    1 + DRIVERS.filter((d) => effectivePace(d.id, gpId, session) < pace).length
+
+  // Lap-by-lap trace for the chart; less scatter for higher-rated drivers.
   const points = 18
+  const noiseAmp = 0.05 + (1 - profile.rating) * 0.1
   const lapSeries = Array.from({ length: points }, (_, i) => {
-    // gentle warm-up, mid-stint plateau, small pit-window dip
-    const drift = Math.sin((i / points) * Math.PI) * 0.4
-    const pit = i === Math.floor(points * 0.55) ? 1.6 : 0
-    return round(lapTime + drift + pit + (rnd() * 0.5 - 0.2), 3)
+    const drift = Math.sin((i / points) * Math.PI) * 0.22
+    const pit = i === Math.floor(points * 0.55) ? 1.4 : 0
+    return round(lapTime + drift + pit + (rnd() * 2 - 1) * noiseAmp, 3)
   })
 
-  // Derived scores. Consistency comes from lap-time spread (excluding the
-  // pit lap); race pace is the average lap; tyre management is seeded.
-  const green = lapSeries.filter((_, i) => i !== Math.floor(points * 0.55))
-  const mean = green.reduce((s, v) => s + v, 0) / green.length
-  const variance = green.reduce((s, v) => s + (v - mean) ** 2, 0) / green.length
-  const stdev = Math.sqrt(variance)
-  const consistency = round(Math.max(60, Math.min(99.5, 100 - stdev * 55)), 1)
   const racePace = round(
     lapSeries.reduce((s, v) => s + v, 0) / lapSeries.length,
     3,
   )
-  const tyreManagement = round(68 + rnd() * 31, 1)
+  // Consistency & tyre management track driver rating for a believable spread.
+  const consistency = round(
+    Math.min(99.2, Math.max(84, 86 + profile.rating * 12 + (rnd() * 3 - 1.5))),
+    1,
+  )
+  const tyreManagement = round(
+    Math.min(98, Math.max(72, 76 + profile.rating * 20 + (rnd() * 6 - 3))),
+    1,
+  )
 
   return {
     driver,
@@ -220,7 +321,9 @@ function fmtLap(sec: number): string {
 
 /** Gap (seconds) between the two drivers, derived from best-lap delta. */
 export function deriveGap(a: DriverData, b: DriverData): number {
-  return round((a.lapTime - b.lapTime) * 6, 2)
+  // Scale the best-lap delta into a plausible on-track interval: team-mates
+  // land within a few tenths, a top car vs. a backmarker a handful of seconds.
+  return round((a.lapTime - b.lapTime) * 3.5, 2)
 }
 
 interface RowSpec {
