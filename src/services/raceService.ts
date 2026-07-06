@@ -7,9 +7,12 @@
  * (e.g. an `httpSource`) — no UI changes required.
  */
 import { mockSource } from './sources/mockSource'
+// When the real API is ready, activate the HTTP source instead of the mock:
+//   import { httpSource } from './sources/httpSource'
+//   const source: RaceDataSource = httpSource
 import type { RaceDataSource } from './sources/RaceDataSource'
 
-// The active data source. Swap this line to go live.
+// The active data source. Swap this single line to go live — no UI changes.
 const source: RaceDataSource = mockSource
 
 export const raceService: RaceDataSource = source
