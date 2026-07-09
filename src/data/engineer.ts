@@ -14,10 +14,11 @@ import {
   generateDriverData,
   buildComparison,
   deriveGap,
-  type DriverData,
+  type DriverStats,
   type SessionType,
   type TyreCompound,
 } from './comparison'
+import { formatLapTime } from '@/lib/format'
 
 export type InsightKind = 'briefing' | 'pace' | 'strategy' | 'rival' | 'swot'
 
@@ -44,11 +45,7 @@ export interface Insight {
 
 // --- helpers ---------------------------------------------------------------
 
-function fmtLap(sec: number): string {
-  const m = Math.floor(sec / 60)
-  const s = (sec - m * 60).toFixed(3).padStart(6, '0')
-  return `${m}:${s}`
-}
+const fmtLap = formatLapTime
 
 const COMPOUND_LIFE: Record<TyreCompound, number> = { Soft: 20, Medium: 30, Hard: 40 }
 const NEXT_COMPOUND: Record<TyreCompound, TyreCompound> = {
@@ -58,12 +55,12 @@ const NEXT_COMPOUND: Record<TyreCompound, TyreCompound> = {
 }
 
 /** Estimated degradation rate (s/lap) from tyre-management score. */
-function degRate(d: DriverData): number {
+function degRate(d: DriverStats): number {
   return Number(((100 - d.tyreManagement) / 100 * 0.12 + 0.02).toFixed(3))
 }
 
 /** Lap-time trend across the stint: >0 means the pace is dropping off. */
-function paceTrend(d: DriverData): number {
+function paceTrend(d: DriverStats): number {
   const n = d.lapSeries.length
   const third = Math.max(1, Math.floor(n / 3))
   const early = d.lapSeries.slice(0, third)
@@ -76,9 +73,9 @@ function paceTrend(d: DriverData): number {
  * The direct rival = the driver whose race pace is closest to ours in this
  * exact session (and not ourselves).
  */
-export function pickRival(driverId: string, gpId: string, session: SessionType): DriverData {
+export function pickRival(driverId: string, gpId: string, session: SessionType): DriverStats {
   const me = generateDriverData(driverId, gpId, session)
-  let best: DriverData | null = null
+  let best: DriverStats | null = null
   let bestDelta = Infinity
   for (const d of DRIVERS) {
     if (d.id === driverId) continue
@@ -94,7 +91,7 @@ export function pickRival(driverId: string, gpId: string, session: SessionType):
 
 // --- generators ------------------------------------------------------------
 
-function paceInsight(me: DriverData): Insight {
+function paceInsight(me: DriverStats): Insight {
   const trend = paceTrend(me)
   const deg = degRate(me)
   const dropping = trend > 0.15
@@ -126,7 +123,7 @@ function paceInsight(me: DriverData): Insight {
   }
 }
 
-function strategyInsight(me: DriverData): Insight {
+function strategyInsight(me: DriverStats): Insight {
   const life = COMPOUND_LIFE[me.tyreCompound]
   const lifeLeft = Math.max(0, life - me.tyreAge)
   const boxNow = lifeLeft <= 2
@@ -163,7 +160,7 @@ function strategyInsight(me: DriverData): Insight {
   }
 }
 
-function rivalInsight(me: DriverData, rival: DriverData): Insight {
+function rivalInsight(me: DriverStats, rival: DriverStats): Insight {
   const cmp = buildComparison(me, rival)
   const gap = deriveGap(me, rival) // >0: me più lento
   const paceDelta = Number((me.racePace - rival.racePace).toFixed(3))
@@ -200,7 +197,7 @@ function rivalInsight(me: DriverData, rival: DriverData): Insight {
   }
 }
 
-function swotInsight(me: DriverData, rival: DriverData): Insight {
+function swotInsight(me: DriverStats, rival: DriverStats): Insight {
   const cmp = buildComparison(me, rival)
   const strengths: string[] = []
   const weaknesses: string[] = []
@@ -238,7 +235,7 @@ function swotInsight(me: DriverData, rival: DriverData): Insight {
   }
 }
 
-function briefingInsight(me: DriverData, rival: DriverData, gpName: string, session: SessionType): Insight {
+function briefingInsight(me: DriverStats, rival: DriverStats, gpName: string, session: SessionType): Insight {
   const gap = deriveGap(me, rival)
   const deg = degRate(me)
   const ahead = gap < 0

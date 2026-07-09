@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Bot, Send, Sparkles, User, Radio, Swords } from 'lucide-react'
-import { PageHeader, Card, Badge, Select } from '@/components/ui'
+import { PageHeader, Card, Badge, Select, SegmentedControl } from '@/components/ui'
 import { raceService } from '@/services/raceService'
 import type {
   SessionType,
@@ -8,16 +8,11 @@ import type {
   InsightKind,
   MetricTone,
 } from '@/domain/models'
+import { formatLapTime } from '@/lib/format'
 import { cn } from '@/lib/cn'
 
 const MARK_A = raceService.driverColors.A
 const MARK_B = raceService.driverColors.B
-
-function fmtLap(sec: number): string {
-  const m = Math.floor(sec / 60)
-  const s = (sec - m * 60).toFixed(3).padStart(6, '0')
-  return `${m}:${s}`
-}
 
 const toneChip: Record<MetricTone, string> = {
   accent: 'border-accent/30 text-accent-soft',
@@ -234,25 +229,12 @@ export function AIRaceEngineer() {
             value={gpId}
             onChange={(e) => setGpId(e.target.value)}
           />
-          <div>
-            <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-zinc-500">
-              Sessione
-            </span>
-            <div className="flex rounded-lg border border-line bg-base-900 p-0.5">
-              {raceService.getSessions().map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSession(s)}
-                  className={cn(
-                    'flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
-                    session === s ? 'bg-base-700 text-white' : 'text-zinc-500 hover:text-zinc-300',
-                  )}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
+          <SegmentedControl
+            label="Sessione"
+            options={raceService.getSessions()}
+            value={session}
+            onChange={setSession}
+          />
         </div>
       </Card>
 
@@ -344,11 +326,11 @@ export function AIRaceEngineer() {
             <div className="divide-y divide-line text-sm">
               <div className="flex items-center justify-between px-4 py-2.5">
                 <span className="text-xs text-zinc-500">Passo medio</span>
-                <span className="tabular font-semibold text-signal">{fmtLap(me.racePace)}</span>
+                <span className="tabular font-semibold text-signal">{formatLapTime(me.racePace)}</span>
               </div>
               <div className="flex items-center justify-between px-4 py-2.5">
                 <span className="text-xs text-zinc-500">Best lap</span>
-                <span className="tabular font-semibold text-accent-soft">{fmtLap(me.lapTime)}</span>
+                <span className="tabular font-semibold text-accent-soft">{formatLapTime(me.lapTime)}</span>
               </div>
               <div className="flex items-center justify-between px-4 py-2.5">
                 <span className="text-xs text-zinc-500">Gomma</span>

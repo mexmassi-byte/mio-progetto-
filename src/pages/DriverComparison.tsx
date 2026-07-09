@@ -21,6 +21,7 @@ import { LapTimeChart } from '@/components/comparison/LapTimeChart'
 import { ChartSkeleton } from '@/components/comparison/ChartSkeleton'
 import { MatchControls } from '@/components/comparison/MatchControls'
 import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
+import { formatLapTime } from '@/lib/format'
 import { raceService } from '@/services/raceService'
 import type {
   SessionType,
@@ -52,7 +53,7 @@ function DriverColumn({
   const { driver } = data
   const stats = [
     { icon: Flag, label: 'Position', value: `P${data.position}` },
-    { icon: Timer, label: 'Best Lap', value: formatLap(data.lapTime) },
+    { icon: Timer, label: 'Best Lap', value: formatLapTime(data.lapTime) },
     { icon: Gauge, label: 'Top Speed', value: `${data.topSpeed} km/h` },
     {
       icon: CircleDot,
@@ -98,12 +99,6 @@ function DriverColumn({
       </div>
     </Card>
   )
-}
-
-function formatLap(sec: number): string {
-  const m = Math.floor(sec / 60)
-  const s = (sec - m * 60).toFixed(3).padStart(6, '0')
-  return `${m}:${s}`
 }
 
 // --- Head-to-head metric row ------------------------------------------------

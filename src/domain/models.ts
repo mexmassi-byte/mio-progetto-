@@ -17,8 +17,8 @@ export type {
   GrandPrix,
   SessionType,
   TyreCompound,
-  // Canonical name for a driver's per-session statistics:
-  DriverData as DriverStats,
+  // A driver's per-session statistics.
+  DriverStats,
 } from '@/data/comparison'
 
 // --- Comparison / battle results -------------------------------------------
@@ -46,7 +46,7 @@ export type {
   MetricTone,
 } from '@/data/engineer'
 
-import type { Driver, DriverData, SessionType } from '@/data/comparison'
+import type { Driver, DriverStats, SessionType } from '@/data/comparison'
 import type { InsightKind } from '@/data/engineer'
 
 /** KPI summary for a session — drives the Dashboard stat row. */
@@ -60,7 +60,7 @@ export interface SessionKpis {
 /** One row of the session leaderboard, ordered by best lap. */
 export interface LeaderboardRow {
   rank: number
-  stats: DriverData
+  stats: DriverStats
   gap: number // seconds behind the leader (0 for P1)
 }
 

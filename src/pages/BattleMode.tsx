@@ -46,9 +46,9 @@ function CombatantCard({
     <div
       className={cn(
         'relative flex flex-col gap-3 rounded-xl border p-5 transition-colors',
-        isOverall ? 'bg-base-850' : 'bg-base-900',
+        isOverall ? 'bg-base-850' : 'border-line bg-base-900',
       )}
-      style={{ borderColor: isOverall ? color : '#23232c' }}
+      style={isOverall ? { borderColor: color } : undefined}
     >
       {isOverall && (
         <Crown

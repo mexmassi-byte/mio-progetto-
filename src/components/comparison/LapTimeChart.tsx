@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { formatLapTime } from '@/lib/format'
 
 interface LapTimeChartProps {
   seriesA: number[]
@@ -15,11 +16,8 @@ const PAD = { top: 22, right: 92, bottom: 30, left: 46 }
 const plotW = W - PAD.left - PAD.right
 const plotH = H - PAD.top - PAD.bottom
 
-function fmt(sec: number): string {
-  const m = Math.floor(sec / 60)
-  const s = (sec - m * 60).toFixed(1).padStart(4, '0')
-  return `${m}:${s}`
-}
+// Compact axis/tooltip label (1 decimal).
+const fmt = (sec: number) => formatLapTime(sec, 1)
 
 /**
  * Placeholder lap-time trend: two driver series on a single time axis.

@@ -1,12 +1,21 @@
 /**
- * Mock data layer for the Driver Comparison dashboard.
+ * Mock data layer (the placeholder F1 dataset + generators behind
+ * `mockSource`). Everything here is FAKE but deterministic: the same
+ * (driver, grand prix, session) selection always yields the same numbers, so
+ * every page shows identical values. Reached only through `raceService`.
  *
- * Everything here is FAKE but deterministic: the same
- * (driver, grand prix, session) selection always yields the same numbers,
- * so the UI reacts believably when the user changes a dropdown. When real
- * telemetry is wired up later, only this module needs to be replaced —
- * the page consumes it through `generateDriverData` / `buildComparison`.
+ * ── Extending the dataset (data-only, no structural changes) ────────────────
+ *   • New driver .......... add a row to `GRID` (and a `TEAMS` entry if the
+ *                           team is new). Its `id` becomes selectable everywhere.
+ *   • New team ............ add an entry to `TEAMS` with its pace/top-speed tier.
+ *   • New grand prix ...... add an entry to `GRANDS_PRIX`.
+ *   • New season .......... swap `TEAMS` + `GRID` + `GRANDS_PRIX` for the new
+ *                           season's values (same shapes).
+ *   • New statistic ....... add a field to `DriverStats`, set it in
+ *                           `generateDriverData`, then read it in the UI.
  */
+
+import { formatLapTime, formatGap } from '@/lib/format'
 
 // Validated categorical series colors (see dataviz palette check).
 export const DRIVER_COLORS = {
@@ -191,7 +200,7 @@ function effectivePace(driverId: string, gpId: string, session: SessionType): nu
 // Per-driver placeholder metrics
 // ---------------------------------------------------------------------------
 
-export interface DriverData {
+export interface DriverStats {
   driver: Driver
   lapTime: number // seconds (best lap)
   topSpeed: number // km/h
@@ -213,7 +222,7 @@ export function generateDriverData(
   driverId: string,
   gpId: string,
   session: SessionType,
-): DriverData {
+): DriverStats {
   const driver = DRIVERS.find((d) => d.id === driverId) ?? DRIVERS[0]
   const gp = GRANDS_PRIX.find((g) => g.id === gpId) ?? GRANDS_PRIX[0]
   const profile = PROFILES[driver.id] ?? { paceDelta: 1, topSpeedDelta: 0, rating: 0.4 }
@@ -313,14 +322,10 @@ export interface MetricRow {
 
 const compoundRank: Record<TyreCompound, number> = { Soft: 3, Medium: 2, Hard: 1 }
 
-function fmtLap(sec: number): string {
-  const m = Math.floor(sec / 60)
-  const s = (sec - m * 60).toFixed(3).padStart(6, '0')
-  return `${m}:${s}`
-}
+const fmtLap = formatLapTime
 
 /** Gap (seconds) between the two drivers, derived from best-lap delta. */
-export function deriveGap(a: DriverData, b: DriverData): number {
+export function deriveGap(a: DriverStats, b: DriverStats): number {
   // Scale the best-lap delta into a plausible on-track interval: team-mates
   // land within a few tenths, a top car vs. a backmarker a handful of seconds.
   return round((a.lapTime - b.lapTime) * 3.5, 2)
@@ -368,11 +373,11 @@ export interface Comparison {
   gap: number
 }
 
-export function buildComparison(a: DriverData, b: DriverData): Comparison {
+export function buildComparison(a: DriverStats, b: DriverStats): Comparison {
   const gap = deriveGap(a, b) // >0 means A slower (behind)
   const gapA = gap
   const gapB = -gap
-  const fmtGap = (g: number) => `${g > 0 ? '+' : ''}${g.toFixed(2)}s`
+  const fmtGap = (g: number) => formatGap(g)
 
   const rows: MetricRow[] = [
     toRow({
@@ -478,7 +483,7 @@ export interface BattleResult {
   overall: Winner
 }
 
-export function buildBattle(a: DriverData, b: DriverData): BattleResult {
+export function buildBattle(a: DriverStats, b: DriverStats): BattleResult {
   const rows: MetricRow[] = [
     toRow({
       key: 'lapTime',

@@ -10,7 +10,7 @@
  * wired up later, only `sampleFrame` (and the track geometry) needs to be
  * replaced — the page consumes frames, not raw data.
  */
-import type { DriverData, GrandPrix, TyreCompound } from './comparison'
+import type { DriverStats, GrandPrix, TyreCompound } from './comparison'
 
 export function getTrack(index: number): string {
   return TRACKS[index % TRACKS.length]
@@ -28,7 +28,7 @@ export const TRACKS: string[] = [
 export const SECTOR_BOUNDS = [0.36, 0.72] as const
 
 export interface DriverFrame {
-  data: DriverData
+  data: DriverStats
   /** Position along the current lap, 0..1 — used to place the car on track. */
   lapFrac: number
   currentLap: number
@@ -63,7 +63,7 @@ function speedAt(lapFrac: number, topSpeed: number): number {
   return Math.round(min + (topSpeed - min) * shape)
 }
 
-export function sampleFrame(drivers: DriverData[], gp: GrandPrix, t: number): Frame {
+export function sampleFrame(drivers: DriverStats[], gp: GrandPrix, t: number): Frame {
   const totalLaps = gp.laps
   const avgLapTime =
     drivers.reduce((s, d) => s + d.racePace, 0) / (drivers.length || 1)

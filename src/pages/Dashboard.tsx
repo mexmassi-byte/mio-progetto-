@@ -22,22 +22,18 @@ import {
   CardBody,
   Badge,
   Select,
+  SegmentedControl,
 } from '@/components/ui'
 import { LapTimeChart } from '@/components/comparison/LapTimeChart'
 import { ChartSkeleton } from '@/components/comparison/ChartSkeleton'
 import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import { raceService } from '@/services/raceService'
 import type { SessionType } from '@/domain/models'
+import { formatLapTime } from '@/lib/format'
 import { cn } from '@/lib/cn'
 
 const MARK_A = raceService.driverColors.A
 const MARK_B = raceService.driverColors.B
-
-function fmtLap(sec: number): string {
-  const m = Math.floor(sec / 60)
-  const s = (sec - m * 60).toFixed(3).padStart(6, '0')
-  return `${m}:${s}`
-}
 
 export function Dashboard() {
   const [gpId, setGpId] = useState('ita')
@@ -116,25 +112,12 @@ export function Dashboard() {
             value={gpId}
             onChange={(e) => setGpId(e.target.value)}
           />
-          <div>
-            <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-zinc-500">
-              Sessione
-            </span>
-            <div className="flex rounded-lg border border-line bg-base-900 p-0.5">
-              {raceService.getSessions().map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSession(s)}
-                  className={cn(
-                    'flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
-                    session === s ? 'bg-base-700 text-white' : 'text-zinc-500 hover:text-zinc-300',
-                  )}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
+          <SegmentedControl
+            label="Sessione"
+            options={raceService.getSessions()}
+            value={session}
+            onChange={setSession}
+          />
         </div>
       </Card>
 
@@ -142,7 +125,7 @@ export function Dashboard() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Giro veloce"
-          value={fmtLap(kpis.fastestLap.seconds)}
+          value={formatLapTime(kpis.fastestLap.seconds)}
           icon={Timer}
           delta={kpis.fastestLap.driver.code}
           trend="up"
@@ -253,7 +236,7 @@ export function Dashboard() {
                       row.rank === 1 ? 'text-accent-soft' : 'text-zinc-500',
                     )}
                   >
-                    {row.rank === 1 ? fmtLap(row.stats.lapTime) : `+${row.gap.toFixed(3)}`}
+                    {row.rank === 1 ? formatLapTime(row.stats.lapTime) : `+${row.gap.toFixed(3)}`}
                   </span>
                 </li>
               ))}

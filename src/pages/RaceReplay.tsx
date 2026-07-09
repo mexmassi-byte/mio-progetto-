@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Rewind,
   Play,
@@ -18,6 +18,7 @@ import {
   CardBody,
   Badge,
   Select,
+  SegmentedControl,
 } from '@/components/ui'
 import { CircuitMap } from '@/components/replay/CircuitMap'
 import { raceService } from '@/services/raceService'
@@ -26,6 +27,7 @@ import type {
   PlaybackSpeed,
   ReplayFrame,
 } from '@/domain/models'
+import { formatGap } from '@/lib/format'
 import { cn } from '@/lib/cn'
 
 const MARK_A = raceService.driverColors.A
@@ -35,8 +37,7 @@ const SPEED_OPTIONS = raceService.getPlaybackSpeeds()
 const SECONDS_PER_LAP = 0.9 // wall-clock seconds per lap at 1× speed
 
 function fmtGap(sec: number, isLeader: boolean): string {
-  if (isLeader) return 'Leader'
-  return `+${sec.toFixed(2)}s`
+  return isLeader ? 'Leader' : formatGap(sec)
 }
 
 // --- Live stats panel -------------------------------------------------------
@@ -108,6 +109,71 @@ function DriverStatsCard({ frame, color }: { frame: ReplayFrame; color: string }
     </Card>
   )
 }
+
+// --- Controls (memoised so playback frames don't re-render them) ------------
+
+interface ReplayControlsProps {
+  gpId: string
+  session: SessionType
+  driver1Id: string
+  driver2Id: string
+  onGp: (id: string) => void
+  onSession: (s: SessionType) => void
+  onDriver1: (id: string) => void
+  onDriver2: (id: string) => void
+}
+
+const ReplayControls = memo(function ReplayControls({
+  gpId,
+  session,
+  driver1Id,
+  driver2Id,
+  onGp,
+  onSession,
+  onDriver1,
+  onDriver2,
+}: ReplayControlsProps) {
+  const drivers = raceService.getDrivers()
+  const driverOptions = (disabledId: string, withNone = false) => [
+    ...(withNone ? [{ value: '', label: '— nessuno —' }] : []),
+    ...drivers.map((d) => ({
+      value: d.id,
+      label: `${d.code} · ${d.name}`,
+      disabled: d.id === disabledId,
+    })),
+  ]
+  const gpOptions = raceService
+    .getGrandsPrix()
+    .map((g) => ({ value: g.id, label: `${g.name} — ${g.circuit}` }))
+
+  return (
+    <Card className="p-5">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Select label="Gran Premio" options={gpOptions} value={gpId} onChange={(e) => onGp(e.target.value)} />
+        <SegmentedControl
+          label="Sessione"
+          options={raceService.getSessions()}
+          value={session}
+          onChange={onSession}
+        />
+        <Select
+          label="Pilota 1"
+          accent={MARK_A}
+          options={driverOptions(driver2Id)}
+          value={driver1Id}
+          onChange={(e) => e.target.value !== driver2Id && onDriver1(e.target.value)}
+        />
+        <Select
+          label="Pilota 2 (opzionale)"
+          accent={driver2Id ? MARK_B : undefined}
+          options={driverOptions(driver1Id, true)}
+          value={driver2Id}
+          onChange={(e) => e.target.value !== driver1Id && onDriver2(e.target.value)}
+        />
+      </div>
+    </Card>
+  )
+})
 
 // --- Page -------------------------------------------------------------------
 
@@ -183,25 +249,6 @@ export function RaceReplay() {
 
   const currentLap = Math.min(gp.laps, Math.floor(t * gp.laps) + 1)
 
-  // Driver option lists with the same-driver guard.
-  const drivers = raceService.getDrivers()
-  const d1Options = drivers.map((d) => ({
-    value: d.id,
-    label: `${d.code} · ${d.name}`,
-    disabled: d.id === driver2Id,
-  }))
-  const d2Options = [
-    { value: '', label: '— nessuno —' },
-    ...drivers.map((d) => ({
-      value: d.id,
-      label: `${d.code} · ${d.name}`,
-      disabled: d.id === driver1Id,
-    })),
-  ]
-  const gpOptions = raceService
-    .getGrandsPrix()
-    .map((g) => ({ value: g.id, label: `${g.name} — ${g.circuit}` }))
-
   return (
     <div className="space-y-6">
       <PageHeader
@@ -211,45 +258,16 @@ export function RaceReplay() {
         description={`Rivivi la gara · ${gp.name} · ${session}. Simulazione con dati segnaposto, nessuna telemetria reale collegata.`}
       />
 
-      {/* Controls */}
-      <Card className="p-5">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <Select label="Gran Premio" options={gpOptions} value={gpId} onChange={(e) => setGpId(e.target.value)} />
-          <div>
-            <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-zinc-500">
-              Sessione
-            </span>
-            <div className="flex rounded-lg border border-line bg-base-900 p-0.5">
-              {raceService.getSessions().map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSession(s)}
-                  className={cn(
-                    'flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
-                    session === s ? 'bg-base-700 text-white' : 'text-zinc-500 hover:text-zinc-300',
-                  )}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-          <Select
-            label="Pilota 1"
-            accent={MARK_A}
-            options={d1Options}
-            value={driver1Id}
-            onChange={(e) => e.target.value !== driver2Id && setDriver1Id(e.target.value)}
-          />
-          <Select
-            label="Pilota 2 (opzionale)"
-            accent={driver2Id ? MARK_B : undefined}
-            options={d2Options}
-            value={driver2Id}
-            onChange={(e) => e.target.value !== driver1Id && setDriver2Id(e.target.value)}
-          />
-        </div>
-      </Card>
+      <ReplayControls
+        gpId={gpId}
+        session={session}
+        driver1Id={driver1Id}
+        driver2Id={driver2Id}
+        onGp={setGpId}
+        onSession={setSession}
+        onDriver1={setDriver1Id}
+        onDriver2={setDriver2Id}
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Map + playback */}
