@@ -4,6 +4,7 @@ import { Home } from '@/pages/Home'
 import { Dashboard } from '@/pages/Dashboard'
 import { DriverComparison } from '@/pages/DriverComparison'
 import { DriverDNA } from '@/pages/DriverDNA'
+import { Predict } from '@/pages/Predict'
 import { RaceReplay } from '@/pages/RaceReplay'
 import { BattleMode } from '@/pages/BattleMode'
 import { AIRaceEngineer } from '@/pages/AIRaceEngineer'
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
       { path: 'driver-dna', element: <DriverDNA /> },
       { path: 'race-replay', element: <RaceReplay /> },
       { path: 'battle-mode', element: <BattleMode /> },
+      { path: 'predict', element: <Predict /> },
       { path: 'ai-race-engineer', element: <AIRaceEngineer /> },
       { path: '*', element: <NotFound /> },
     ],

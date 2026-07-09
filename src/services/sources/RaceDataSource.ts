@@ -31,6 +31,8 @@ import type {
   QuickAction,
   DriverDNA,
   DnaAnalysis,
+  Prediction,
+  WeatherCondition,
 } from '@/domain/models'
 
 export interface RaceDataSource {
@@ -57,6 +59,15 @@ export interface RaceDataSource {
   getSeasons(): string[]
   getDriverDNA(driverId: string, season: string): DriverDNA
   analyzeDNA(dna: DriverDNA): DnaAnalysis
+
+  // --- prediction ---
+  getWeatherConditions(): WeatherCondition[]
+  getPrediction(
+    driverId: string,
+    gpId: string,
+    season: string,
+    weather: WeatherCondition,
+  ): Prediction
 
   // --- replay ---
   getTrack(gpId: string): string

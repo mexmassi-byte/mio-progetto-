@@ -41,6 +41,7 @@ import type {
   PlaybackSpeed,
   QuickAction,
   SessionType,
+  WeatherCondition,
 } from '@/domain/models'
 
 // Base URL for the future API, from an env var at build time (see
@@ -80,6 +81,7 @@ function notImplemented(method: string): never {
 // data is real. Kept in sync with the mock source on purpose.
 const SESSIONS: SessionType[] = ['Practice', 'Qualifying', 'Sprint', 'Race']
 const SEASONS: string[] = ['2025', '2024', '2023']
+const WEATHER: WeatherCondition[] = ['Dry', 'Mixed', 'Wet']
 const PLAYBACK_SPEEDS: readonly PlaybackSpeed[] = [0.5, 1, 2, 4]
 const DRIVER_COLORS = { A: '#e10600', B: '#0ea5c4' } as const
 const SECTOR_BOUNDS: readonly number[] = [0.36, 0.72]
@@ -134,6 +136,10 @@ export const httpSource: RaceDataSource = {
   getSeasons: () => [...SEASONS],
   getDriverDNA: (_driverId, _season) => notImplemented('getDriverDNA'),
   analyzeDNA: (_dna) => notImplemented('analyzeDNA'),
+
+  // --- prediction ---
+  getWeatherConditions: () => [...WEATHER],
+  getPrediction: (_driverId, _gpId, _season, _weather) => notImplemented('getPrediction'),
 
   // --- replay ---
   getTrack: (_gpId) => notImplemented('getTrack'),

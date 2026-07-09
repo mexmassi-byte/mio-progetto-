@@ -23,6 +23,7 @@ import {
 } from '@/data/replay'
 import { buildInsight, detectKind, pickRival, QUICK_ACTIONS } from '@/data/engineer'
 import { SEASONS, generateDriverDNA, analyzeDriverDNA } from '@/data/dna'
+import { WEATHER, generatePrediction } from '@/data/predict'
 import type { RaceDataSource } from './RaceDataSource'
 import type {
   ChampionshipEntry,
@@ -72,6 +73,11 @@ export const mockSource: RaceDataSource = {
   getSeasons: () => [...SEASONS],
   getDriverDNA: (driverId, season) => generateDriverDNA(driverId, season),
   analyzeDNA: (dna) => analyzeDriverDNA(dna),
+
+  // prediction
+  getWeatherConditions: () => [...WEATHER],
+  getPrediction: (driverId, gpId, season, weather) =>
+    generatePrediction(driverId, gpId, season, weather),
 
   // replay
   getTrack: (gpId) => getTrackByIndex(GRANDS_PRIX.findIndex((g) => g.id === gpId)),

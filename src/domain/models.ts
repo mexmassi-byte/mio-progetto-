@@ -47,7 +47,7 @@ export type {
 } from '@/data/engineer'
 
 import type { Driver, DriverStats, SessionType } from '@/data/comparison'
-import type { InsightKind } from '@/data/engineer'
+import type { InsightKind, MetricTone } from '@/data/engineer'
 
 /** KPI summary for a session — drives the Dashboard stat row. */
 export interface SessionKpis {
@@ -105,6 +105,40 @@ export interface DnaAnalysis {
   summary: string
   strengths: DnaAttribute[]
   weaknesses: DnaAttribute[]
+}
+
+/** Weather scenario for a race simulation. */
+export type WeatherCondition = 'Dry' | 'Mixed' | 'Wet'
+
+/** Outcome probabilities (0–100) for a simulated grand prix. */
+export interface PredictionProbabilities {
+  win: number
+  podium: number
+  top10: number
+  pole: number
+  fastestLap: number
+  safetyCar: number
+}
+
+/** A highlighted driver of the prediction (shown in the AI summary). */
+export interface PredictionFactor {
+  label: string
+  value: string
+  tone: MetricTone
+}
+
+/** Result of a grand-prix simulation for a driver/team. */
+export interface Prediction {
+  driver: Driver
+  gpId: string
+  season: string
+  weather: WeatherCondition
+  expectedPosition: number
+  probabilities: PredictionProbabilities
+  tyreStrategy: string
+  pitStops: number
+  factors: PredictionFactor[]
+  summary: string
 }
 
 /** Convenience alias used by service method signatures. */

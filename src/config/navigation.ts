@@ -4,6 +4,7 @@ import {
   Dna,
   Rewind,
   Swords,
+  Sparkles,
   Bot,
   type LucideIcon,
 } from 'lucide-react'
@@ -36,6 +37,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Driver DNA', to: '/driver-dna', icon: Dna, group: 'analysis' },
   { label: 'Race Replay', to: '/race-replay', icon: Rewind, group: 'analysis' },
   { label: 'Battle Mode', to: '/battle-mode', icon: Swords, group: 'analysis' },
+  { label: 'Predict', to: '/predict', icon: Sparkles, group: 'analysis' },
   {
     label: 'AI Race Engineer',
     to: '/ai-race-engineer',
