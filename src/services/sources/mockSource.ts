@@ -22,6 +22,7 @@ import {
   SECTOR_BOUNDS,
 } from '@/data/replay'
 import { buildInsight, detectKind, pickRival, QUICK_ACTIONS } from '@/data/engineer'
+import { SEASONS, generateDriverDNA, analyzeDriverDNA } from '@/data/dna'
 import type { RaceDataSource } from './RaceDataSource'
 import type {
   ChampionshipEntry,
@@ -66,6 +67,11 @@ export const mockSource: RaceDataSource = {
   // engineer insights
   getInsight: (kind, driverId, gpId, session) => buildInsight(kind, driverId, gpId, session),
   detectInsightKind: (text) => detectKind(text),
+
+  // driver DNA
+  getSeasons: () => [...SEASONS],
+  getDriverDNA: (driverId, season) => generateDriverDNA(driverId, season),
+  analyzeDNA: (dna) => analyzeDriverDNA(dna),
 
   // replay
   getTrack: (gpId) => getTrackByIndex(GRANDS_PRIX.findIndex((g) => g.id === gpId)),

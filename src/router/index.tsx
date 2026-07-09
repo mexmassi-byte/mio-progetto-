@@ -3,6 +3,7 @@ import { Layout } from '@/components/layout/Layout'
 import { Home } from '@/pages/Home'
 import { Dashboard } from '@/pages/Dashboard'
 import { DriverComparison } from '@/pages/DriverComparison'
+import { DriverDNA } from '@/pages/DriverDNA'
 import { RaceReplay } from '@/pages/RaceReplay'
 import { BattleMode } from '@/pages/BattleMode'
 import { AIRaceEngineer } from '@/pages/AIRaceEngineer'
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
     children: [
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'confronto-piloti', element: <DriverComparison /> },
+      { path: 'driver-dna', element: <DriverDNA /> },
       { path: 'race-replay', element: <RaceReplay /> },
       { path: 'battle-mode', element: <BattleMode /> },
       { path: 'ai-race-engineer', element: <AIRaceEngineer /> },

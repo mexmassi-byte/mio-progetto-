@@ -29,6 +29,8 @@ import type {
   ChampionshipEntry,
   CurrentUser,
   QuickAction,
+  DriverDNA,
+  DnaAnalysis,
 } from '@/domain/models'
 
 export interface RaceDataSource {
@@ -50,6 +52,11 @@ export interface RaceDataSource {
   // --- engineer insights ---
   getInsight(kind: InsightKind, driverId: string, gpId: string, session: SessionType): Insight
   detectInsightKind(text: string): InsightKind
+
+  // --- driver DNA ---
+  getSeasons(): string[]
+  getDriverDNA(driverId: string, season: string): DriverDNA
+  analyzeDNA(dna: DriverDNA): DnaAnalysis
 
   // --- replay ---
   getTrack(gpId: string): string

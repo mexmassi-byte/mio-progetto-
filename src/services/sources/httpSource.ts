@@ -79,6 +79,7 @@ function notImplemented(method: string): never {
 // These are product configuration, so they live client-side even once the
 // data is real. Kept in sync with the mock source on purpose.
 const SESSIONS: SessionType[] = ['Practice', 'Qualifying', 'Sprint', 'Race']
+const SEASONS: string[] = ['2025', '2024', '2023']
 const PLAYBACK_SPEEDS: readonly PlaybackSpeed[] = [0.5, 1, 2, 4]
 const DRIVER_COLORS = { A: '#e10600', B: '#0ea5c4' } as const
 const SECTOR_BOUNDS: readonly number[] = [0.36, 0.72]
@@ -128,6 +129,11 @@ export const httpSource: RaceDataSource = {
   // --- engineer insights (derived) ---
   getInsight: (_kind, _driverId, _gpId, _session) => notImplemented('getInsight'),
   detectInsightKind: (_text) => notImplemented('detectInsightKind'),
+
+  // --- driver DNA ---
+  getSeasons: () => [...SEASONS],
+  getDriverDNA: (_driverId, _season) => notImplemented('getDriverDNA'),
+  analyzeDNA: (_dna) => notImplemented('analyzeDNA'),
 
   // --- replay ---
   getTrack: (_gpId) => notImplemented('getTrack'),

@@ -84,5 +84,28 @@ export interface QuickAction {
   label: string
 }
 
+/** One Driver-DNA attribute (0–100). */
+export interface DnaAttribute {
+  key: string
+  label: string
+  value: number
+}
+
+/** A driver's complete driving-style profile for a season. */
+export interface DriverDNA {
+  driver: Driver
+  season: string
+  attributes: DnaAttribute[]
+  overall: number // 0–100 average
+}
+
+/** Auto-generated race-engineer read of a Driver DNA. */
+export interface DnaAnalysis {
+  archetype: string
+  summary: string
+  strengths: DnaAttribute[]
+  weaknesses: DnaAttribute[]
+}
+
 /** Convenience alias used by service method signatures. */
 export type { SessionType as Session }

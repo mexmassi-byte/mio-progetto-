@@ -173,6 +173,11 @@ function mulberry32(seed: number): () => number {
 
 const round = (n: number, d = 2) => Number(n.toFixed(d))
 
+/** Deterministic RNG seeded from a string key (shared across the data layer). */
+export function seededRandom(key: string): () => number {
+  return mulberry32(hashString(key))
+}
+
 // Sessions have slightly different pace envelopes (qualy is the fastest).
 const SESSION_PACE: Record<SessionType, number> = {
   Practice: 0.9,

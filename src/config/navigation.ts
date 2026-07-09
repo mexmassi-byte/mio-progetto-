@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   Users,
+  Dna,
   Rewind,
   Swords,
   Bot,
@@ -32,6 +33,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Users,
     group: 'analysis',
   },
+  { label: 'Driver DNA', to: '/driver-dna', icon: Dna, group: 'analysis' },
   { label: 'Race Replay', to: '/race-replay', icon: Rewind, group: 'analysis' },
   { label: 'Battle Mode', to: '/battle-mode', icon: Swords, group: 'analysis' },
   {
