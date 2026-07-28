@@ -8,6 +8,9 @@ sostituito con API reali **senza toccare la UI**.
 > ⚠️ Nessun dato ufficiale di Formula 1 è integrato. I valori mostrati sono
 > segnaposto coerenti, generati in modo deterministico.
 
+📐 **Preparazione alla 1.0** — audit architetturale e guida all'integrazione di
+dati, autenticazione e pagamenti reali: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
 ---
 
 ## Indice
