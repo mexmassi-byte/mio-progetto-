@@ -141,5 +141,48 @@ export interface Prediction {
   summary: string
 }
 
+// --- AI Coach ---------------------------------------------------------------
+
+/** A scored coach indicator (0–100) with a display value. */
+export interface CoachMetric {
+  key: string
+  label: string
+  value: number
+  display: string
+  tone: MetricTone
+}
+
+/** An event marker on the analysed-session timeline. */
+export interface CoachTimelineEvent {
+  lap: number
+  label: string
+  tone: MetricTone
+}
+
+/** The auto-generated insight panel for a driver/session. */
+export interface CoachInsights {
+  driver: Driver
+  season: string
+  sessionLabel: string
+  strengths: string[]
+  weaknesses: string[]
+  metrics: CoachMetric[]
+  confidence: number
+  code: string
+  refCode: string
+  lapSeries: number[]
+  refLapSeries: number[]
+  timeline: CoachTimelineEvent[]
+}
+
+/** A race-engineer answer to a coach question. */
+export interface CoachAnswer {
+  title: string
+  text: string
+  confidence: number
+  metrics: CoachMetric[]
+  focus?: string
+}
+
 /** Convenience alias used by service method signatures. */
 export type { SessionType as Session }

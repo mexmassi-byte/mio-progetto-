@@ -82,6 +82,14 @@ function notImplemented(method: string): never {
 const SESSIONS: SessionType[] = ['Practice', 'Qualifying', 'Sprint', 'Race']
 const SEASONS: string[] = ['2025', '2024', '2023']
 const WEATHER: WeatherCondition[] = ['Dry', 'Mixed', 'Wet']
+const COACH_SESSIONS: string[] = ['FP1', 'FP2', 'FP3', 'Qualifica', 'Sprint', 'Gara']
+const COACH_PROMPTS: string[] = [
+  'Perché è stato più veloce?',
+  'Dove perde tempo?',
+  'Come potrebbe migliorare?',
+  'Qual è la strategia migliore?',
+  'Perché il degrado gomme è aumentato?',
+]
 const PLAYBACK_SPEEDS: readonly PlaybackSpeed[] = [0.5, 1, 2, 4]
 const DRIVER_COLORS = { A: '#e10600', B: '#0ea5c4' } as const
 const SECTOR_BOUNDS: readonly number[] = [0.36, 0.72]
@@ -140,6 +148,12 @@ export const httpSource: RaceDataSource = {
   // --- prediction ---
   getWeatherConditions: () => [...WEATHER],
   getPrediction: (_driverId, _gpId, _season, _weather) => notImplemented('getPrediction'),
+
+  // --- AI coach ---
+  getCoachSessions: () => [...COACH_SESSIONS],
+  getCoachPrompts: () => [...COACH_PROMPTS],
+  getCoachInsights: (_driverId, _gpId, _season, _coachSession) => notImplemented('getCoachInsights'),
+  askCoach: (_question, _driverId, _gpId, _season, _coachSession) => notImplemented('askCoach'),
 
   // --- replay ---
   getTrack: (_gpId) => notImplemented('getTrack'),

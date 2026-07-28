@@ -8,6 +8,7 @@ import { Predict } from '@/pages/Predict'
 import { RaceReplay } from '@/pages/RaceReplay'
 import { BattleMode } from '@/pages/BattleMode'
 import { AIRaceEngineer } from '@/pages/AIRaceEngineer'
+import { AICoach } from '@/pages/AICoach'
 import { NotFound } from '@/pages/NotFound'
 
 export const router = createBrowserRouter([
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
       { path: 'battle-mode', element: <BattleMode /> },
       { path: 'predict', element: <Predict /> },
       { path: 'ai-race-engineer', element: <AIRaceEngineer /> },
+      { path: 'ai-coach', element: <AICoach /> },
       { path: '*', element: <NotFound /> },
     ],
   },

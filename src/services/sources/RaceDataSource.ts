@@ -33,6 +33,8 @@ import type {
   DnaAnalysis,
   Prediction,
   WeatherCondition,
+  CoachInsights,
+  CoachAnswer,
 } from '@/domain/models'
 
 export interface RaceDataSource {
@@ -68,6 +70,12 @@ export interface RaceDataSource {
     season: string,
     weather: WeatherCondition,
   ): Prediction
+
+  // --- AI coach ---
+  getCoachSessions(): string[]
+  getCoachPrompts(): string[]
+  getCoachInsights(driverId: string, gpId: string, season: string, coachSession: string): CoachInsights
+  askCoach(question: string, driverId: string, gpId: string, season: string, coachSession: string): CoachAnswer
 
   // --- replay ---
   getTrack(gpId: string): string

@@ -24,6 +24,12 @@ import {
 import { buildInsight, detectKind, pickRival, QUICK_ACTIONS } from '@/data/engineer'
 import { SEASONS, generateDriverDNA, analyzeDriverDNA } from '@/data/dna'
 import { WEATHER, generatePrediction } from '@/data/predict'
+import {
+  COACH_SESSIONS,
+  COACH_PROMPTS,
+  generateCoachInsights,
+  askCoach,
+} from '@/data/coach'
 import type { RaceDataSource } from './RaceDataSource'
 import type {
   ChampionshipEntry,
@@ -78,6 +84,14 @@ export const mockSource: RaceDataSource = {
   getWeatherConditions: () => [...WEATHER],
   getPrediction: (driverId, gpId, season, weather) =>
     generatePrediction(driverId, gpId, season, weather),
+
+  // AI coach
+  getCoachSessions: () => [...COACH_SESSIONS],
+  getCoachPrompts: () => [...COACH_PROMPTS],
+  getCoachInsights: (driverId, gpId, season, coachSession) =>
+    generateCoachInsights(driverId, gpId, season, coachSession),
+  askCoach: (question, driverId, gpId, season, coachSession) =>
+    askCoach(question, driverId, gpId, season, coachSession),
 
   // replay
   getTrack: (gpId) => getTrackByIndex(GRANDS_PRIX.findIndex((g) => g.id === gpId)),

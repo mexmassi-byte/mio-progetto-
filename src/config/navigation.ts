@@ -6,6 +6,7 @@ import {
   Swords,
   Sparkles,
   Bot,
+  GraduationCap,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -45,6 +46,7 @@ export const NAV_ITEMS: NavItem[] = [
     tag: 'beta',
     group: 'lab',
   },
+  { label: 'AI Coach', to: '/ai-coach', icon: GraduationCap, tag: 'beta', group: 'lab' },
 ]
 
 export const NAV_GROUPS: { id: NavItem['group']; label: string }[] = [
