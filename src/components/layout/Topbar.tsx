@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Menu, Search, Bell, Radio } from 'lucide-react'
 import { NAV_ITEMS } from '@/config/navigation'
 import { Button } from '@/components/ui'
@@ -15,6 +15,7 @@ function useCurrentTitle(): string {
 
 export function Topbar({ onOpenSidebar }: TopbarProps) {
   const title = useCurrentTitle()
+  const navigate = useNavigate()
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-base-950/80 px-4 backdrop-blur-md sm:px-6">
@@ -53,7 +54,11 @@ export function Topbar({ onOpenSidebar }: TopbarProps) {
         <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-accent" />
       </button>
 
-      <Button size="sm" className="hidden sm:inline-flex">
+      <Button
+        size="sm"
+        className="hidden sm:inline-flex"
+        onClick={() => navigate('/confronto-piloti')}
+      >
         Nuova analisi
       </Button>
     </header>

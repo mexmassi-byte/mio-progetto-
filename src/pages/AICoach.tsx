@@ -18,27 +18,11 @@ import {
 import { LapTimeChart } from '@/components/comparison/LapTimeChart'
 import { raceService } from '@/services/raceService'
 import type { CoachAnswer, CoachMetric, MetricTone } from '@/domain/models'
+import { toneChipClass as toneChip, toneHex } from '@/lib/tone'
 import { cn } from '@/lib/cn'
 
 const MARK_A = raceService.driverColors.A
 const MARK_B = raceService.driverColors.B
-
-const toneChip: Record<MetricTone, string> = {
-  accent: 'border-accent/30 text-accent-soft',
-  cyan: 'border-signal/30 text-signal',
-  green: 'border-signal-green/30 text-signal-green',
-  amber: 'border-signal-amber/30 text-signal-amber',
-  purple: 'border-signal-purple/30 text-signal-purple',
-  neutral: 'border-line text-zinc-300',
-}
-const toneHex: Record<MetricTone, string> = {
-  accent: '#e10600',
-  cyan: '#22d3ee',
-  green: '#34d399',
-  amber: '#fbbf24',
-  purple: '#a78bfa',
-  neutral: '#71717a',
-}
 
 function confidenceLevel(v: number): { label: string; tone: MetricTone } {
   if (v >= 85) return { label: 'Alta', tone: 'green' }

@@ -18,26 +18,11 @@ import {
 } from '@/components/ui'
 import { Gauge } from '@/components/predict/Gauge'
 import { raceService } from '@/services/raceService'
-import type { MetricTone, WeatherCondition } from '@/domain/models'
+import type { WeatherCondition } from '@/domain/models'
+import { toneChipClass as toneChip, probabilityColor as tierColor } from '@/lib/tone'
 import { cn } from '@/lib/cn'
 
 const MARK_A = raceService.driverColors.A
-
-const toneChip: Record<MetricTone, string> = {
-  accent: 'border-accent/30 text-accent-soft',
-  cyan: 'border-signal/30 text-signal',
-  green: 'border-signal-green/30 text-signal-green',
-  amber: 'border-signal-amber/30 text-signal-amber',
-  purple: 'border-signal-purple/30 text-signal-purple',
-  neutral: 'border-line text-zinc-300',
-}
-
-function tierColor(v: number): string {
-  if (v >= 55) return '#34d399'
-  if (v >= 30) return '#22d3ee'
-  if (v >= 12) return '#fbbf24'
-  return '#71717a'
-}
 
 function compoundColor(name: string): string {
   const s = name.toLowerCase()

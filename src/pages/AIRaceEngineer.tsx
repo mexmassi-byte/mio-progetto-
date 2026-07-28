@@ -2,26 +2,13 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Bot, Send, Sparkles, User, Radio, Swords } from 'lucide-react'
 import { PageHeader, Card, Badge, Select, SegmentedControl } from '@/components/ui'
 import { raceService } from '@/services/raceService'
-import type {
-  SessionType,
-  Insight,
-  InsightKind,
-  MetricTone,
-} from '@/domain/models'
+import type { SessionType, Insight, InsightKind } from '@/domain/models'
 import { formatLapTime } from '@/lib/format'
+import { toneChipClass as toneChip } from '@/lib/tone'
 import { cn } from '@/lib/cn'
 
 const MARK_A = raceService.driverColors.A
 const MARK_B = raceService.driverColors.B
-
-const toneChip: Record<MetricTone, string> = {
-  accent: 'border-accent/30 text-accent-soft',
-  cyan: 'border-signal/30 text-signal',
-  green: 'border-signal-green/30 text-signal-green',
-  amber: 'border-signal-amber/30 text-signal-amber',
-  purple: 'border-signal-purple/30 text-signal-purple',
-  neutral: 'border-line text-zinc-300',
-}
 
 const kindTag: Record<InsightKind, string> = {
   briefing: 'Briefing',

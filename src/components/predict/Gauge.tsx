@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { probabilityColor } from '@/lib/tone'
 
 interface GaugeProps {
   value: number // 0–100
@@ -13,13 +14,6 @@ const STROKE = 9
 const R = (SIZE - STROKE) / 2
 const C = 2 * Math.PI * R
 
-function tierColor(value: number): string {
-  if (value >= 55) return '#34d399' // green
-  if (value >= 30) return '#22d3ee' // cyan
-  if (value >= 12) return '#fbbf24' // amber
-  return '#71717a' // muted
-}
-
 /**
  * Animated circular gauge (activity-ring style). The progress arc sweeps in
  * from the top on mount; color reflects likelihood unless overridden.
@@ -31,7 +25,7 @@ export function Gauge({ value, label, color, size = SIZE }: GaugeProps) {
     return () => cancelAnimationFrame(id)
   }, [])
 
-  const stroke = color ?? tierColor(value)
+  const stroke = color ?? probabilityColor(value)
   const offset = mounted ? C * (1 - Math.max(0, Math.min(100, value)) / 100) : C
 
   return (
