@@ -7,6 +7,8 @@ import {
   Sparkles,
   Bot,
   GraduationCap,
+  User,
+  Crown,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -17,7 +19,7 @@ export interface NavItem {
   /** Optional short badge shown in the sidebar (e.g. "beta", "soon"). */
   tag?: string
   /** Optional group heading this item belongs to. */
-  group: 'main' | 'analysis' | 'lab'
+  group: 'main' | 'analysis' | 'lab' | 'account'
 }
 
 /**
@@ -47,10 +49,13 @@ export const NAV_ITEMS: NavItem[] = [
     group: 'lab',
   },
   { label: 'AI Coach', to: '/ai-coach', icon: GraduationCap, tag: 'beta', group: 'lab' },
+  { label: 'Profilo', to: '/profile', icon: User, group: 'account' },
+  { label: 'Premium', to: '/premium', icon: Crown, group: 'account' },
 ]
 
 export const NAV_GROUPS: { id: NavItem['group']; label: string }[] = [
   { id: 'main', label: 'Panoramica' },
   { id: 'analysis', label: 'Analisi' },
   { id: 'lab', label: 'Lab' },
+  { id: 'account', label: 'Account' },
 ]

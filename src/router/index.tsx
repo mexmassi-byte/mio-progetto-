@@ -9,11 +9,17 @@ import { RaceReplay } from '@/pages/RaceReplay'
 import { BattleMode } from '@/pages/BattleMode'
 import { AIRaceEngineer } from '@/pages/AIRaceEngineer'
 import { AICoach } from '@/pages/AICoach'
+import { Login } from '@/pages/Login'
+import { SignUp } from '@/pages/SignUp'
+import { Profile } from '@/pages/Profile'
+import { Premium } from '@/pages/Premium'
 import { NotFound } from '@/pages/NotFound'
 
 export const router = createBrowserRouter([
-  // Standalone premium landing — no app shell (sidebar/topbar).
+  // Standalone pages — no app shell (sidebar/topbar).
   { path: '/', element: <Home />, errorElement: <NotFound /> },
+  { path: '/login', element: <Login /> },
+  { path: '/signup', element: <SignUp /> },
 
   // Application shell wraps every in-product page.
   {
@@ -28,6 +34,8 @@ export const router = createBrowserRouter([
       { path: 'predict', element: <Predict /> },
       { path: 'ai-race-engineer', element: <AIRaceEngineer /> },
       { path: 'ai-coach', element: <AICoach /> },
+      { path: 'profile', element: <Profile /> },
+      { path: 'premium', element: <Premium /> },
       { path: '*', element: <NotFound /> },
     ],
   },

@@ -184,5 +184,32 @@ export interface CoachAnswer {
   focus?: string
 }
 
+// --- Account ----------------------------------------------------------------
+
+export type AccountPlan = 'Free' | 'Premium'
+
+/** The signed-in account (placeholder — no real backend yet). */
+export interface Account {
+  id: string
+  firstName: string
+  lastName: string
+  username: string
+  email: string
+  plan: AccountPlan
+  favoriteDriverId: string
+  favoriteTeam: string
+  favoriteGpId: string
+  createdAt: string // ISO
+}
+
+/** Payload for creating an account. */
+export interface SignupInput {
+  firstName: string
+  lastName: string
+  username: string
+  email: string
+  password: string
+}
+
 /** Convenience alias used by service method signatures. */
 export type { SessionType as Session }

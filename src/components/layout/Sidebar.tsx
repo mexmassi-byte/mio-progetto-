@@ -2,7 +2,7 @@ import { NavLink, Link } from 'react-router-dom'
 import { X, Gauge } from 'lucide-react'
 import { NAV_ITEMS, NAV_GROUPS } from '@/config/navigation'
 import { Badge } from '@/components/ui'
-import { raceService } from '@/services/raceService'
+import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/lib/cn'
 
 interface SidebarProps {
@@ -92,20 +92,35 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   )
 }
 
-function SidebarFooter() {
-  const user = raceService.getCurrentUser()
+function SidebarFooter({ onNavigate }: { onNavigate?: () => void }) {
+  const { user } = useAuth()
+  const initials = user
+    ? ((user.firstName[0] ?? user.username[0] ?? 'P') + (user.lastName[0] ?? '')).toUpperCase()
+    : 'PV'
   return (
     <div className="border-t border-line p-3">
-      <div className="flex items-center gap-3 rounded-lg bg-base-850 px-3 py-2.5">
+      <Link
+        to={user ? '/profile' : '/login'}
+        onClick={onNavigate}
+        className="flex items-center gap-3 rounded-lg bg-base-850 px-3 py-2.5 transition-colors hover:bg-base-800"
+      >
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-base-700 text-xs font-semibold text-zinc-300">
-          {user.initials}
+          {initials}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-xs font-medium text-zinc-200">{user.name}</p>
-          <p className="truncate text-[10px] text-zinc-600">{user.role}</p>
+          <p className="truncate text-xs font-medium text-zinc-200">
+            {user ? `@${user.username}` : 'Ospite'}
+          </p>
+          <p className="truncate text-[10px] text-zinc-600">
+            {user ? user.plan : 'Accedi al tuo account'}
+          </p>
         </div>
-        <span className="h-2 w-2 rounded-full bg-signal-green" />
-      </div>
+        {user ? (
+          <span className="h-2 w-2 rounded-full bg-signal-green" />
+        ) : (
+          <span className="text-[10px] font-medium text-accent-soft">Accedi</span>
+        )}
+      </Link>
     </div>
   )
 }
@@ -154,7 +169,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             </button>
           </div>
           <NavLinks onNavigate={onClose} />
-          <SidebarFooter />
+          <SidebarFooter onNavigate={onClose} />
         </aside>
       </div>
     </>
