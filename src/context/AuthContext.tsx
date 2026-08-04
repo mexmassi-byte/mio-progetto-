@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
 import { authService } from '@/services/authService'
+import { billingService } from '@/services/billingService'
 import type { Account, SignupInput } from '@/domain/models'
 
 interface AuthContextValue {
@@ -8,7 +9,8 @@ interface AuthContextValue {
   signup: (input: SignupInput) => Promise<Account>
   logout: () => void
   updateProfile: (patch: Partial<Account>) => Promise<Account>
-  upgrade: () => Promise<Account>
+  /** Runs the one-time checkout and unlocks full access. */
+  purchase: () => Promise<Account>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -40,14 +42,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(u)
     return u
   }
-  const upgrade = async () => {
-    const u = await authService.upgrade()
+  const purchase = async () => {
+    // With a real provider this returns a redirectUrl and the page navigates
+    // to the hosted checkout; the webhook then flips the account server-side.
+    const result = await billingService.createCheckout()
+    if (result.status !== 'completed') throw new Error('Checkout non completato')
+    const u = await authService.grantFullAccess()
     setUser(u)
     return u
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, updateProfile, upgrade }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, updateProfile, purchase }}>
       {children}
     </AuthContext.Provider>
   )

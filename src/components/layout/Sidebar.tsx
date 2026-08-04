@@ -112,7 +112,11 @@ function SidebarFooter({ onNavigate }: { onNavigate?: () => void }) {
             {user ? `@${user.username}` : 'Ospite'}
           </p>
           <p className="truncate text-[10px] text-zinc-600">
-            {user ? user.plan : 'Accedi al tuo account'}
+            {user
+              ? user.access === 'Full'
+                ? 'Accesso completo'
+                : 'Anteprima'
+              : 'Accedi al tuo account'}
           </p>
         </div>
         {user ? (

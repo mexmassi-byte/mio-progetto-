@@ -8,7 +8,7 @@ import {
   Bot,
   GraduationCap,
   User,
-  Crown,
+  KeyRound,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -50,7 +50,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   { label: 'AI Coach', to: '/ai-coach', icon: GraduationCap, tag: 'beta', group: 'lab' },
   { label: 'Profilo', to: '/profile', icon: User, group: 'account' },
-  { label: 'Premium', to: '/premium', icon: Crown, group: 'account' },
+  { label: 'Get Access', to: '/get-access', icon: KeyRound, group: 'account' },
 ]
 
 export const NAV_GROUPS: { id: NavItem['group']; label: string }[] = [

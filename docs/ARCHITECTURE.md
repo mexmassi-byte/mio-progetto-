@@ -43,9 +43,9 @@ solo con due superfici — un **servizio** (dati) e i **modelli** di dominio (ti
                │ delega a                     │ oggi: localStorage
                ▼                              ▼ domani: API + token
    ┌─────────────────────────┐   ┌───────────────────────────┐
-   │ RaceDataSource (contratto)│  │ (payments: da introdurre) │
-   │  • mockSource (ATTIVO)    │  └───────────────────────────┘
-   │  • httpSource (scheletro) │
+   │ RaceDataSource (contratto)│  │ billingService            │
+   │  • mockSource (ATTIVO)    │  │  (acquisto una tantum)     │
+   │  • httpSource (scheletro) │  └───────────────────────────┘
    └───────────┬─────────────┘
                ▼
    src/data/*  (generatori placeholder deterministici)
@@ -61,6 +61,7 @@ solo con due superfici — un **servizio** (dati) e i **modelli** di dominio (ti
 | `src/services/sources/mockSource.ts` | Implementazione placeholder (unica a toccare `@/data/*`) | sostituita da httpSource |
 | `src/services/sources/httpSource.ts` | **Scheletro API** (inerte, endpoint map documentata) | da implementare |
 | `src/services/authService.ts` | Auth placeholder (localStorage, async) | da collegare all'API |
+| `src/services/billingService.ts` | Checkout placeholder — **acquisto una tantum** (no abbonamenti) | da collegare al provider |
 | `src/context/AuthContext.tsx` | Stato auth globale (`useAuth`) | resta invariato |
 | `src/data/*` | Generatori F1 fittizi (comparison, dna, predict, coach, replay, engineer) | rimossi/relegati a fixtures |
 | `src/components/ui/*` | Design system riutilizzabile | resta invariato |
@@ -98,7 +99,8 @@ Auth flow:
 
 ```
 authService.getCurrentUser() → AuthProvider(state) → useAuth() → pagine/sidebar
-login/signup/logout/updateProfile/upgrade → authService → setUser(...)
+login/signup/logout/updateProfile → authService → setUser(...)
+purchase() → billingService.createCheckout() → authService.grantFullAccess()
 ```
 
 ---
@@ -118,7 +120,8 @@ login/signup/logout/updateProfile/upgrade → authService → setUser(...)
 | `src/services/sources/mockSource.ts` | `CURRENT_USER` (utente demo sidebar), aggregati (KPI/leaderboard/campionato) | Da httpSource |
 | `src/services/authService.ts` | Sessione in **localStorage**, credenziali accettate senza verifica | API auth |
 | `src/pages/Profile.tsx` | `RECENT` (attività recenti statiche), stats generate con `seededRandom` | API attività utente |
-| `src/pages/Premium.tsx` | `FEATURES`, `FAQ`, prezzi (`€9,99`) | Config prodotto / billing |
+| `src/pages/GetAccess.tsx` | `ACCESS_MATRIX`, `HIGHLIGHTS`, `FAQ` | Config prodotto |
+| `src/services/billingService.ts` | `PRODUCT` (prezzo), `createCheckout` simulato | Provider di pagamento |
 | `src/pages/Home.tsx` | `MODULES` (etichette landing) | Copy statica (ok) |
 | `src/pages/Dashboard.tsx` | `quickAccess` (copy + micro-stat) | Copy statica + dati via service |
 
@@ -127,8 +130,8 @@ login/signup/logout/updateProfile/upgrade → authService → setUser(...)
 | Servizio | Metodi | Note |
 |---|---|---|
 | **`raceService`** (via `RaceDataSource`) | 27 metodi — `getDrivers`, `getGrandsPrix`, `getSessions`, `getSeasons`, `getWeatherConditions`, `getCoachSessions`, `getDriverStats`, `getRival`, `compareDrivers`, `battle`, `getInsight`, `detectInsightKind`, `getDriverDNA`, `analyzeDNA`, `getPrediction`, `getCoachInsights`, `askCoach`, `getTrack`, `sampleReplay`, `getSessionKpis`, `getSessionLeaderboard`, `getChampionship`, `getCurrentUser`, `getQuickActions`, `getCoachPrompts`, `getPlaybackSpeeds`, + `driverColors`/`sectorBounds` | Swap `mockSource → httpSource` (1 riga) |
-| **`authService`** | `getCurrentUser`, `login`, `signup`, `logout`, `updateProfile`, `upgrade` | Sostituire localStorage con API + token |
-| **`billingService`** *(da creare)* | `createCheckout`, `getSubscription`, `cancel`, webhook handler | Vedi §6 |
+| **`authService`** | `getCurrentUser`, `login`, `signup`, `logout`, `updateProfile`, `grantFullAccess` | Sostituire localStorage con API + token |
+| **`billingService`** *(placeholder presente)* | `getProduct`, `createCheckout` (acquisto una tantum) | Vedi §6 |
 
 ### 3.3 Componenti già riutilizzabili (nessuna modifica)
 
@@ -149,7 +152,7 @@ login/signup/logout/updateProfile/upgrade → authService → setUser(...)
 | Pagine che usano `useSimulatedFetch` (Dashboard, Driver Comparison) | passare da delay simulato a `loading` reale del fetch |
 | Pagine chat (AI Race Engineer, AI Coach) | l'`askCoach`/`getInsight` diventa `await`; aggiungere gestione errori |
 | `Profile.tsx` | rimuovere `seededRandom` diretto; leggere stats/attività da service (vedi coupling §3.5) |
-| `Premium.tsx` | `upgrade()` → flusso checkout; `FEATURES`/prezzi da config |
+| `GetAccess.tsx` | `createCheckout()` → redirect all'hosted checkout; prodotto/prezzo da config |
 | Tutte le pagine dati | se il service diventa async: `useMemo` → `useEffect + state`/react-query (vedi §4, strategia consigliata: cache sincrona per non toccare la UI) |
 
 ### 3.5 Dipendenze ancora troppo accoppiate
@@ -236,7 +239,7 @@ Seam: **`src/services/authService.ts`** (l'unico modulo con `localStorage`).
 | `getCurrentUser()` | legge localStorage | legge token e/o `GET /auth/me` (cache) |
 | `logout()` | rimuove localStorage | invalida token/sessione |
 | `updateProfile(patch)` | merge locale | `PATCH /auth/me` |
-| `upgrade()` | flip a Premium | derivato dal billing (vedi §6) |
+| `grantFullAccess()` | flip a `access: 'Full'` | rimosso: lo imposta il webhook (vedi §6) |
 
 **Note:**
 
@@ -252,31 +255,38 @@ Seam: **`src/services/authService.ts`** (l'unico modulo con `localStorage`).
 
 ## 6. Integrare i pagamenti
 
-Oggi: nessun pagamento. `Premium.tsx` chiama `upgrade()` che imposta
-`plan: 'Premium'` (placeholder).
+> ThePaddockView si vende con un **acquisto una tantum**: nessun abbonamento,
+> nessun rinnovo, nessun flusso di disdetta. Il modello è binario —
+> `account.access: 'Preview' | 'Full'`.
 
-**Architettura consigliata (Stripe/Paddle):**
+Oggi il seam esiste già: **`src/services/billingService.ts`** (placeholder) con
+`getProduct()` e `createCheckout()`; `AuthContext.purchase()` incatena checkout →
+`authService.grantFullAccess()`.
 
-1. Nuovo **`src/services/billingService.ts`** (stesso pattern del data layer):
+**Architettura consigliata (Stripe / Paddle / Lemon Squeezy):**
+
+1. **`billingService.createCheckout()`** → chiama il backend, che crea una
+   sessione di **pagamento singolo** e restituisce l'URL dell'hosted checkout:
    ```ts
-   createCheckoutSession(plan): Promise<{ url }>   // → redirect all'hosted checkout
-   getSubscription(): Promise<Subscription | null>
-   cancelSubscription(): Promise<void>
+   const { redirectUrl } = await api.post('/billing/checkout', { productId })
+   return { status: 'completed', redirectUrl }
    ```
-   Nessuna carta gestita dal frontend (PCI: usare l'hosted checkout del provider).
-2. **`Premium.tsx`**: il pulsante *Upgrade* chiama `billingService.createCheckout`
-   e fa `window.location = url` (invece di `upgrade()`).
-3. **Webhook lato backend** (`checkout.completed` / `subscription.updated`)
-   aggiorna il piano dell'account nel database.
-4. Il **piano** dell'utente arriva già da `authService.getCurrentUser()` →
-   `account.plan` (`'Free' | 'Premium'`): la UI (badge, gating feature Premium,
-   footer sidebar) **funziona già** senza modifiche.
-5. **Entitlements / gating**: la tabella `FEATURES` in `Premium.tsx` è già la
-   fonte Free-vs-Premium; per proteggere le feature runtime introdurre un helper
-   `can(feature)` basato su `account.plan`.
+   La pagina fa `window.location.assign(redirectUrl)`.
+   Nessuna carta gestita dal frontend (hosted checkout → PCI fuori scope).
+2. **`billingService.getProduct()`** → legge prodotto/prezzo dal backend (o
+   resta config, con l'importo validato server-side al checkout).
+3. **Webhook lato backend** (`payment_intent.succeeded` / `checkout.completed`)
+   marca l'account come acquistato: imposta `access: 'Full'` e `purchasedAt`.
+   Lato client `grantFullAccess()` sparisce — basta ri-leggere il profilo.
+4. L'**accesso** arriva già da `authService.getCurrentUser()` →
+   `account.access`: la UI (badge profilo, footer sidebar, pagina Get Access)
+   **funziona già** senza modifiche.
+5. **Entitlements / gating**: la matrice `ACCESS_MATRIX` in `GetAccess.tsx` è la
+   fonte Anteprima-vs-Acquisto; per proteggere le feature a runtime introdurre
+   un helper `can(feature)` basato su `account.access`.
 
-Modello dominio da aggiungere: `Subscription { status, plan, renewsAt, provider }`
-in `domain/models.ts`.
+Modelli già presenti in `domain/models.ts`: `Product` (importo in centesimi) e
+`CheckoutResult { status, redirectUrl? }`.
 
 ---
 
@@ -312,7 +322,7 @@ Regole che tengono l'app coerente durante e dopo la migrazione:
 - [ ] Definire lo schema API e il mapping DTO → `domain/models`.
 - [ ] Strategia async: **prefetch + cache sincrona** (mantiene la UI invariata).
 - [ ] Collegare `authService` all'API di autenticazione (token, refresh, 401).
-- [ ] Creare `billingService` + webhook piano; `Premium` usa il checkout.
+- [ ] Collegare `billingService` al provider + webhook acquisto; `GetAccess` redirige all'hosted checkout.
 - [ ] Decoupling: rimuovere `seededRandom` da `Profile.tsx` (→ service).
 - [ ] Invertire la dipendenza tipi: definire i modelli in `domain`, importati da `data/*`.
 - [ ] Spostare contenuti statici (`RECENT`, `FEATURES`, `FAQ`) in `config/` o service.

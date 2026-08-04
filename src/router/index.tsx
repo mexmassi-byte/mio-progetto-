@@ -12,7 +12,7 @@ import { AICoach } from '@/pages/AICoach'
 import { Login } from '@/pages/Login'
 import { SignUp } from '@/pages/SignUp'
 import { Profile } from '@/pages/Profile'
-import { Premium } from '@/pages/Premium'
+import { GetAccess } from '@/pages/GetAccess'
 import { NotFound } from '@/pages/NotFound'
 
 export const router = createBrowserRouter([
@@ -35,7 +35,7 @@ export const router = createBrowserRouter([
       { path: 'ai-race-engineer', element: <AIRaceEngineer /> },
       { path: 'ai-coach', element: <AICoach /> },
       { path: 'profile', element: <Profile /> },
-      { path: 'premium', element: <Premium /> },
+      { path: 'get-access', element: <GetAccess /> },
       { path: '*', element: <NotFound /> },
     ],
   },

@@ -62,7 +62,7 @@ export const authService = {
             lastName: '',
             username: email.split('@')[0] || 'pilota',
             email,
-            plan: 'Free',
+            access: 'Preview',
             ...DEFAULT_FAVORITES,
             createdAt: new Date().toISOString(),
           }
@@ -77,7 +77,7 @@ export const authService = {
       lastName: input.lastName,
       username: input.username,
       email: input.email,
-      plan: 'Free',
+      access: 'Preview',
       ...DEFAULT_FAVORITES,
       createdAt: new Date().toISOString(),
     }
@@ -95,10 +95,19 @@ export const authService = {
     return delay(next, 200)
   },
 
-  upgrade: async (): Promise<Account> => {
+  /**
+   * Grants full access after a completed one-time purchase. With a real
+   * backend this is not called by the client: the payment provider's webhook
+   * flips the account server-side and this reduces to re-reading the profile.
+   */
+  grantFullAccess: async (): Promise<Account> => {
     const current = read()
     if (!current) throw new Error('Not authenticated')
-    const next: Account = { ...current, plan: 'Premium' }
+    const next: Account = {
+      ...current,
+      access: 'Full',
+      purchasedAt: new Date().toISOString(),
+    }
     write(next)
     return delay(next)
   },

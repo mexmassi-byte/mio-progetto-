@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import {
   User,
-  Crown,
+  KeyRound,
   LogOut,
   Star,
   Users,
@@ -64,7 +64,10 @@ export function Profile() {
     month: 'long',
     year: 'numeric',
   })
-  const isPremium = user.plan === 'Premium'
+  const hasFullAccess = user.access === 'Full'
+  const purchasedOn = user.purchasedAt
+    ? new Date(user.purchasedAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })
+    : null
 
   return (
     <div className="space-y-6">
@@ -90,23 +93,26 @@ export function Profile() {
             <div>
               <div className="flex items-center gap-2">
                 <p className="text-lg font-semibold text-white">@{user.username}</p>
-                <Badge tone={isPremium ? 'amber' : 'neutral'}>
-                  {isPremium && <Crown className="h-3 w-3" />}
-                  {user.plan}
+                <Badge tone={hasFullAccess ? 'amber' : 'neutral'}>
+                  {hasFullAccess && <KeyRound className="h-3 w-3" />}
+                  {hasFullAccess ? 'Accesso completo' : 'Anteprima'}
                 </Badge>
               </div>
               <p className="text-sm text-zinc-500">
                 {user.firstName || user.lastName ? `${user.firstName} ${user.lastName} · ` : ''}
                 {user.email}
               </p>
-              <p className="mt-0.5 text-xs text-zinc-600">Membro da {memberSince}</p>
+              <p className="mt-0.5 text-xs text-zinc-600">
+                Membro da {memberSince}
+                {purchasedOn ? ` · acquistato il ${purchasedOn}` : ''}
+              </p>
             </div>
           </div>
-          {!isPremium && (
-            <Link to="/premium">
+          {!hasFullAccess && (
+            <Link to="/get-access">
               <Button size="sm">
-                <Crown className="h-4 w-4" />
-                Passa a Premium
+                <KeyRound className="h-4 w-4" />
+                Sblocca l'accesso
               </Button>
             </Link>
           )}

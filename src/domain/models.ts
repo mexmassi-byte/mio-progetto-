@@ -186,7 +186,12 @@ export interface CoachAnswer {
 
 // --- Account ----------------------------------------------------------------
 
-export type AccountPlan = 'Free' | 'Premium'
+/**
+ * Access level. ThePaddockView is sold as a ONE-TIME purchase — there is no
+ * recurring subscription: an account either has preview access or, after the
+ * purchase, permanent full access.
+ */
+export type AccountAccess = 'Preview' | 'Full'
 
 /** The signed-in account (placeholder — no real backend yet). */
 export interface Account {
@@ -195,7 +200,9 @@ export interface Account {
   lastName: string
   username: string
   email: string
-  plan: AccountPlan
+  access: AccountAccess
+  /** ISO date of the one-time purchase; undefined while on preview. */
+  purchasedAt?: string
   favoriteDriverId: string
   favoriteTeam: string
   favoriteGpId: string
@@ -209,6 +216,26 @@ export interface SignupInput {
   username: string
   email: string
   password: string
+}
+
+/** The single one-time product sold (no recurring billing). */
+export interface Product {
+  id: string
+  name: string
+  /** Amount in minor units (cents) — avoids float issues at checkout. */
+  amount: number
+  currency: string
+  /** Preformatted price, e.g. "€29,99". */
+  priceDisplay: string
+  /** What the purchase unlocks. */
+  includes: string[]
+}
+
+/** Outcome of a checkout attempt. */
+export interface CheckoutResult {
+  status: 'completed' | 'cancelled'
+  /** Set by a real provider: the hosted-checkout URL to redirect to. */
+  redirectUrl?: string
 }
 
 /** Convenience alias used by service method signatures. */
