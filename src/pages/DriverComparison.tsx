@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import {
   Users,
   ArrowLeftRight,
@@ -23,8 +23,8 @@ import { MatchControls } from '@/components/comparison/MatchControls'
 import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import { formatLapTime } from '@/lib/format'
 import { raceService } from '@/services/raceService'
+import { useDriverSelection, useGpSelection, useSessionSelection } from '@/lib/selection'
 import type {
-  SessionType,
   DriverStats,
   MetricRow,
   Winner,
@@ -302,10 +302,10 @@ function SummarySection({
 // --- Page -------------------------------------------------------------------
 
 export function DriverComparison() {
-  const [driverAId, setDriverAId] = useState('ver')
-  const [driverBId, setDriverBId] = useState('nor')
-  const [gpId, setGpId] = useState('ita')
-  const [session, setSession] = useState<SessionType>('Qualifying')
+  const [driverAId, setDriverAId] = useDriverSelection('compare.driverA', 'ver')
+  const [driverBId, setDriverBId] = useDriverSelection('compare.driverB', 'nor')
+  const [gpId, setGpId] = useGpSelection('compare.gp', 'ita')
+  const [session, setSession] = useSessionSelection('compare.session', 'Qualifying')
 
   const dataA = useMemo(
     () => raceService.getDriverStats(driverAId, gpId, session),

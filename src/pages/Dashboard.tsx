@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import {
   LayoutDashboard,
@@ -28,7 +28,7 @@ import { LapTimeChart } from '@/components/comparison/LapTimeChart'
 import { ChartSkeleton } from '@/components/comparison/ChartSkeleton'
 import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import { raceService } from '@/services/raceService'
-import type { SessionType } from '@/domain/models'
+import { useGpSelection, useSessionSelection } from '@/lib/selection'
 import { formatLapTime } from '@/lib/format'
 import { cn } from '@/lib/cn'
 
@@ -36,8 +36,8 @@ const MARK_A = raceService.driverColors.A
 const MARK_B = raceService.driverColors.B
 
 export function Dashboard() {
-  const [gpId, setGpId] = useState('ita')
-  const [session, setSession] = useState<SessionType>('Race')
+  const [gpId, setGpId] = useGpSelection('dashboard.gp', 'ita')
+  const [session, setSession] = useSessionSelection('dashboard.session', 'Race')
 
   const gp = raceService.getGrandsPrix().find((g) => g.id === gpId)!
 

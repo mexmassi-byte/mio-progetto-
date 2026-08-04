@@ -22,6 +22,7 @@ import {
 } from '@/components/ui'
 import { CircuitMap } from '@/components/replay/CircuitMap'
 import { raceService } from '@/services/raceService'
+import { useDriverSelection, useGpSelection, useSessionSelection } from '@/lib/selection'
 import type {
   SessionType,
   PlaybackSpeed,
@@ -178,10 +179,10 @@ const ReplayControls = memo(function ReplayControls({
 // --- Page -------------------------------------------------------------------
 
 export function RaceReplay() {
-  const [gpId, setGpId] = useState('mon')
-  const [session, setSession] = useState<SessionType>('Race')
-  const [driver1Id, setDriver1Id] = useState('ver')
-  const [driver2Id, setDriver2Id] = useState('nor')
+  const [gpId, setGpId] = useGpSelection('replay.gp', 'mon')
+  const [session, setSession] = useSessionSelection('replay.session', 'Race')
+  const [driver1Id, setDriver1Id] = useDriverSelection('replay.driver1', 'ver')
+  const [driver2Id, setDriver2Id] = useDriverSelection('replay.driver2', 'nor', true)
 
   const [t, setT] = useState(0)
   const [playing, setPlaying] = useState(false)

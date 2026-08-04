@@ -35,6 +35,7 @@ import type {
   WeatherCondition,
   CoachInsights,
   CoachAnswer,
+  AppNotification,
 } from '@/domain/models'
 
 export interface RaceDataSource {
@@ -85,6 +86,9 @@ export interface RaceDataSource {
   getSessionKpis(gpId: string, session: SessionType): SessionKpis
   getSessionLeaderboard(gpId: string, session: SessionType): LeaderboardRow[]
   getChampionship(gpId: string, session: SessionType): ChampionshipEntry[]
+
+  // --- notifications ---
+  getNotifications(): AppNotification[]
 
   // --- app ---
   getCurrentUser(): CurrentUser

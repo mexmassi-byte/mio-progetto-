@@ -10,8 +10,8 @@ import {
 } from '@/components/ui'
 import { MatchControls } from '@/components/comparison/MatchControls'
 import { raceService } from '@/services/raceService'
+import { useDriverSelection, useGpSelection, useSessionSelection } from '@/lib/selection'
 import type {
-  SessionType,
   DriverStats,
   MetricRow,
   Winner,
@@ -146,10 +146,10 @@ function BattleBar({ row, animated }: { row: MetricRow; animated: boolean }) {
 // --- Page -------------------------------------------------------------------
 
 export function BattleMode() {
-  const [driverAId, setDriverAId] = useState('ver')
-  const [driverBId, setDriverBId] = useState('lec')
-  const [gpId, setGpId] = useState('ita')
-  const [session, setSession] = useState<SessionType>('Race')
+  const [driverAId, setDriverAId] = useDriverSelection('battle.driverA', 'ver')
+  const [driverBId, setDriverBId] = useDriverSelection('battle.driverB', 'lec')
+  const [gpId, setGpId] = useGpSelection('battle.gp', 'ita')
+  const [session, setSession] = useSessionSelection('battle.session', 'Race')
 
   const dataA = useMemo(
     () => raceService.getDriverStats(driverAId, gpId, session),

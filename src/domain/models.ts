@@ -209,6 +209,22 @@ export interface Account {
   createdAt: string // ISO
 }
 
+/** Aggregate usage statistics shown on the profile. */
+export interface ProfileStats {
+  analyses: number
+  favorites: number
+  sessions: number
+}
+
+/** An entry in the account's recent-activity list. */
+export interface RecentAnalysis {
+  id: string
+  label: string
+  detail: string
+  to: string
+  when: string
+}
+
 /** Payload for creating an account. */
 export interface SignupInput {
   firstName: string
@@ -229,6 +245,21 @@ export interface Product {
   priceDisplay: string
   /** What the purchase unlocks. */
   includes: string[]
+}
+
+/** A product notification shown in the notification centre. */
+export type NotificationKind = 'update' | 'analysis' | 'feature' | 'ai' | 'system'
+
+export interface AppNotification {
+  id: string
+  kind: NotificationKind
+  title: string
+  body: string
+  /** Human-readable relative time. */
+  time: string
+  /** Optional route the notification links to. */
+  to?: string
+  read: boolean
 }
 
 /** Outcome of a checkout attempt. */

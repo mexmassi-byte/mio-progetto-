@@ -30,6 +30,7 @@ import {
   generateCoachInsights,
   askCoach,
 } from '@/data/coach'
+import { generateNotifications } from '@/data/notifications'
 import type { RaceDataSource } from './RaceDataSource'
 import type {
   ChampionshipEntry,
@@ -125,6 +126,9 @@ export const mockSource: RaceDataSource = {
       points: Math.max(0, 300 - i * 24 - (s.position % 5) * 3),
     }))
   },
+
+  // notifications
+  getNotifications: () => generateNotifications(),
 
   // app
   getCurrentUser: () => CURRENT_USER,

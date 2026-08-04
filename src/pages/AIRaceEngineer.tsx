@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Bot, Send, Sparkles, User, Radio, Swords } from 'lucide-react'
 import { PageHeader, Card, Badge, Select, SegmentedControl } from '@/components/ui'
 import { raceService } from '@/services/raceService'
-import type { SessionType, Insight, InsightKind } from '@/domain/models'
+import { useDriverSelection, useGpSelection, useSessionSelection } from '@/lib/selection'
+import type { Insight, InsightKind } from '@/domain/models'
 import { formatLapTime } from '@/lib/format'
 import { toneChipClass as toneChip } from '@/lib/tone'
 import { cn } from '@/lib/cn'
@@ -123,9 +124,9 @@ interface Msg {
 // --- page -------------------------------------------------------------------
 
 export function AIRaceEngineer() {
-  const [driverId, setDriverId] = useState('ver')
-  const [gpId, setGpId] = useState('ita')
-  const [session, setSession] = useState<SessionType>('Race')
+  const [driverId, setDriverId] = useDriverSelection('engineer.driver', 'ver')
+  const [gpId, setGpId] = useGpSelection('engineer.gp', 'ita')
+  const [session, setSession] = useSessionSelection('engineer.session', 'Race')
 
   const [messages, setMessages] = useState<Msg[]>([])
   const [typing, setTyping] = useState(false)

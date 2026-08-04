@@ -19,6 +19,7 @@ import { LapTimeChart } from '@/components/comparison/LapTimeChart'
 import { ChartSkeleton } from '@/components/comparison/ChartSkeleton'
 import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import { raceService } from '@/services/raceService'
+import { useCoachSessionSelection, useDriverSelection, useGpSelection, useSeasonSelection } from '@/lib/selection'
 import type { CoachAnswer, CoachMetric, MetricTone } from '@/domain/models'
 import { toneChipClass as toneChip, toneHex } from '@/lib/tone'
 import { cn } from '@/lib/cn'
@@ -146,10 +147,10 @@ interface Msg {
 // --- page -------------------------------------------------------------------
 
 export function AICoach() {
-  const [driverId, setDriverId] = useState('ver')
-  const [gpId, setGpId] = useState('ita')
-  const [season, setSeason] = useState('2025')
-  const [coachSession, setCoachSession] = useState('Gara')
+  const [driverId, setDriverId] = useDriverSelection('coach.driver', 'ver')
+  const [gpId, setGpId] = useGpSelection('coach.gp', 'ita')
+  const [season, setSeason] = useSeasonSelection('coach.season', '2025')
+  const [coachSession, setCoachSession] = useCoachSessionSelection('coach.session', 'Gara')
 
   const [messages, setMessages] = useState<Msg[]>([])
   const [typing, setTyping] = useState(false)

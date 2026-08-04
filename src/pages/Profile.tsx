@@ -25,15 +25,16 @@ import {
 } from '@/components/ui'
 import { useAuth } from '@/context/AuthContext'
 import { raceService } from '@/services/raceService'
-import { seededRandom } from '@/data/comparison'
+import { authService } from '@/services/authService'
 
-const RECENT = [
-  { icon: Dna, label: 'Driver DNA', sub: 'Max Verstappen · 2025', to: '/driver-dna', when: '2h fa' },
-  { icon: Sparkles, label: 'Predict', sub: 'Italian GP · Wet', to: '/predict', when: '5h fa' },
-  { icon: Users, label: 'Driver Comparison', sub: 'VER vs NOR', to: '/confronto-piloti', when: 'ieri' },
-  { icon: GraduationCap, label: 'AI Coach', sub: 'Qualifica · Monza', to: '/ai-coach', when: 'ieri' },
-  { icon: Rewind, label: 'Race Replay', sub: 'Monaco GP', to: '/race-replay', when: '2g fa' },
-]
+/** Icon per recent-activity label (presentation only; data comes from the service). */
+const RECENT_ICON: Record<string, typeof Activity> = {
+  'Driver DNA': Dna,
+  Predict: Sparkles,
+  'Driver Comparison': Users,
+  'AI Coach': GraduationCap,
+  'Race Replay': Rewind,
+}
 
 export function Profile() {
   const { user, logout, updateProfile } = useAuth()
@@ -42,16 +43,11 @@ export function Profile() {
   const teams = useMemo(() => [...new Set(drivers.map((d) => d.team))], [drivers])
   const gps = raceService.getGrandsPrix()
 
-  // Deterministic placeholder stats from the account id.
-  const stats = useMemo(() => {
-    if (!user) return { analyses: 0, favorites: 0, sessions: 0 }
-    const rnd = seededRandom(`profile|${user.id}`)
-    return {
-      analyses: 40 + Math.floor(rnd() * 160),
-      favorites: 3 + Math.floor(rnd() * 12),
-      sessions: 8 + Math.floor(rnd() * 40),
-    }
-  }, [user])
+  const stats = useMemo(
+    () => (user ? authService.getProfileStats(user.id) : { analyses: 0, favorites: 0, sessions: 0 }),
+    [user],
+  )
+  const recent = useMemo(() => authService.getRecentAnalyses(), [])
 
   if (!user) return <Navigate to="/login" replace />
 
@@ -178,10 +174,10 @@ export function Profile() {
           <CardHeader title="Ultime analisi" subtitle="Attività recente" />
           <CardBody className="px-0 py-0">
             <ul className="divide-y divide-line">
-              {RECENT.map((r) => {
-                const Icon = r.icon
+              {recent.map((r) => {
+                const Icon = RECENT_ICON[r.label] ?? Activity
                 return (
-                  <li key={r.label + r.sub}>
+                  <li key={r.id}>
                     <Link
                       to={r.to}
                       className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-base-850"
@@ -191,7 +187,7 @@ export function Profile() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-zinc-200">{r.label}</p>
-                        <p className="truncate text-xs text-zinc-600">{r.sub}</p>
+                        <p className="truncate text-xs text-zinc-600">{r.detail}</p>
                       </div>
                       <span className="shrink-0 text-[11px] text-zinc-600">{r.when}</span>
                     </Link>

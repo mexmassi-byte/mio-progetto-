@@ -164,6 +164,9 @@ export const httpSource: RaceDataSource = {
   getSessionLeaderboard: (_gpId, _session) => notImplemented('getSessionLeaderboard'),
   getChampionship: (_gpId, _session) => notImplemented('getChampionship'),
 
+  // --- notifications ---
+  getNotifications: () => notImplemented('getNotifications'),
+
   // --- app ---
   getCurrentUser: () => notImplemented('getCurrentUser'),
 }

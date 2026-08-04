@@ -62,6 +62,9 @@ solo con due superfici — un **servizio** (dati) e i **modelli** di dominio (ti
 | `src/services/sources/httpSource.ts` | **Scheletro API** (inerte, endpoint map documentata) | da implementare |
 | `src/services/authService.ts` | Auth placeholder (localStorage, async) | da collegare all'API |
 | `src/services/billingService.ts` | Checkout placeholder — **acquisto una tantum** (no abbonamenti) | da collegare al provider |
+| `src/lib/usePersistentState.ts` · `selection.ts` | Persistenza selezioni (localStorage) con validazione contro il data layer | resta invariato |
+| `src/lib/searchIndex.ts` | Indice ricerca globale, derivato dal service | resta invariato |
+| `src/lib/useOnlineStatus.ts` | Stato connettività (banner offline, retry) | resta invariato |
 | `src/context/AuthContext.tsx` | Stato auth globale (`useAuth`) | resta invariato |
 | `src/data/*` | Generatori F1 fittizi (comparison, dna, predict, coach, replay, engineer) | rimossi/relegati a fixtures |
 | `src/components/ui/*` | Design system riutilizzabile | resta invariato |
@@ -132,6 +135,8 @@ purchase() → billingService.createCheckout() → authService.grantFullAccess()
 | **`raceService`** (via `RaceDataSource`) | 27 metodi — `getDrivers`, `getGrandsPrix`, `getSessions`, `getSeasons`, `getWeatherConditions`, `getCoachSessions`, `getDriverStats`, `getRival`, `compareDrivers`, `battle`, `getInsight`, `detectInsightKind`, `getDriverDNA`, `analyzeDNA`, `getPrediction`, `getCoachInsights`, `askCoach`, `getTrack`, `sampleReplay`, `getSessionKpis`, `getSessionLeaderboard`, `getChampionship`, `getCurrentUser`, `getQuickActions`, `getCoachPrompts`, `getPlaybackSpeeds`, + `driverColors`/`sectorBounds` | Swap `mockSource → httpSource` (1 riga) |
 | **`authService`** | `getCurrentUser`, `login`, `signup`, `logout`, `updateProfile`, `grantFullAccess` | Sostituire localStorage con API + token |
 | **`billingService`** *(placeholder presente)* | `getProduct`, `createCheckout` (acquisto una tantum) | Vedi §6 |
+| **`raceService.getNotifications`** | feed notifiche prodotto | `GET /notifications` |
+| **`authService`** *(profilo)* | `getProfileStats`, `getRecentAnalyses` | `GET /me/stats`, `/me/activity` |
 
 ### 3.3 Componenti già riutilizzabili (nessuna modifica)
 
@@ -157,9 +162,9 @@ purchase() → billingService.createCheckout() → authService.grantFullAccess()
 
 ### 3.5 Dipendenze ancora troppo accoppiate
 
-1. **`src/pages/Profile.tsx` importa `seededRandom` da `@/data/comparison`** —
-   unico punto in cui la UI raggiunge direttamente il data layer. Spostare la
-   generazione delle statistiche dietro il service (es. `authService`/`profileService`).
+1. ~~`Profile.tsx` importa `seededRandom` dal data layer~~ — **risolto**: le
+   statistiche e le attività recenti passano da `authService`. Nessun file in
+   `src/pages` o `src/components` importa più da `@/data/*`.
 2. **`domain/models.ts` re-esporta i tipi da `@/data/*`** (es. `DriverStats`,
    `MetricRow`, `Insight`). Il dominio dipende dall'implementazione: prima della
    1.0 conviene **invertire** — definire i tipi in `domain` e farli importare a

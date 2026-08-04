@@ -18,7 +18,7 @@ import {
 } from '@/components/ui'
 import { Gauge } from '@/components/predict/Gauge'
 import { raceService } from '@/services/raceService'
-import type { WeatherCondition } from '@/domain/models'
+import { useDriverSelection, useGpSelection, useSeasonSelection, useWeatherSelection } from '@/lib/selection'
 import { toneChipClass as toneChip, probabilityColor as tierColor } from '@/lib/tone'
 import { cn } from '@/lib/cn'
 
@@ -51,10 +51,10 @@ function ProbBar({ label, value, color }: { label: string; value: number; color?
 
 export function Predict() {
   const [mode, setMode] = useState<'driver' | 'team'>('driver')
-  const [driverId, setDriverId] = useState('ver')
-  const [gpId, setGpId] = useState('ita')
-  const [season, setSeason] = useState('2025')
-  const [weather, setWeather] = useState<WeatherCondition>('Dry')
+  const [driverId, setDriverId] = useDriverSelection('predict.driver', 'ver')
+  const [gpId, setGpId] = useGpSelection('predict.gp', 'ita')
+  const [season, setSeason] = useSeasonSelection('predict.season', '2025')
+  const [weather, setWeather] = useWeatherSelection('predict.weather', 'Dry')
 
   const drivers = raceService.getDrivers()
   const teams = useMemo(() => [...new Set(drivers.map((d) => d.team))], [drivers])

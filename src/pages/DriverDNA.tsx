@@ -12,6 +12,7 @@ import {
 } from '@/components/ui'
 import { RadarChart } from '@/components/dna/RadarChart'
 import { raceService } from '@/services/raceService'
+import { useDriverSelection, useSeasonSelection } from '@/lib/selection'
 import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import { cn } from '@/lib/cn'
 
@@ -124,9 +125,9 @@ function MiniCard({
 // --- page -------------------------------------------------------------------
 
 export function DriverDNA() {
-  const [driverAId, setDriverAId] = useState('ver')
-  const [driverBId, setDriverBId] = useState('')
-  const [season, setSeason] = useState('2025')
+  const [driverAId, setDriverAId] = useDriverSelection('dna.driverA', 'ver')
+  const [driverBId, setDriverBId] = useDriverSelection('dna.driverB', '', true)
+  const [season, setSeason] = useSeasonSelection('dna.season', '2025')
 
   // Bars replay their fill on every selection change, not just on mount.
   const [animated, setAnimated] = useState(false)
