@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { formatLapTime } from '@/lib/format'
 
 interface LapTimeChartProps {
@@ -50,6 +50,46 @@ export function LapTimeChart({
 
   const yTicks = [min, (min + max) / 2, max]
   const hoverX = hover !== null ? x(hover) : 0
+
+  // Keep the two end labels legible when the traces converge: if they'd sit
+  // within one line-height, push them symmetrically apart.
+  const endLabelY = useMemo(() => {
+    const MIN_GAP = 11
+    let a = y(seriesA[n - 1]) + 3
+    let b = y(seriesB[n - 1]) + 3
+    const gap = Math.abs(a - b)
+    if (gap < MIN_GAP) {
+      const push = (MIN_GAP - gap) / 2
+      if (a <= b) {
+        a -= push
+        b += push
+      } else {
+        a += push
+        b -= push
+      }
+    }
+    return { a, b }
+  }, [seriesA, seriesB, y, n])
+
+  // Draw-on: the traces stroke in from left to right on mount and whenever the
+  // plotted data changes, so a new selection reads as a fresh telemetry trace.
+  const pathARef = useRef<SVGPathElement>(null)
+  const pathBRef = useRef<SVGPathElement>(null)
+  const [drawn, setDrawn] = useState(false)
+  useEffect(() => {
+    setDrawn(false)
+    const id = requestAnimationFrame(() => setDrawn(true))
+    return () => cancelAnimationFrame(id)
+  }, [pathA, pathB])
+
+  const drawStyle = (ref: React.RefObject<SVGPathElement>) => {
+    const len = ref.current?.getTotalLength?.() ?? 1000
+    return {
+      strokeDasharray: len,
+      strokeDashoffset: drawn ? 0 : len,
+      transition: drawn ? 'stroke-dashoffset 0.9s cubic-bezier(0.16,1,0.3,1)' : 'none',
+    }
+  }
 
   return (
     <div className="relative w-full">
@@ -108,14 +148,32 @@ export function LapTimeChart({
         )}
 
         {/* Series */}
-        <path d={pathB} fill="none" stroke={colorB} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-        <path d={pathA} fill="none" stroke={colorA} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+        <path
+          ref={pathBRef}
+          d={pathB}
+          fill="none"
+          stroke={colorB}
+          strokeWidth={2}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          style={drawStyle(pathBRef)}
+        />
+        <path
+          ref={pathARef}
+          d={pathA}
+          fill="none"
+          stroke={colorA}
+          strokeWidth={2}
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          style={drawStyle(pathARef)}
+        />
 
-        {/* End labels */}
-        <text x={x(n - 1) + 8} y={y(seriesA[n - 1]) + 3} fontSize={11} fontWeight={600} fill={colorA}>
+        {/* End labels — nudged apart when the traces finish close together */}
+        <text x={x(n - 1) + 8} y={endLabelY.a} fontSize={11} fontWeight={600} fill={colorA}>
           {codeA}
         </text>
-        <text x={x(n - 1) + 8} y={y(seriesB[n - 1]) + 3} fontSize={11} fontWeight={600} fill={colorB}>
+        <text x={x(n - 1) + 8} y={endLabelY.b} fontSize={11} fontWeight={600} fill={colorB}>
           {codeB}
         </text>
 

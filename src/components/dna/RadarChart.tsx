@@ -31,10 +31,14 @@ export function RadarChart({ axes, series, max = 100 }: RadarChartProps) {
   const [hover, setHover] = useState<number | null>(null)
   const svgRef = useRef<SVGSVGElement>(null)
 
+  // Replays the grow-in whenever the plotted values change (new driver,
+  // season or comparison), so a selection change is visibly acknowledged.
+  const signature = series.map((s) => `${s.label}:${s.values.join(',')}`).join('|')
   useEffect(() => {
+    setMounted(false)
     const id = requestAnimationFrame(() => setMounted(true))
     return () => cancelAnimationFrame(id)
-  }, [])
+  }, [signature])
 
   const angle = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / n
   const point = (value: number, i: number) => {
@@ -116,7 +120,10 @@ export function RadarChart({ axes, series, max = 100 }: RadarChartProps) {
             transform: mounted ? 'scale(1)' : 'scale(0.2)',
             opacity: mounted ? 1 : 0,
             transformOrigin: `${CX}px ${CY}px`,
-            transition: 'transform 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.5s ease-out',
+            // No transition on the reset frame, so the replay never rewinds.
+            transition: mounted
+              ? 'transform 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.5s ease-out'
+              : 'none',
           }}
         >
           {series.map((s) => (

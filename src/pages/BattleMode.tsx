@@ -161,12 +161,14 @@ export function BattleMode() {
   )
   const battle = useMemo(() => raceService.battle(dataA, dataB), [dataA, dataB])
 
-  // Light mount animation for the battle bars.
+  // Battle bars replay from centre on mount and on every selection change,
+  // so a new duel is visibly "fought" rather than silently swapped.
   const [animated, setAnimated] = useState(false)
   useEffect(() => {
+    setAnimated(false)
     const t = requestAnimationFrame(() => setAnimated(true))
     return () => cancelAnimationFrame(t)
-  }, [])
+  }, [driverAId, driverBId, gpId, session])
 
   const gp = raceService.getGrandsPrix().find((g) => g.id === gpId)!
   const swap = () => {

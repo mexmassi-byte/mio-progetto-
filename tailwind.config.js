@@ -28,8 +28,11 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        sans: ['"Inter Variable"', 'Inter', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono Variable"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+      },
+      letterSpacing: {
+        tightest: '-0.03em',
       },
       boxShadow: {
         glow: '0 0 0 1px rgba(225,6,0,0.25), 0 0 24px -6px rgba(225,6,0,0.45)',

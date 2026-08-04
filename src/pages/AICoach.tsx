@@ -16,6 +16,8 @@ import {
   Select,
 } from '@/components/ui'
 import { LapTimeChart } from '@/components/comparison/LapTimeChart'
+import { ChartSkeleton } from '@/components/comparison/ChartSkeleton'
+import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import { raceService } from '@/services/raceService'
 import type { CoachAnswer, CoachMetric, MetricTone } from '@/domain/models'
 import { toneChipClass as toneChip, toneHex } from '@/lib/tone'
@@ -159,6 +161,7 @@ export function AICoach() {
     () => raceService.getCoachInsights(driverId, gpId, season, coachSession),
     [driverId, gpId, season, coachSession],
   )
+  const chartLoading = useSimulatedFetch([driverId, gpId, season, coachSession])
   const gp = raceService.getGrandsPrix().find((g) => g.id === gpId)!
 
   // Fresh opening read whenever the selection changes.
@@ -367,14 +370,18 @@ export function AICoach() {
             action={<Badge tone="cyan">demo</Badge>}
           />
           <CardBody>
-            <LapTimeChart
-              seriesA={insights.lapSeries}
-              seriesB={insights.refLapSeries}
-              codeA={insights.code}
-              codeB={insights.refCode}
-              colorA={MARK_A}
-              colorB={MARK_B}
-            />
+            {chartLoading ? (
+              <ChartSkeleton />
+            ) : (
+              <LapTimeChart
+                seriesA={insights.lapSeries}
+                seriesB={insights.refLapSeries}
+                codeA={insights.code}
+                codeB={insights.refCode}
+                colorA={MARK_A}
+                colorB={MARK_B}
+              />
+            )}
           </CardBody>
         </Card>
 

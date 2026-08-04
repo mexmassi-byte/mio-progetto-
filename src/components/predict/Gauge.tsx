@@ -19,14 +19,17 @@ const C = 2 * Math.PI * R
  * from the top on mount; color reflects likelihood unless overridden.
  */
 export function Gauge({ value, label, color, size = SIZE }: GaugeProps) {
-  const [mounted, setMounted] = useState(false)
+  // Starts empty and sweeps in on mount; afterwards the arc eases directly
+  // from the old value to the new one, so changing a selection reads as the
+  // needle moving rather than a silent swap.
+  const [shown, setShown] = useState(0)
   useEffect(() => {
-    const id = requestAnimationFrame(() => setMounted(true))
+    const id = requestAnimationFrame(() => setShown(value))
     return () => cancelAnimationFrame(id)
-  }, [])
+  }, [value])
 
   const stroke = color ?? probabilityColor(value)
-  const offset = mounted ? C * (1 - Math.max(0, Math.min(100, value)) / 100) : C
+  const offset = C * (1 - Math.max(0, Math.min(100, shown)) / 100)
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -43,7 +46,10 @@ export function Gauge({ value, label, color, size = SIZE }: GaugeProps) {
             strokeLinecap="round"
             strokeDasharray={C}
             strokeDashoffset={offset}
-            style={{ transition: 'stroke-dashoffset 0.9s cubic-bezier(0.16,1,0.3,1)' }}
+            style={{
+              transition:
+                'stroke-dashoffset 0.9s cubic-bezier(0.16,1,0.3,1), stroke 0.4s ease-out',
+            }}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">

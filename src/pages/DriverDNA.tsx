@@ -7,9 +7,12 @@ import {
   CardBody,
   Badge,
   Select,
+  Skeleton,
+  PanelSkeleton,
 } from '@/components/ui'
 import { RadarChart } from '@/components/dna/RadarChart'
 import { raceService } from '@/services/raceService'
+import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import { cn } from '@/lib/cn'
 
 const MARK_A = raceService.driverColors.A
@@ -125,11 +128,15 @@ export function DriverDNA() {
   const [driverBId, setDriverBId] = useState('')
   const [season, setSeason] = useState('2025')
 
+  // Bars replay their fill on every selection change, not just on mount.
   const [animated, setAnimated] = useState(false)
   useEffect(() => {
+    setAnimated(false)
     const id = requestAnimationFrame(() => setAnimated(true))
     return () => cancelAnimationFrame(id)
-  }, [])
+  }, [driverAId, driverBId, season])
+
+  const loading = useSimulatedFetch([driverAId, driverBId, season])
 
   const dnaA = useMemo(
     () => raceService.getDriverDNA(driverAId, season),
@@ -241,7 +248,13 @@ export function DriverDNA() {
             }
           />
           <CardBody>
-            <RadarChart axes={axes} series={series} />
+            {loading ? (
+              <div className="mx-auto w-full max-w-md">
+                <Skeleton className="mx-auto aspect-square w-full rounded-full" />
+              </div>
+            ) : (
+              <RadarChart axes={axes} series={series} />
+            )}
           </CardBody>
         </Card>
 
@@ -305,18 +318,22 @@ export function DriverDNA() {
           subtitle={dnaB ? 'Confronto per attributo' : 'Indicatori per attributo'}
           action={<Badge tone="cyan">demo</Badge>}
         />
-        <CardBody className="px-0 py-1">
-          <div className="divide-y divide-line">
-            {dnaA.attributes.map((attr, i) => (
-              <AttributeBar
-                key={attr.key}
-                label={attr.label}
-                a={attr.value}
-                b={dnaB?.attributes[i].value}
-                animated={animated}
-              />
-            ))}
-          </div>
+        <CardBody className={loading ? undefined : 'px-0 py-1'}>
+          {loading ? (
+            <PanelSkeleton rows={6} />
+          ) : (
+            <div className="divide-y divide-line">
+              {dnaA.attributes.map((attr, i) => (
+                <AttributeBar
+                  key={attr.key}
+                  label={attr.label}
+                  a={attr.value}
+                  b={dnaB?.attributes[i].value}
+                  animated={animated}
+                />
+              ))}
+            </div>
+          )}
         </CardBody>
       </Card>
     </div>
