@@ -13,6 +13,8 @@ import {
 import { RadarChart } from '@/components/dna/RadarChart'
 import { raceService } from '@/services/raceService'
 import { useDriverSelection, useSeasonSelection } from '@/lib/selection'
+import { useDataVersion } from '@/lib/useDataVersion'
+import { useDataNote } from '@/lib/dataNote'
 import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import { cn } from '@/lib/cn'
 
@@ -126,8 +128,12 @@ function MiniCard({
 
 export function DriverDNA() {
   const [driverAId, setDriverAId] = useDriverSelection('dna.driverA', 'ver')
-  const [driverBId, setDriverBId] = useDriverSelection('dna.driverB', '', true)
+  const [driverBId, setDriverBId] = useDriverSelection('dna.driverB', '', { allowEmpty: true })
   const [season, setSeason] = useSeasonSelection('dna.season', '2025')
+
+  // Real data lands after first paint; this makes the reads below re-run.
+  const version = useDataVersion()
+  const dataNote = useDataNote()
 
   // Bars replay their fill on every selection change, not just on mount.
   const [animated, setAnimated] = useState(false)
@@ -141,11 +147,11 @@ export function DriverDNA() {
 
   const dnaA = useMemo(
     () => raceService.getDriverDNA(driverAId, season),
-    [driverAId, season],
+    [driverAId, season, version],
   )
   const dnaB = useMemo(
     () => (driverBId ? raceService.getDriverDNA(driverBId, season) : null),
-    [driverBId, season],
+    [driverBId, season, version],
   )
   const analysis = useMemo(() => raceService.analyzeDNA(dnaA), [dnaA])
 
@@ -172,7 +178,7 @@ export function DriverDNA() {
         icon={Dna}
         title="Driver DNA"
         badge="anteprima"
-        description={`Profilo tecnico dello stile di guida · stagione ${season}. Dati segnaposto coerenti, nessuna telemetria reale collegata.`}
+        description={`Profilo tecnico dello stile di guida · stagione ${season}. ${dataNote}`}
       />
 
       {/* Controls */}
@@ -317,7 +323,7 @@ export function DriverDNA() {
         <CardHeader
           title="Attributi"
           subtitle={dnaB ? 'Confronto per attributo' : 'Indicatori per attributo'}
-          action={<Badge tone="cyan">demo</Badge>}
+          action={<Badge tone="cyan">stima</Badge>}
         />
         <CardBody className={loading ? undefined : 'px-0 py-1'}>
           {loading ? (

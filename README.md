@@ -1,12 +1,25 @@
 # ThePaddockView
 
 Piattaforma di analisi telemetrica in stile SaaS per la Formula 1 — tema dark
-"cockpit / data platform". Il frontend è completo e interattivo; i dati sono
-**segnaposto deterministici** dietro un layer dati progettato per essere
-sostituito con API reali **senza toccare la UI**.
+"cockpit / data platform". Il frontend è completo e interattivo e legge **dati
+reali di Formula 1** attraverso un layer dati che isola completamente la UI
+dalla loro provenienza.
 
-> ⚠️ Nessun dato ufficiale di Formula 1 è integrato. I valori mostrati sono
-> segnaposto coerenti, generati in modo deterministico.
+**Fonti dati (pubbliche, senza chiave API):**
+
+| Fonte | Cosa fornisce |
+| --- | --- |
+| [Jolpica-F1](https://github.com/jolpica/jolpica-f1) (successore di Ergast) | stagioni, calendario, piloti + scuderie, classifica piloti |
+| [OpenF1](https://openf1.org) | giri di sessione (tempi, settori, trappola velocità), stint gomme, distanza di gara |
+
+> ℹ️ Se le API non sono raggiungibili — offline, rete bloccata, endpoint in
+> errore — ogni singola porzione di dati ricade su un **segnaposto
+> deterministico**: la UI non si rompe mai e l'indicatore in alto a sinistra
+> dichiara sempre quale delle due sorgenti è attiva.
+>
+> Le analisi derivate (Driver DNA, Predict, AI Coach, AI Race Engineer) sono
+> **elaborazioni interne** calcolate su questi dati, non output di un modello
+> esterno: nell'interfaccia sono etichettate come `stima`.
 
 📐 **Preparazione alla 1.0** — audit architetturale e guida all'integrazione di
 dati, autenticazione e pagamenti reali: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
@@ -21,7 +34,8 @@ dati, autenticazione e pagamenti reali: [`docs/ARCHITECTURE.md`](docs/ARCHITECTU
 - [Architettura a layer](#architettura-a-layer)
 - [Data flow](#data-flow)
 - [Aggiungere una nuova pagina](#aggiungere-una-nuova-pagina)
-- [Collegare API reali](#collegare-api-reali)
+- [Configurazione dati e API](#configurazione-dati-e-api)
+- [Deploy](#deploy)
 - [Design system & convenzioni](#design-system--convenzioni)
 
 ---
@@ -61,10 +75,15 @@ src/
 │
 ├── services/                # ⬛ DATA LAYER — accesso ai dati
 │   ├── raceService.ts       #   punto di accesso UNICO usato dalla UI
+│   ├── api/                 #   client + adattatori delle API pubbliche
+│   │   ├── jolpica.ts       #     Jolpica-F1 (calendario, piloti, classifica)
+│   │   ├── openf1.ts        #     OpenF1 (giri, settori, stint gomme)
+│   │   └── mappers.ts       #     payload esterni → modelli di dominio
 │   └── sources/
 │       ├── RaceDataSource.ts#   contratto (interfaccia) = "API contract"
-│       ├── mockSource.ts    #   implementazione placeholder (attiva)
-│       └── httpSource.ts    #   scheletro per API reale (inerte, guida)
+│       ├── apiSource.ts     #   dati reali + fallback per-slice (ATTIVA)
+│       ├── mockSource.ts    #   implementazione segnaposto deterministica
+│       └── httpSource.ts    #   scheletro per un'API privata (inerte, guida)
 │
 ├── data/                    # interni del mockSource (generatori deterministici)
 │   ├── comparison.ts        #   piloti, GP, sessioni, stats, comparison, battle
@@ -104,7 +123,8 @@ I riquadri ⬛ segnano i due layer chiave dell'architettura dati.
 
 Il principio guida: **la UI non sa da dove arrivano i dati.** Ogni pagina parla
 solo con `raceService`; dietro il servizio, una sorgente intercambiabile
-(`RaceDataSource`) fornisce i dati. Oggi è il mock, domani sarà un'API.
+(`RaceDataSource`) fornisce i dati. Oggi è `apiSource` (dati reali con fallback
+segnaposto), domani può essere un'API privata senza toccare una riga di UI.
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -116,26 +136,51 @@ solo con `raceService`; dietro il servizio, una sorgente intercambiabile
                         ▼
 ┌─────────────────────────────────────────────┐
 │  raceService  (services/raceService.ts)      │  ← punto di accesso UNICO
-│  const source: RaceDataSource = mockSource   │
+│  sorgente scelta da VITE_DATA_SOURCE         │
 └───────────────────────┬─────────────────────┘
                         │  delega a
                         ▼
 ┌─────────────────────────────────────────────┐
 │  RaceDataSource  (interfaccia / contratto)   │
 │    implementato da:                          │
-│    • mockSource  →  data/*  (ATTIVO)         │
-│    • httpSource  →  API reale (scheletro)    │
+│    • apiSource   →  api/*  (ATTIVA)          │
+│         └─ fallback per-slice ↓              │
+│    • mockSource  →  data/*                   │
+│    • httpSource  →  API privata (scheletro)  │
 └─────────────────────────────────────────────┘
 ```
+
+### Contratto sincrono su dati asincroni
+
+`RaceDataSource` è sincrono di proposito: nessun componente ha dovuto cambiare
+per ricevere dati reali. `apiSource` regge questo contratto con una cache in
+memoria e due funzioni di riempimento:
+
+- `bootstrap()` — chiamata una volta in `main.tsx`, carica stagione, calendario,
+  griglia e classifica;
+- `loadSession(gpId, session)` — innescata dal primo getter che richiede una
+  sessione non ancora in cache.
+
+Finché una porzione non è arrivata (o se la richiesta fallisce) il getter
+restituisce il segnaposto corrispondente. Le pagine si aggiornano da sole:
+`useDataVersion()` sottoscrive le variazioni della cache e rientra nelle
+dipendenze dei `useMemo` che leggono il servizio.
+
+Poiché la griglia reale sostituisce quella segnaposto **dopo il primo render**,
+le selezioni persistite passano da `@/lib/selection`, che le rivalida a ogni
+cambio di dati: un id che non esiste più ricade sul default della pagina e, se
+manca anche quello, sulla prima voce disponibile.
 
 Regole:
 
 1. **I componenti importano solo** `@/services/raceService` (per i dati) e
-   `@/domain/models` (per i tipi). Mai da `@/data/*`.
-2. **`mockSource` è l'unico** modulo che importa `@/data/*`.
+   `@/domain/models` (per i tipi). Mai da `@/data/*` o `@/services/api/*`.
+2. **`mockSource` è l'unico** modulo che importa `@/data/*`; **`apiSource` è
+   l'unico** che importa `@/services/api/*`.
 3. **Nessun dato/derivazione hardcoded nei componenti**: KPI, classifiche,
    snapshot campionato, utente, ecc. sono calcolati nel data layer.
-4. Cambiare sorgente dati = cambiare **una riga** in `raceService.ts`.
+4. Cambiare sorgente dati = variabile d'ambiente `VITE_DATA_SOURCE`
+   (`api` predefinita · `mock` · `http`).
 
 ### I modelli (`domain/models.ts`)
 
@@ -232,53 +277,77 @@ Esempio: aggiungere una pagina **"Tyre Strategy"** in `/tyre-strategy`.
 
 ---
 
-## Collegare API reali
+## Configurazione dati e API
 
-Tutto è già predisposto: la UI è sincrona e disaccoppiata, il contratto è
-definito, lo scheletro HTTP esiste.
+### Variabili d'ambiente
 
-**Passi:**
+Copia `.env.example` in `.env.local`. Nessuna è obbligatoria: senza file
+l'applicazione parte già sui dati reali pubblici.
 
-1. Configura il base URL — copia `.env.example` in `.env.local`:
+| Variabile | Default | A cosa serve |
+| --- | --- | --- |
+| `VITE_DATA_SOURCE` | `api` | Sorgente attiva: `api` (reale + fallback), `mock`, `http` |
+| `VITE_JOLPICA_BASE_URL` | `https://api.jolpi.ca/ergast/f1` | Mirror o proxy di Jolpica-F1 |
+| `VITE_OPENF1_BASE_URL` | `https://api.openf1.org/v1` | Mirror o proxy di OpenF1 |
+| `VITE_API_BASE_URL` | `/api/v1` | Base URL dell'eventuale API privata (`httpSource`) |
+
+### Collegare un'API privata o a pagamento
+
+Le fonti pubbliche non espongono tutto (posizione in gara live, dati
+proprietari). Per collegare un feed privato **non serve toccare la UI**:
+
+1. Metti la chiave in `.env.local` — è l'**unico punto** che la conosce:
 
    ```bash
-   VITE_API_BASE_URL=https://api.thepaddockview.com/v1
+   VITE_API_BASE_URL=https://api.fornitore.com/v1
+   VITE_API_KEY=...
    ```
 
-   (tipizzato in `src/vite-env.d.ts`; fallback same-origin `/api/v1`.)
+   Aggiungi la variabile ai tipi in `src/vite-env.d.ts`.
 
 2. Implementa i metodi in `src/services/sources/httpSource.ts` usando
-   `RaceApiClient` (il wrapper `fetch` con la richiesta già abbozzata). Mappa
-   suggerita degli endpoint documentata nel file stesso.
+   `RaceApiClient` (wrapper `fetch` già abbozzato, mappa endpoint nei commenti).
 
-3. Attiva la sorgente in `src/services/raceService.ts` — **una riga**:
-
-   ```ts
-   import { httpSource } from './sources/httpSource'
-   const source: RaceDataSource = httpSource
-   ```
+3. Attiva la sorgente: `VITE_DATA_SOURCE=http`.
 
 4. **La UI non cambia.** Legge già tutto tramite `raceService`.
 
+> ⚠️ Una chiave in una variabile `VITE_*` finisce nel bundle ed è visibile a
+> chiunque apra i DevTools. Per un fornitore a pagamento la chiave va tenuta su
+> un proxy server-side, e `VITE_API_BASE_URL` deve puntare a quel proxy.
+
 ### Il ponte sincrono → asincrono
 
-`RaceDataSource` è volutamente **sincrono** per non toccare i componenti. Un'API
-reale è asincrona: il ponte consigliato è **prefetch + cache**.
+È lo stesso schema già implementato in `apiSource` (prefetch + cache):
 
 ```
-prefetch(gp, session)  →  fetch async  →  popola una cache in memoria
-        │                                        │
-        └── gated da un loading state ───────────┘
-getX(...)  →  legge dalla cache (sincrono)
+bootstrap() / loadSession()  →  fetch async  →  cache in memoria
+        │                                             │
+        └── stato pubblicato da getApiStatus() ───────┘
+getX(...)  →  legge dalla cache (sincrono, con fallback al mock)
 ```
 
-Il loading è già modellato da `useSimulatedFetch`: diventerà lo stato "pending"
-reale del prefetch, quindi **il component layer resta invariato**. Dettagli e
-mappa endpoint nei commenti di `httpSource.ts`.
+> Nota: comparison, battle, insight, DNA, predict e replay sono **derivati**.
+> Possono restare lato client (riusando le funzioni pure) o essere serviti
+> dall'API — la scelta è dell'implementatore.
 
-> Nota: comparison, battle, insight e replay sono **derivati**. Possono restare
-> lato client (riusando le funzioni pure) o essere serviti dall'API — la scelta
-> è dell'implementatore.
+---
+
+## Deploy
+
+Le configurazioni sono già nel repository; il build è una SPA, quindi tutte
+richiedono il rewrite delle rotte su `index.html`.
+
+| Piattaforma | File | Note |
+| --- | --- | --- |
+| Vercel | `vercel.json` | rewrite SPA + header di sicurezza |
+| Netlify | `netlify.toml`, `public/_redirects` | rewrite SPA + header |
+| GitHub Pages | `.github/workflows/deploy.yml` | build, type-check e copia di `index.html` in `404.html` |
+
+```bash
+npm run build     # output in dist/
+npm run preview   # verifica locale del build di produzione
+```
 
 ---
 
@@ -303,7 +372,19 @@ mappa endpoint nei commenti di `httpSource.ts`.
 
 ## Stato attuale
 
-Frontend completo e interattivo (Home, Dashboard, Driver Comparison, Race
-Replay, Battle Mode, AI Race Engineer), design premium coerente, architettura
-dati pronta per l'integrazione reale. Prossimo grande passo: implementare
-`httpSource` contro un'API di Formula 1.
+Frontend completo e interattivo (Home, Dashboard, Driver Comparison, Driver
+DNA, Race Replay, Battle Mode, Predict, AI Race Engineer, AI Coach, account e
+acquisto una tantum), collegato a dati reali di Formula 1 tramite fonti
+pubbliche senza chiave API.
+
+**Cosa manca per una 1.0 pienamente operativa** — tutto ciò che richiede un
+server, e che nessuna quantità di codice client può risolvere:
+
+- autenticazione reale (oggi la sessione vive in `localStorage`);
+- pagamento reale e verifica dell'accesso lato server (il diritto d'accesso è
+  oggi un campo del browser: la firma locale rende evidente la manomissione, ma
+  non può impedirla);
+- persistenza dell'account e dei preferiti su database;
+- proxy server-side se in futuro si aggiunge un feed a pagamento con chiave.
+
+Dettagli e piano in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).

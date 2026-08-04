@@ -23,6 +23,8 @@ import {
 import { CircuitMap } from '@/components/replay/CircuitMap'
 import { raceService } from '@/services/raceService'
 import { useDriverSelection, useGpSelection, useSessionSelection } from '@/lib/selection'
+import { useDataVersion } from '@/lib/useDataVersion'
+import { useDataBadge, useDataNote } from '@/lib/dataNote'
 import type {
   SessionType,
   PlaybackSpeed,
@@ -182,7 +184,12 @@ export function RaceReplay() {
   const [gpId, setGpId] = useGpSelection('replay.gp', 'mon')
   const [session, setSession] = useSessionSelection('replay.session', 'Race')
   const [driver1Id, setDriver1Id] = useDriverSelection('replay.driver1', 'ver')
-  const [driver2Id, setDriver2Id] = useDriverSelection('replay.driver2', 'nor', true)
+  const [driver2Id, setDriver2Id] = useDriverSelection('replay.driver2', 'nor', { allowEmpty: true, nth: 1 })
+
+  // Real data lands after first paint; this makes the reads below re-run.
+  const version = useDataVersion()
+  const dataNote = useDataNote()
+  const dataBadge = useDataBadge()
 
   const [t, setT] = useState(0)
   const [playing, setPlaying] = useState(false)
@@ -199,13 +206,15 @@ export function RaceReplay() {
   const trackD = raceService.getTrack(gpId)
   useEffect(() => void (totalLapsRef.current = gp.laps), [gp])
 
+  // De-duplicated: a grid change can leave both slots pointing at the same
+  // driver, which would render two identical, overlapping traces.
   const selectedIds = useMemo(
-    () => [driver1Id, ...(driver2Id ? [driver2Id] : [])],
+    () => [...new Set([driver1Id, ...(driver2Id ? [driver2Id] : [])])],
     [driver1Id, driver2Id],
   )
   const dataList = useMemo(
     () => selectedIds.map((id) => raceService.getDriverStats(id, gpId, session)),
-    [selectedIds, gpId, session],
+    [selectedIds, gpId, session, version],
   )
   const frame = useMemo(() => raceService.sampleReplay(dataList, gpId, t), [dataList, gpId, t])
 
@@ -256,7 +265,7 @@ export function RaceReplay() {
         icon={Rewind}
         title="Race Replay"
         badge="anteprima"
-        description={`Rivivi la gara · ${gp.name} · ${session}. Simulazione con dati segnaposto, nessuna telemetria reale collegata.`}
+        description={`Rivivi la gara · ${gp.name} · ${session}. Ricostruzione visiva. ${dataNote}`}
       />
 
       <ReplayControls
@@ -386,10 +395,12 @@ export function RaceReplay() {
         <div className="space-y-4">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-sm font-semibold text-zinc-200">Telemetria live</h3>
-            <Badge tone="cyan">demo</Badge>
+            <Badge tone="cyan">{dataBadge}</Badge>
           </div>
           {frame.frames.map((f, i) => (
-            <DriverStatsCard key={f.data.driver.id} frame={f} color={COLORS[i]} />
+            // Keyed by the selected slot: while a session loads, two slots can
+            // briefly resolve to the same placeholder driver.
+            <DriverStatsCard key={selectedIds[i] ?? i} frame={f} color={COLORS[i]} />
           ))}
         </div>
       </div>

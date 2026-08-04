@@ -34,15 +34,19 @@ export function LapTimeChart({
   const [hover, setHover] = useState<number | null>(null)
 
   const { x, y, min, max, pathA, pathB, n } = useMemo(() => {
-    const n = Math.max(seriesA.length, seriesB.length)
-    const all = [...seriesA, ...seriesB]
-    const rawMin = Math.min(...all)
-    const rawMax = Math.max(...all)
+    const n = Math.max(seriesA.length, seriesB.length, 1)
+    // A live feed can hand us short or empty series (a driver who ran few laps,
+    // or a session still loading). Fall back to a valid range so the scale
+    // never collapses to NaN and the SVG stays renderable.
+    const all = [...seriesA, ...seriesB].filter((v) => Number.isFinite(v))
+    const rawMin = all.length ? Math.min(...all) : 0
+    const rawMax = all.length ? Math.max(...all) : 1
     const pad = (rawMax - rawMin) * 0.15 || 0.5
     const min = rawMin - pad
     const max = rawMax + pad
     const x = (i: number) => PAD.left + (n === 1 ? 0 : (i / (n - 1)) * plotW)
-    const y = (v: number) => PAD.top + ((v - min) / (max - min)) * plotH
+    const y = (v: number) =>
+      Number.isFinite(v) ? PAD.top + ((v - min) / (max - min)) * plotH : PAD.top + plotH / 2
     const toPath = (s: number[]) =>
       s.map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')
     return { x, y, min, max, pathA: toPath(seriesA), pathB: toPath(seriesB), n }
@@ -55,8 +59,10 @@ export function LapTimeChart({
   // within one line-height, push them symmetrically apart.
   const endLabelY = useMemo(() => {
     const MIN_GAP = 11
-    let a = y(seriesA[n - 1]) + 3
-    let b = y(seriesB[n - 1]) + 3
+    // Each label follows its own trace: the two series can differ in length.
+    const lastOf = (s: number[]) => s[s.length - 1]
+    let a = y(lastOf(seriesA)) + 3
+    let b = y(lastOf(seriesB)) + 3
     const gap = Math.abs(a - b)
     if (gap < MIN_GAP) {
       const push = (MIN_GAP - gap) / 2

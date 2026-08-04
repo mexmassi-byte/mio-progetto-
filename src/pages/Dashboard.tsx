@@ -29,6 +29,8 @@ import { ChartSkeleton } from '@/components/comparison/ChartSkeleton'
 import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import { raceService } from '@/services/raceService'
 import { useGpSelection, useSessionSelection } from '@/lib/selection'
+import { useDataVersion } from '@/lib/useDataVersion'
+import { useDataBadge, useDataNote } from '@/lib/dataNote'
 import { formatLapTime } from '@/lib/format'
 import { cn } from '@/lib/cn'
 
@@ -39,28 +41,33 @@ export function Dashboard() {
   const [gpId, setGpId] = useGpSelection('dashboard.gp', 'ita')
   const [session, setSession] = useSessionSelection('dashboard.session', 'Race')
 
+  // Real data lands after first paint; this makes the reads below re-run.
+  const version = useDataVersion()
+  const dataNote = useDataNote()
+  const dataBadge = useDataBadge()
+
   const gp = raceService.getGrandsPrix().find((g) => g.id === gpId)!
 
   // All session data comes from the service — the page performs no data
   // derivation of its own.
-  const kpis = useMemo(() => raceService.getSessionKpis(gpId, session), [gpId, session])
+  const kpis = useMemo(() => raceService.getSessionKpis(gpId, session), [gpId, session, version])
   const leaderboard = useMemo(
     () => raceService.getSessionLeaderboard(gpId, session),
-    [gpId, session],
+    [gpId, session, version],
   )
   const championship = useMemo(
     () => raceService.getChampionship(gpId, session),
-    [gpId, session],
+    [gpId, session, version],
   )
   const leader = leaderboard[0].stats
   const second = leaderboard[1].stats
   const battle = useMemo(() => raceService.battle(leader, second), [leader, second])
   const insight = useMemo(
     () => raceService.getInsight('strategy', leader.driver.id, gpId, session),
-    [leader, gpId, session],
+    [leader, gpId, session, version],
   )
 
-  const chartLoading = useSimulatedFetch([gpId, session])
+  const chartLoading = useSimulatedFetch([gpId, session, version])
 
   const quickAccess = [
     {
@@ -98,7 +105,7 @@ export function Dashboard() {
       <PageHeader
         icon={LayoutDashboard}
         title="Dashboard"
-        description={`Overview sessione · ${gp.name} · ${session}. Dati segnaposto coerenti, nessuna telemetria reale collegata.`}
+        description={`Overview sessione · ${gp.name} · ${session}. ${dataNote}`}
       />
 
       {/* Session selector */}
@@ -195,7 +202,7 @@ export function Dashboard() {
           <CardHeader
             title="Andamento sessione"
             subtitle={`Passo dei due piloti di vertice · ${gp.name}`}
-            action={<Badge tone="cyan">demo</Badge>}
+            action={<Badge tone="cyan">{dataBadge}</Badge>}
           />
           <CardBody>
             {chartLoading ? (
@@ -349,7 +356,7 @@ export function Dashboard() {
         <CardHeader
           title="Snapshot campionato"
           subtitle="Vertice classifica piloti"
-          action={<Badge tone="cyan">demo</Badge>}
+          action={<Badge tone="cyan">{dataBadge}</Badge>}
         />
         <CardBody className="px-0 py-0">
           <ul className="divide-y divide-line sm:grid sm:grid-cols-2 sm:divide-y-0">

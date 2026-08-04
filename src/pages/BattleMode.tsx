@@ -11,6 +11,8 @@ import {
 import { MatchControls } from '@/components/comparison/MatchControls'
 import { raceService } from '@/services/raceService'
 import { useDriverSelection, useGpSelection, useSessionSelection } from '@/lib/selection'
+import { useDataVersion } from '@/lib/useDataVersion'
+import { useDataNote } from '@/lib/dataNote'
 import type {
   DriverStats,
   MetricRow,
@@ -147,17 +149,21 @@ function BattleBar({ row, animated }: { row: MetricRow; animated: boolean }) {
 
 export function BattleMode() {
   const [driverAId, setDriverAId] = useDriverSelection('battle.driverA', 'ver')
-  const [driverBId, setDriverBId] = useDriverSelection('battle.driverB', 'lec')
+  const [driverBId, setDriverBId] = useDriverSelection('battle.driverB', 'lec', { nth: 1 })
   const [gpId, setGpId] = useGpSelection('battle.gp', 'ita')
   const [session, setSession] = useSessionSelection('battle.session', 'Race')
 
+  // Real data lands after first paint; this makes the reads below re-run.
+  const version = useDataVersion()
+  const dataNote = useDataNote()
+
   const dataA = useMemo(
     () => raceService.getDriverStats(driverAId, gpId, session),
-    [driverAId, gpId, session],
+    [driverAId, gpId, session, version],
   )
   const dataB = useMemo(
     () => raceService.getDriverStats(driverBId, gpId, session),
-    [driverBId, gpId, session],
+    [driverBId, gpId, session, version],
   )
   const battle = useMemo(() => raceService.battle(dataA, dataB), [dataA, dataB])
 
@@ -185,7 +191,7 @@ export function BattleMode() {
         icon={Swords}
         title="Battle Mode"
         badge="anteprima"
-        description={`Duello testa a testa · ${gp.name} · ${session}. Dati segnaposto, nessuna telemetria reale collegata.`}
+        description={`Duello testa a testa · ${gp.name} · ${session}. ${dataNote}`}
         actions={
           <Button size="sm" variant="outline" onClick={swap}>
             <ArrowLeftRight className="h-4 w-4" />
@@ -263,7 +269,7 @@ export function BattleMode() {
 
       {/* Final verdict */}
       <Card>
-        <CardHeader title="Verdetto" subtitle="Pilota complessivamente migliore" action={<Badge tone="cyan">demo</Badge>} />
+        <CardHeader title="Verdetto" subtitle="Pilota complessivamente migliore" action={<Badge tone="cyan">stima</Badge>} />
         <CardBody>
           <div className="flex flex-col items-center gap-3 rounded-lg border border-line bg-base-850 p-6 text-center animate-fade-up">
             {overallWinner ? (

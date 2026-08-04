@@ -24,6 +24,8 @@ import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import { formatLapTime } from '@/lib/format'
 import { raceService } from '@/services/raceService'
 import { useDriverSelection, useGpSelection, useSessionSelection } from '@/lib/selection'
+import { useDataVersion } from '@/lib/useDataVersion'
+import { useDataNote } from '@/lib/dataNote'
 import type {
   DriverStats,
   MetricRow,
@@ -234,7 +236,7 @@ function SummarySection({
       <CardHeader
         title="Summary"
         subtitle="Vincitore automatico per categoria"
-        action={<Badge tone="cyan">demo</Badge>}
+        action={<Badge tone="cyan">stima</Badge>}
       />
       <CardBody className="space-y-5">
         {/* Headline */}
@@ -303,17 +305,21 @@ function SummarySection({
 
 export function DriverComparison() {
   const [driverAId, setDriverAId] = useDriverSelection('compare.driverA', 'ver')
-  const [driverBId, setDriverBId] = useDriverSelection('compare.driverB', 'nor')
+  const [driverBId, setDriverBId] = useDriverSelection('compare.driverB', 'nor', { nth: 1 })
   const [gpId, setGpId] = useGpSelection('compare.gp', 'ita')
   const [session, setSession] = useSessionSelection('compare.session', 'Qualifying')
 
+  // Real data lands after first paint; this makes the reads below re-run.
+  const version = useDataVersion()
+  const dataNote = useDataNote()
+
   const dataA = useMemo(
     () => raceService.getDriverStats(driverAId, gpId, session),
-    [driverAId, gpId, session],
+    [driverAId, gpId, session, version],
   )
   const dataB = useMemo(
     () => raceService.getDriverStats(driverBId, gpId, session),
-    [driverBId, gpId, session],
+    [driverBId, gpId, session, version],
   )
   const comparison = useMemo(() => raceService.compareDrivers(dataA, dataB), [dataA, dataB])
   const chartLoading = useSimulatedFetch([driverAId, driverBId, gpId, session])
@@ -331,7 +337,7 @@ export function DriverComparison() {
         icon={Users}
         title="Driver Comparison"
         badge="anteprima"
-        description={`Confronto testa a testa · ${gp.name} · ${session}. Dati segnaposto, nessuna telemetria reale collegata.`}
+        description={`Confronto testa a testa · ${gp.name} · ${session}. ${dataNote}`}
         actions={
           <Button size="sm" variant="outline" onClick={swap}>
             <ArrowLeftRight className="h-4 w-4" />

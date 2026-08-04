@@ -1,0 +1,10 @@
+{
+  "name": "ThePaddockView",
+  "short_name": "PaddockView",
+  "description": "Piattaforma di analisi dati Formula 1",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050506",
+  "theme_color": "#050506",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

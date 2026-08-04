@@ -47,11 +47,19 @@ export interface Insight {
 
 const fmtLap = formatLapTime
 
-const COMPOUND_LIFE: Record<TyreCompound, number> = { Soft: 20, Medium: 30, Hard: 40 }
+const COMPOUND_LIFE: Record<TyreCompound, number> = {
+  Soft: 20,
+  Medium: 30,
+  Hard: 40,
+  Intermediate: 25,
+  Wet: 30,
+}
 const NEXT_COMPOUND: Record<TyreCompound, TyreCompound> = {
   Soft: 'Medium',
   Medium: 'Hard',
   Hard: 'Soft',
+  Intermediate: 'Medium',
+  Wet: 'Intermediate',
 }
 
 /** Estimated degradation rate (s/lap) from tyre-management score. */

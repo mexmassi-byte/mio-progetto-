@@ -25,6 +25,7 @@ import {
 } from '@/components/ui'
 import { useAuth } from '@/context/AuthContext'
 import { raceService } from '@/services/raceService'
+import { useDataVersion } from '@/lib/useDataVersion'
 import { authService } from '@/services/authService'
 
 /** Icon per recent-activity label (presentation only; data comes from the service). */
@@ -39,9 +40,11 @@ const RECENT_ICON: Record<string, typeof Activity> = {
 export function Profile() {
   const { user, logout, updateProfile } = useAuth()
 
-  const drivers = raceService.getDrivers()
+  // Grid and calendar arrive asynchronously from the live feed.
+  const version = useDataVersion()
+  const drivers = useMemo(() => raceService.getDrivers(), [version])
   const teams = useMemo(() => [...new Set(drivers.map((d) => d.team))], [drivers])
-  const gps = raceService.getGrandsPrix()
+  const gps = useMemo(() => raceService.getGrandsPrix(), [version])
 
   const stats = useMemo(
     () => (user ? authService.getProfileStats(user.id) : { analyses: 0, favorites: 0, sessions: 0 }),

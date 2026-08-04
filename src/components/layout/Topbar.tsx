@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Menu, Search, Radio } from 'lucide-react'
+import { Menu, Search } from 'lucide-react'
 import { NAV_ITEMS } from '@/config/navigation'
 import { Button } from '@/components/ui'
 import { CommandPalette } from './CommandPalette'
 import { NotificationCenter } from './NotificationCenter'
+import { DataSourceIndicator } from './DataSourceIndicator'
 
 interface TopbarProps {
   onOpenSidebar: () => void
@@ -46,10 +47,7 @@ export function Topbar({ onOpenSidebar }: TopbarProps) {
 
         <div className="min-w-0">
           <h2 className="truncate text-sm font-semibold text-zinc-100">{title}</h2>
-          <div className="flex items-center gap-1.5 text-[11px] text-zinc-600">
-            <Radio className="h-3 w-3 text-signal-green" />
-            <span>Sessione demo · nessun dato live</span>
-          </div>
+          <DataSourceIndicator />
         </div>
 
         {/* Global search trigger */}

@@ -144,8 +144,11 @@ export const GRANDS_PRIX: GrandPrix[] = [
 export const SESSIONS = ['Practice', 'Qualifying', 'Sprint', 'Race'] as const
 export type SessionType = (typeof SESSIONS)[number]
 
+// Dry compounds are the ones the placeholder generator picks from; the wet
+// compounds exist because a real session feed reports them.
 export const TYRE_COMPOUNDS = ['Soft', 'Medium', 'Hard'] as const
-export type TyreCompound = (typeof TYRE_COMPOUNDS)[number]
+export const ALL_TYRE_COMPOUNDS = [...TYRE_COMPOUNDS, 'Intermediate', 'Wet'] as const
+export type TyreCompound = (typeof ALL_TYRE_COMPOUNDS)[number]
 
 // ---------------------------------------------------------------------------
 // Deterministic pseudo-random helpers
@@ -325,7 +328,13 @@ export interface MetricRow {
   hint?: string
 }
 
-const compoundRank: Record<TyreCompound, number> = { Soft: 3, Medium: 2, Hard: 1 }
+const compoundRank: Record<TyreCompound, number> = {
+  Soft: 3,
+  Medium: 2,
+  Hard: 1,
+  Intermediate: 2,
+  Wet: 1,
+}
 
 const fmtLap = formatLapTime
 

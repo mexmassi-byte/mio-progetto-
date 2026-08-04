@@ -81,7 +81,9 @@ export function CircuitMap({ trackD, frames, colors, sectorBounds }: CircuitMapP
           if (!p) return null
           const color = colors[i] ?? '#e10600'
           return (
-            <g key={f.data.driver.id} style={{ filter: `drop-shadow(0 0 6px ${color})` }}>
+            // Keyed by slot: two frames can share a driver while a session
+            // is still loading placeholder stats.
+            <g key={`${f.data.driver.id}-${i}`} style={{ filter: `drop-shadow(0 0 6px ${color})` }}>
               <circle cx={p.x} cy={p.y} r={7} fill={color} stroke="#0a0a0c" strokeWidth={2} />
               <text
                 x={p.x}

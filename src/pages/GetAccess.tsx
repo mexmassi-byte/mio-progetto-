@@ -52,7 +52,7 @@ const FAQ = [
   },
   {
     q: 'I dati sono reali?',
-    a: "Non ancora. I valori mostrati sono segnaposto coerenti; l'architettura è già pronta per collegare dati di Formula 1 reali.",
+    a: 'Sì. Griglia, calendario, classifica e tempi sul giro arrivano da Jolpica-F1 e OpenF1, fonti pubbliche di dati di Formula 1. Le analisi derivate (DNA, Predict, Coach) sono elaborazioni interne calcolate su quei dati.',
   },
 ]
 

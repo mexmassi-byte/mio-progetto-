@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#050506"/>
+  <circle cx="600" cy="120" r="320" fill="#e10600" opacity="0.16"/>
+  <g transform="translate(80,250)">
+    <rect x="0" y="0" width="14" height="70" rx="4" fill="#e10600"/>
+    <rect x="26" y="18" width="14" height="52" rx="4" fill="#0ea5c4"/>
+    <rect x="52" y="8" width="14" height="62" rx="4" fill="#f4f4f5"/>
+  </g>
+  <text x="80" y="400" font-family="Inter,system-ui,sans-serif" font-size="66" font-weight="700" fill="#ffffff">Analyze Formula 1</text>
+  <text x="80" y="480" font-family="Inter,system-ui,sans-serif" font-size="66" font-weight="700" fill="#a1a1aa">like an engineer.</text>
+  <text x="80" y="545" font-family="Inter,system-ui,sans-serif" font-size="26" fill="#71717a">Telemetria · Driver DNA · Predict · AI Coach</text>
+  <text x="80" y="160" font-family="Inter,system-ui,sans-serif" font-size="24" font-weight="600" fill="#e10600" letter-spacing="4">THEPADDOCKVIEW</text>
+</svg>

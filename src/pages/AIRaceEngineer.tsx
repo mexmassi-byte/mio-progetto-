@@ -3,6 +3,8 @@ import { Bot, Send, Sparkles, User, Radio, Swords } from 'lucide-react'
 import { PageHeader, Card, Badge, Select, SegmentedControl } from '@/components/ui'
 import { raceService } from '@/services/raceService'
 import { useDriverSelection, useGpSelection, useSessionSelection } from '@/lib/selection'
+import { useDataVersion } from '@/lib/useDataVersion'
+import { useDataNote } from '@/lib/dataNote'
 import type { Insight, InsightKind } from '@/domain/models'
 import { formatLapTime } from '@/lib/format'
 import { toneChipClass as toneChip } from '@/lib/tone'
@@ -128,6 +130,10 @@ export function AIRaceEngineer() {
   const [gpId, setGpId] = useGpSelection('engineer.gp', 'ita')
   const [session, setSession] = useSessionSelection('engineer.session', 'Race')
 
+  // Real data lands after first paint; this makes the reads below re-run.
+  const version = useDataVersion()
+  const dataNote = useDataNote()
+
   const [messages, setMessages] = useState<Msg[]>([])
   const [typing, setTyping] = useState(false)
   const [input, setInput] = useState('')
@@ -136,11 +142,11 @@ export function AIRaceEngineer() {
 
   const me = useMemo(
     () => raceService.getDriverStats(driverId, gpId, session),
-    [driverId, gpId, session],
+    [driverId, gpId, session, version],
   )
   const rival = useMemo(
     () => raceService.getRival(driverId, gpId, session),
-    [driverId, gpId, session],
+    [driverId, gpId, session, version],
   )
   const gap = useMemo(() => raceService.compareDrivers(me, rival).gap, [me, rival])
 
@@ -154,7 +160,7 @@ export function AIRaceEngineer() {
         insight: raceService.getInsight('briefing', driverId, gpId, session),
       },
     ])
-  }, [driverId, gpId, session])
+  }, [driverId, gpId, session, version])
 
   // Keep the conversation scrolled to the latest message.
   useEffect(() => {
@@ -198,7 +204,7 @@ export function AIRaceEngineer() {
         icon={Bot}
         title="AI Race Engineer"
         badge="beta"
-        description="Il tuo ingegnere di pista virtuale: analisi strategica su ritmo, gomme e rivali. Insight simulati su dati segnaposto, nessun modello o telemetria reale collegati."
+        description={`Il tuo ingegnere di pista virtuale: analisi strategica su ritmo, gomme e rivali. Insight generati da regole interne, nessun modello linguistico collegato. ${dataNote}`}
       />
 
       {/* Controls */}
@@ -292,7 +298,7 @@ export function AIRaceEngineer() {
         <div className="space-y-4">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-sm font-semibold text-zinc-200">Contesto sessione</h3>
-            <Badge tone="cyan">demo</Badge>
+            <Badge tone="cyan">stima</Badge>
           </div>
 
           <Card className="overflow-hidden">

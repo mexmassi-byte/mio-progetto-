@@ -20,6 +20,8 @@ import { ChartSkeleton } from '@/components/comparison/ChartSkeleton'
 import { useSimulatedFetch } from '@/lib/useSimulatedFetch'
 import { raceService } from '@/services/raceService'
 import { useCoachSessionSelection, useDriverSelection, useGpSelection, useSeasonSelection } from '@/lib/selection'
+import { useDataVersion } from '@/lib/useDataVersion'
+import { useDataNote } from '@/lib/dataNote'
 import type { CoachAnswer, CoachMetric, MetricTone } from '@/domain/models'
 import { toneChipClass as toneChip, toneHex } from '@/lib/tone'
 import { cn } from '@/lib/cn'
@@ -152,6 +154,10 @@ export function AICoach() {
   const [season, setSeason] = useSeasonSelection('coach.season', '2025')
   const [coachSession, setCoachSession] = useCoachSessionSelection('coach.session', 'Gara')
 
+  // Real data lands after first paint; this makes the reads below re-run.
+  const version = useDataVersion()
+  const dataNote = useDataNote()
+
   const [messages, setMessages] = useState<Msg[]>([])
   const [typing, setTyping] = useState(false)
   const [input, setInput] = useState('')
@@ -160,9 +166,9 @@ export function AICoach() {
 
   const insights = useMemo(
     () => raceService.getCoachInsights(driverId, gpId, season, coachSession),
-    [driverId, gpId, season, coachSession],
+    [driverId, gpId, season, coachSession, version],
   )
-  const chartLoading = useSimulatedFetch([driverId, gpId, season, coachSession])
+  const chartLoading = useSimulatedFetch([driverId, gpId, season, coachSession, version])
   const gp = raceService.getGrandsPrix().find((g) => g.id === gpId)!
 
   // Fresh opening read whenever the selection changes.
@@ -175,7 +181,7 @@ export function AICoach() {
         answer: raceService.askCoach('', driverId, gpId, season, coachSession),
       },
     ])
-  }, [driverId, gpId, season, coachSession])
+  }, [driverId, gpId, season, coachSession, version])
 
   useEffect(() => {
     const el = listRef.current
@@ -213,7 +219,7 @@ export function AICoach() {
         icon={GraduationCap}
         title="AI Coach"
         badge="beta"
-        description="Il tuo analista di pista: capisci le prestazioni di un pilota o di una sessione. Risposte simulate su dati segnaposto, nessun modello reale collegato."
+        description={`Il tuo analista di pista: capisci le prestazioni di un pilota o di una sessione. Risposte generate da regole interne, nessun modello linguistico collegato. ${dataNote}`}
       />
 
       {/* 1 — Selection panel */}
@@ -368,7 +374,7 @@ export function AICoach() {
           <CardHeader
             title="Andamento sessione"
             subtitle={`${insights.code} vs ${insights.refCode} · ${coachSession}`}
-            action={<Badge tone="cyan">demo</Badge>}
+            action={<Badge tone="cyan">stima</Badge>}
           />
           <CardBody>
             {chartLoading ? (

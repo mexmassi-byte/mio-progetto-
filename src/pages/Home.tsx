@@ -219,10 +219,67 @@ function PreviewMock({ kind }: { kind: 'radar' | 'gauges' | 'track' }) {
   )
 }
 
+
+// --- Legal notice (privacy) --------------------------------------------------
+
+function LegalNotice({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center px-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Informativa privacy"
+    >
+      <div className="absolute inset-0 animate-fade-in bg-black/75 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative max-h-[80vh] w-full max-w-lg animate-fade-up overflow-y-auto rounded-xl border border-line-strong bg-base-900 p-6 shadow-panel">
+        <div className="flex items-start justify-between gap-4">
+          <h2 className="text-lg font-semibold text-white">Privacy &amp; dati</h2>
+          <button
+            onClick={onClose}
+            className="rounded-md p-1 text-zinc-500 transition-colors hover:text-zinc-200"
+            aria-label="Chiudi"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="mt-4 space-y-3 text-sm leading-relaxed text-zinc-400">
+          <p>
+            <strong className="text-zinc-200">Nessun tracciamento.</strong> ThePaddockView non
+            utilizza cookie di profilazione, analytics di terze parti né pubblicità.
+          </p>
+          <p>
+            <strong className="text-zinc-200">Dati memorizzati.</strong> Account e preferenze
+            (pilota, Gran Premio, stagione) restano nel <em>localStorage</em> del tuo browser e non
+            vengono inviati ad alcun server. Puoi cancellarli svuotando i dati del sito.
+          </p>
+          <p>
+            <strong className="text-zinc-200">Fonti dati.</strong> I dati di Formula 1 provengono da
+            API pubbliche (Jolpica-F1, OpenF1). Le relative richieste sono soggette alle privacy
+            policy dei rispettivi fornitori.
+          </p>
+          <p>
+            <strong className="text-zinc-200">Progetto indipendente.</strong> Non affiliato,
+            associato o approvato da Formula 1, FIA o dai team. F1 è un marchio registrato di
+            Formula One Licensing BV.
+          </p>
+          <p className="text-xs text-zinc-600">
+            Domande? Scrivi a{' '}
+            <a href="mailto:hello@thepaddockview.app" className="text-accent-soft hover:underline">
+              hello@thepaddockview.app
+            </a>
+            .
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // --- page --------------------------------------------------------------------
 
 export function Home() {
   const navigate = useNavigate()
+  const [legalOpen, setLegalOpen] = useState(false)
   const year = new Date().getFullYear()
 
   return (
@@ -402,8 +459,15 @@ export function Home() {
           <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-zinc-500">
             <button onClick={() => scrollTo('why')} className="transition-colors hover:text-zinc-200">About</button>
             <button onClick={() => scrollTo('features')} className="transition-colors hover:text-zinc-200">Features</button>
-            <button className="cursor-default transition-colors hover:text-zinc-300">Privacy</button>
-            <button className="cursor-default transition-colors hover:text-zinc-300">Contact</button>
+            <button onClick={() => setLegalOpen(true)} className="transition-colors hover:text-zinc-200">
+              Privacy
+            </button>
+            <a
+              href="mailto:hello@thepaddockview.app?subject=ThePaddockView"
+              className="transition-colors hover:text-zinc-200"
+            >
+              Contact
+            </a>
           </nav>
           <div className="flex items-center gap-3 text-[11px] text-zinc-600">
             <span className="rounded-md border border-line bg-base-900 px-2 py-0.5 uppercase tracking-wider text-zinc-500">
@@ -413,6 +477,8 @@ export function Home() {
           </div>
         </div>
       </footer>
+
+      {legalOpen && <LegalNotice onClose={() => setLegalOpen(false)} />}
     </div>
   )
 }

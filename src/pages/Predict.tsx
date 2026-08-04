@@ -19,6 +19,8 @@ import {
 import { Gauge } from '@/components/predict/Gauge'
 import { raceService } from '@/services/raceService'
 import { useDriverSelection, useGpSelection, useSeasonSelection, useWeatherSelection } from '@/lib/selection'
+import { useDataVersion } from '@/lib/useDataVersion'
+import { useDataNote } from '@/lib/dataNote'
 import { toneChipClass as toneChip, probabilityColor as tierColor } from '@/lib/tone'
 import { cn } from '@/lib/cn'
 
@@ -56,6 +58,10 @@ export function Predict() {
   const [season, setSeason] = useSeasonSelection('predict.season', '2025')
   const [weather, setWeather] = useWeatherSelection('predict.weather', 'Dry')
 
+  // Real data lands after first paint; this makes the reads below re-run.
+  const version = useDataVersion()
+  const dataNote = useDataNote()
+
   const drivers = raceService.getDrivers()
   const teams = useMemo(() => [...new Set(drivers.map((d) => d.team))], [drivers])
   const [teamName, setTeamName] = useState(teams[0])
@@ -64,7 +70,7 @@ export function Predict() {
   const subjectId = mode === 'driver' ? driverId : leadOf(teamName)
   const prediction = useMemo(
     () => raceService.getPrediction(subjectId, gpId, season, weather),
-    [subjectId, gpId, season, weather],
+    [subjectId, gpId, season, weather, version],
   )
   const gp = raceService.getGrandsPrix().find((g) => g.id === gpId)!
   const p = prediction.probabilities
@@ -85,7 +91,7 @@ export function Predict() {
         icon={Sparkles}
         title="Predict"
         badge="beta"
-        description={`Simula un Gran Premio e ottieni una previsione · ${gp.name} · stagione ${season}. Modello segnaposto, nessuna telemetria reale collegata.`}
+        description={`Simula un Gran Premio e ottieni una previsione · ${gp.name} · stagione ${season}. Modello statistico interno. ${dataNote}`}
       />
 
       {/* Controls */}
@@ -185,7 +191,7 @@ export function Predict() {
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <Card>
-            <CardHeader title="Probabilità" subtitle="Esiti simulati" action={<Badge tone="cyan">demo</Badge>} />
+            <CardHeader title="Probabilità" subtitle="Esiti simulati" action={<Badge tone="cyan">stima</Badge>} />
             <CardBody className="px-0 py-1">
               <div className="divide-y divide-line">
                 <ProbBar label="Vittoria" value={p.win} />
