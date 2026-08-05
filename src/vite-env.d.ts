@@ -13,6 +13,8 @@ interface ImportMetaEnv {
    * Leave unset to fall back to the same-origin "/api/v1".
    */
   readonly VITE_API_BASE_URL?: string
+  /** 'hash' routes in the URL fragment, for hosts without SPA rewrites. */
+  readonly VITE_ROUTER?: 'hash' | 'history'
 }
 
 interface ImportMeta {

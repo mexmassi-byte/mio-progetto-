@@ -1,5 +1,5 @@
 import { lazy, Suspense, type ReactNode } from 'react'
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, createHashRouter } from 'react-router-dom'
 import { Layout } from '@/components/layout/Layout'
 import { RouteFallback } from '@/components/layout/RouteFallback'
 // The landing is the entry point — keep it in the main chunk so first paint
@@ -27,7 +27,15 @@ const SignUp = lazy(() => import('@/pages/SignUp').then((m) => ({ default: m.Sig
 /** Wraps a lazily-loaded page in a skeleton fallback. */
 const page = (node: ReactNode) => <Suspense fallback={<RouteFallback />}>{node}</Suspense>
 
-export const router = createBrowserRouter([
+/**
+ * Clean URLs need the host to rewrite every path to `index.html`. Where that
+ * isn't possible (a static file drop, a preview served from a sub-path), set
+ * `VITE_ROUTER=hash` and routing moves into the fragment instead.
+ */
+const createRouter =
+  import.meta.env.VITE_ROUTER === 'hash' ? createHashRouter : createBrowserRouter
+
+export const router = createRouter([
   // Standalone pages — no app shell (sidebar/topbar).
   { path: '/', element: <Home />, errorElement: <NotFound /> },
   { path: '/login', element: page(<Login />) },
