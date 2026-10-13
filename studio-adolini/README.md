@@ -14,7 +14,8 @@ nessun framework, bundler o build step.
 
 ## Avvio
 
-I moduli ES richiedono un server HTTP (non `file://`):
+Basta aprire `index.html` nel browser (doppio clic). Serve una connessione a
+Internet per i font Google e per Three.js/Lenis dalla CDN. In alternativa:
 
 ```bash
 cd studio-adolini
@@ -22,8 +23,8 @@ python3 -m http.server 8000
 # http://localhost:8000
 ```
 
-Aggiungendo `?dev` all'URL si attivano i log di sviluppo (tempi del caricamento,
-immagini non trovate, fallback WebGL).
+Aggiungendo `?dev` all'URL (da server locale) si attivano i log di sviluppo
+(tempi del caricamento, immagini non trovate, fallback WebGL).
 
 ## Contenuti e fonti
 
