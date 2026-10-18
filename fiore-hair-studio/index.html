@@ -124,7 +124,8 @@ html.lenis, html.lenis body { height: auto; }
   border-radius: var(--radius-pill);
   font-size: .9375rem; font-weight: 500; white-space: nowrap;
   transform: scale(calc(1 + .04 * var(--h)));
-  transition: background-color .3s, color .3s, border-color .3s;
+  transition: background-color .3s, color .3s, border-color .3s, var(--glow-transition);
+  --glow-surface-spot: 7rem;
 }
 .pill--plain { padding: 0 1.5rem; }
 .pill__badge { width: 2.5rem; height: 2.5rem; border-radius: 50%; display: grid; place-items: center; }
@@ -267,7 +268,8 @@ html.lenis, html.lenis body { height: auto; }
   padding: .875rem; border-radius: 1.75rem; cursor: pointer;
   background: rgba(255,255,255,.72); border: 1px solid rgba(255,255,255,.8);
   -webkit-backdrop-filter: blur(20px) saturate(1.15); backdrop-filter: blur(20px) saturate(1.15);
-  box-shadow: 0 1.5rem 3rem -1.75rem rgba(41,36,42,.45);
+  --surface-shadow: 0 1.5rem 3rem -1.75rem rgba(41,36,42,.45);
+  box-shadow: var(--surface-shadow);
 }
 .hc-tile { position: relative; align-self: start; aspect-ratio: 1; border-radius: 1.25rem; background: var(--ink); color: var(--accent); display: grid; place-items: center; overflow: hidden; --flower-eye: var(--ink); }
 .hc-tile svg { width: 56%; height: 56%; transition: transform .9s var(--ease-out); }
@@ -393,7 +395,7 @@ html.lenis, html.lenis body { height: auto; }
 .svc-index { font-size: .875rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .svc-title { font-family: var(--serif); font-weight: 400; font-size: 2.5rem; line-height: 1.05; }
 .svc-desc { max-width: 32rem; font-size: .9375rem; line-height: 1.6; color: var(--muted); }
-.svc-btn { width: 3.25rem; height: 3.25rem; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line); background: #fff; transition: background-color .3s, color .3s, border-color .3s; }
+.svc-btn { width: 3.25rem; height: 3.25rem; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line); background: #fff; transition: background-color .3s, color .3s, border-color .3s, var(--glow-transition); }
 .svc-btn svg { width: 1.125rem; height: 1.125rem; transform: translate(calc(.14rem * var(--h)), calc(-.14rem * var(--h))); }
 .svc-btn::after { content: ""; position: absolute; inset: 0; border-radius: 1.5rem; }
 .svc-row:hover .svc-btn, .svc-btn:focus-visible { background: var(--ink); color: #fff; border-color: var(--ink); }
@@ -427,8 +429,7 @@ html.lenis, html.lenis body { height: auto; }
 /* ==========================================================================
    Footer
    ========================================================================== */
-.footer { position: relative; overflow: hidden; padding: 7rem 0 2rem; border-radius: var(--radius-card) var(--radius-card) 0 0; background: var(--ink); color: #fff; }
-.footer-watermark { position: absolute; left: 50%; bottom: -.16em; transform: translateX(-50%); font-size: calc(var(--text-watermark) * 1.7); color: #fff; opacity: .04; pointer-events: none; --flower-eye: transparent; }
+.footer { position: relative; padding: 7rem 0 2rem; border-radius: var(--radius-card) var(--radius-card) 0 0; background: var(--ink); color: #fff; }
 .footer-cta { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 2rem; }
 .footer-title { font-family: var(--serif); font-weight: 400; font-size: 5.5rem; line-height: 1.02; }
 .footer-title .tone { color: var(--subtle); }
@@ -442,7 +443,7 @@ html.lenis, html.lenis body { height: auto; }
 .footer-contact span { display: block; color: var(--subtle); line-height: 1.6; }
 .footer-legal { position: relative; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; margin-top: 5rem; padding-top: 1.75rem; border-top: 1px solid rgba(255,255,255,.12); font-size: .8125rem; color: var(--subtle); }
 @media (max-width:1024px) { .footer-title { font-size: 4rem; } .footer-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width:640px) { .footer { padding-top: 5rem; } .footer-cta { grid-template-columns: minmax(0, 1fr); } .footer-title { font-size: 2.75rem; } .footer-cols { grid-template-columns: minmax(0, 1fr); margin-top: 4rem; } .footer-watermark { font-size: 7rem; } }
+@media (max-width:640px) { .footer { padding-top: 5rem; } .footer-cta { grid-template-columns: minmax(0, 1fr); } .footer-title { font-size: 2.75rem; } .footer-cols { grid-template-columns: minmax(0, 1fr); margin-top: 4rem; } .footer-legal { margin-top: 3.5rem; } }
 
 /* ==========================================================================
    Navigation overlay
@@ -504,6 +505,177 @@ html.lenis, html.lenis body { height: auto; }
   .modal-panel { width: 100%; max-height: 92svh; padding: 2rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px)); border-radius: 1.5rem 1.5rem 0 0; transform: translateY(100%); }
   .modal-title { font-size: 2rem; }
 }
+
+/* ==========================================================================
+   Glow system: neutral metal → luminous secondary colour on hover.
+   Reusable: every colour derives from --secondary-color; tune the tokens below.
+
+   Markup
+     data-glow="display"     big headings: metallic sheen, light sweep, layered bloom, cursor spot
+     data-glow="text"        links and small labels: same light, restrained
+     data-glow="surface"     buttons, cards, tiles: luminous edge, halo, inner cursor light
+     data-glow="ring"        small controls whose layout must not change: edge + halo only
+     data-glow="signature"   the brand signature at the bottom of the page
+     … "self"                e.g. data-glow="surface self": lights only on its own hover
+     data-glow-group         hovering or focusing it lights the [data-glow] elements inside
+     data-glow-glyphs        text-bearing children of a display/signature element
+     data-glow-surface       "dark" | "light": background its children sit on
+   Components with their own `transition` append var(--glow-transition);
+   components with their own box-shadow move it to --surface-shadow.
+   ========================================================================== */
+@property --glow { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --glow-sweep { syntax: '<number>'; inherits: true; initial-value: 0; }
+
+:root {
+  --secondary-color: var(--accent);   /* Fiore: the logo mauve */
+  --glow-intensity: 1;                /* global strength, ~0.6–1.4 */
+  --glow-duration: 700ms;             /* colour + bloom fade */
+  --glow-sweep-duration: 1200ms;      /* light travelling across the lettering */
+  --glow-ease: cubic-bezier(.22, 1, .36, 1);
+  --glow-sweep-ease: cubic-bezier(.6, .05, .3, 1);
+  --glow-angle: 100deg;               /* gradient direction */
+  --glow-chroma: .06;                 /* colour added to the secondary hue when lit */
+  --glow-sheen: .3;                   /* resting metallic reflection on display type */
+  --signature-scale: 27;              /* signature font-size as % of footer width */
+  --signature-intensity: 1.3;
+  --glow-dark: 0;
+  --glow-transition: --glow var(--glow-duration) var(--glow-ease), --glow-sweep var(--glow-sweep-duration) var(--glow-sweep-ease);
+}
+[data-glow-surface="dark"] > * { --glow-dark: 1; }
+[data-glow-surface="light"] > * { --glow-dark: 0; }
+
+:where([data-glow]) { --glow: 0; --glow-sweep: 0; transition: var(--glow-transition); }
+[data-glow] {
+  --glow-level: 1;
+  --tone-neon: color-mix(in oklab, var(--secondary-color) 55%, white);
+  --tone-hot: color-mix(in oklab, var(--secondary-color) 18%, white);
+  --tone-mid: var(--secondary-color);
+  --tone-deep: color-mix(in oklab, var(--secondary-color) 62%, black);
+  --glow-text: color-mix(in oklab, var(--tone-deep), var(--tone-neon) calc(var(--glow-dark) * 100%));
+  --glow-text-hi: color-mix(in oklab, var(--tone-mid), var(--tone-hot) calc(var(--glow-dark) * 100%));
+  --glow-text-2: color-mix(in oklab, color-mix(in oklab, var(--tone-deep), var(--tone-mid) 35%), var(--tone-neon) calc(var(--glow-dark) * 100%));
+  --glow-bloom: color-mix(in oklab, var(--tone-mid), var(--tone-neon) calc(var(--glow-dark) * 100%));
+  --glow-edge: color-mix(in oklab, var(--tone-mid), var(--tone-hot) calc(var(--glow-dark) * 100%));
+  --glow-sheen-tint: color-mix(in oklab, white, var(--secondary-color) calc(var(--glow-dark) * 100%));
+  --glow-power: calc(var(--glow) * var(--glow-intensity) * var(--glow-level));
+}
+@supports (color: oklch(from red l c h)) {
+  [data-glow] {
+    --tone-neon: oklch(from var(--secondary-color) .84 calc(c + var(--glow-chroma)) h);
+    --tone-hot: oklch(from var(--secondary-color) .96 calc((c + var(--glow-chroma)) * .4) h);
+    --tone-mid: oklch(from var(--secondary-color) .66 calc(c + var(--glow-chroma)) h);
+    --tone-deep: oklch(from var(--secondary-color) .47 calc(c + var(--glow-chroma)) h);
+  }
+}
+
+/* Intensity per element type */
+[data-glow~="display"] {
+  --glow-b1: .035em; --glow-b2: .16em; --glow-b3: .4em;
+  --glow-spot: 1.1em;
+  --glow-stroke-w: max(.5px, .005em);
+  --glyph-base: linear-gradient(var(--glow-angle), currentColor 0 38%, color-mix(in oklab, currentColor, var(--glow-sheen-tint) calc(var(--glow-sheen) * 100%)) 50%, currentColor 62%);
+}
+[data-glow~="text"] {
+  --glow-level: .6;
+  --glow-b1: .06em; --glow-b2: .35em; --glow-b3: .9em;
+  --glow-spot: 2.5em;
+  --glyph-base: linear-gradient(currentColor, currentColor);
+}
+[data-glow~="surface"], [data-glow~="ring"] { --glow-level: .85; }
+
+/* Lit state: hover (precise pointers only, so touch never sticks), keyboard focus, or .is-lit */
+@media (hover: hover) and (pointer: fine) {
+  [data-glow]:hover,
+  [data-glow-group]:hover [data-glow]:not([data-glow~="self"]) { --glow: 1; --glow-sweep: 1; }
+}
+[data-glow]:focus-visible,
+[data-glow].is-lit,
+[data-glow-group]:focus-visible [data-glow]:not([data-glow~="self"]),
+[data-glow-group].is-lit [data-glow]:not([data-glow~="self"]) { --glow: 1; --glow-sweep: 1; }
+[data-glow-group]:has(:focus-visible) [data-glow]:not([data-glow~="self"]) { --glow: 1; --glow-sweep: 1; }
+
+/* Lettering: resting metal, then the lit gradient slides across, plus a cursor spot */
+@supports ((background-clip: text) or (-webkit-background-clip: text)) and (color: color-mix(in oklab, red, blue)) {
+  [data-glow~="display"]:not([data-lines]),
+  [data-glow~="display"][data-lines] .line-inner,
+  [data-glow~="text"],
+  [data-glow-glyphs] {
+    background-image:
+      radial-gradient(circle var(--glow-spot) at var(--lx, 50%) var(--ly, 50%), color-mix(in oklab, var(--glow-text-hi) min(100%, calc(var(--glow) * 85%)), transparent), transparent),
+      linear-gradient(var(--glow-angle), transparent 0 30%, var(--glow-text) 44%, var(--glow-text-hi) 55%, var(--glow-text) 67%, var(--glow-text-2) 100%),
+      var(--glyph-base);
+    background-size: 100% 100%, 320% 100%, 100% 100%;
+    background-position: 0 0, calc(var(--glow-sweep) * 100%) 50%, 0 0;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: var(--glow-stroke-w, 0) color-mix(in oklab, var(--glow-edge) min(100%, calc(var(--glow) * 70%)), var(--glow-stroke-base, transparent));
+  }
+  [data-glow~="display"], [data-glow~="text"], [data-glow~="signature"] {
+    filter:
+      drop-shadow(0 0 calc(var(--glow) * var(--glow-b1)) color-mix(in oklab, var(--glow-bloom) min(100%, calc(var(--glow-power) * 65%)), transparent))
+      drop-shadow(0 0 calc(var(--glow) * var(--glow-b2)) color-mix(in oklab, var(--glow-bloom) min(100%, calc(var(--glow-power) * 38%)), transparent))
+      drop-shadow(0 0 calc(var(--glow) * var(--glow-b3)) color-mix(in oklab, var(--glow-bloom) min(100%, calc(var(--glow-power) * 20%)), transparent));
+  }
+}
+
+/* Surfaces: luminous edge, layered halo, inner illumination that follows the cursor */
+:where([data-glow~="surface"]) { position: relative; isolation: isolate; }
+@supports (color: color-mix(in oklab, red, blue)) {
+  [data-glow~="surface"], [data-glow~="ring"] {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--glow-edge) min(100%, calc(var(--glow) * 75%)), transparent),
+      0 0 calc(var(--glow) * 1rem) color-mix(in oklab, var(--glow-bloom) min(100%, calc(var(--glow-power) * 45%)), transparent),
+      0 calc(var(--glow) * .6rem) calc(var(--glow) * 2.6rem) color-mix(in oklab, var(--glow-bloom) min(100%, calc(var(--glow-power) * 26%)), transparent),
+      inset 0 0 calc(var(--glow) * 1.4rem) color-mix(in oklab, var(--glow-bloom) min(100%, calc(var(--glow-power) * 18%)), transparent),
+      var(--surface-shadow, 0 0 #0000);
+  }
+  [data-glow~="surface"]::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+    background: radial-gradient(circle var(--glow-surface-spot, 16rem) at var(--lx, 50%) var(--ly, 50%), color-mix(in oklab, var(--glow-bloom) min(100%, calc(var(--glow-power) * 32%)), transparent), transparent);
+  }
+}
+
+/* Component tuning */
+.svc-title[data-glow] { --glow-level: .75; }
+.band-word { display: inline-block; }
+.nav-link[data-glow-group] > span:last-child { --glow-level: .8; }
+
+/* ==========================================================================
+   Signature: the brand name closes the page
+   ========================================================================== */
+.signature { container-type: inline-size; margin-top: 3rem; }
+.signature__name {
+  --glow-level: var(--signature-intensity);
+  --glow-b1: .02em; --glow-b2: .09em; --glow-b3: .26em;
+  --glow-spot: .7em;
+  --glow-stroke-w: max(1px, .0045em);
+  --glow-stroke-base: rgb(255 255 255 / .22);
+  --glyph-base: linear-gradient(180deg,
+    color-mix(in oklab, white 92%, var(--secondary-color)) 0%,
+    color-mix(in oklab, white 52%, var(--ink)) 34%,
+    color-mix(in oklab, var(--ink) 55%, var(--secondary-color)) 52%,
+    color-mix(in oklab, white 68%, var(--secondary-color)) 68%,
+    color-mix(in oklab, var(--ink) 30%, var(--secondary-color)) 100%);
+  display: flex; justify-content: center;
+  padding-block: .04em .14em;
+  font-family: var(--serif); font-weight: 400; line-height: .8;
+  font-size: 22vw;
+  font-size: calc(var(--signature-scale) * 1cqi);
+  color: var(--subtle);
+}
+.signature__word { display: inline-block; letter-spacing: .1em; margin-inline-end: -.1em; white-space: nowrap; }
+.signature__flower {
+  display: inline-block; width: .78em; height: .78em; margin-inline: .02em .14em;
+  vertical-align: -.04em;
+  background-color: currentColor;
+  -webkit-mask: var(--flower-mask) center / contain no-repeat;
+  mask: var(--flower-mask) center / contain no-repeat;
+  --flower-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Crect width='48' height='48' fill='%23fff'/%3E%3Ccircle cx='24' cy='24' r='1.9'/%3E%3C/mask%3E%3C/defs%3E%3Cg mask='url(%23m)'%3E%3Cellipse cx='24' cy='13' rx='6.4' ry='10.6'/%3E%3Cellipse cx='24' cy='13' rx='6.4' ry='10.6' transform='rotate(72 24 24)'/%3E%3Cellipse cx='24' cy='13' rx='6.4' ry='10.6' transform='rotate(144 24 24)'/%3E%3Cellipse cx='24' cy='13' rx='6.4' ry='10.6' transform='rotate(216 24 24)'/%3E%3Cellipse cx='24' cy='13' rx='6.4' ry='10.6' transform='rotate(288 24 24)'/%3E%3C/g%3E%3C/svg%3E");
+}
+/* The flower takes the same lettering background, masked to its shape */
+.signature__flower[data-glow-glyphs] { -webkit-background-clip: border-box; background-clip: border-box; -webkit-text-stroke: 0; }
 </style>
 </head>
 <body>
@@ -585,19 +757,19 @@ html.lenis, html.lenis body { height: auto; }
       <span class="brand__name" aria-hidden="true"><strong>FIORE</strong><small>Hair Studio</small></span>
     </button>
     <nav class="nav-desktop" aria-label="Navigazione principale">
-      <a href="#home" data-hover="link"><span>Home</span></a>
-      <a href="#works" data-hover="link"><span>Saloni</span></a>
-      <a href="#services" data-hover="link"><span>Servizi</span></a>
-      <a href="#about" data-hover="link"><span>Studio</span></a>
-      <a href="#contatti" data-hover="link"><span>Contatti</span></a>
-      <button type="button" class="nav-desktop__cta" data-open-modal data-hover="link"><span>Prenota</span></button>
+      <a href="#home" data-hover="link" data-glow-group><span data-glow="text">Home</span></a>
+      <a href="#works" data-hover="link" data-glow-group><span data-glow="text">Saloni</span></a>
+      <a href="#services" data-hover="link" data-glow-group><span data-glow="text">Servizi</span></a>
+      <a href="#about" data-hover="link" data-glow-group><span data-glow="text">Studio</span></a>
+      <a href="#contatti" data-hover="link" data-glow-group><span data-glow="text">Contatti</span></a>
+      <button type="button" class="nav-desktop__cta" data-open-modal data-hover="link" data-glow-group data-glow-surface="dark"><span data-glow="text">Prenota</span></button>
     </nav>
     <div class="header__right">
       <div class="clock" aria-label="Ora locale">
         <time class="clock__time" data-clock-time>--:--</time>
         <span class="clock__date" data-clock-date>Genova</span>
       </div>
-      <button class="menu-btn" id="menu-btn" type="button" aria-controls="nav" aria-expanded="false" data-hover="fast">
+      <button class="menu-btn" id="menu-btn" type="button" aria-controls="nav" aria-expanded="false" data-hover="fast" data-glow="surface self">
         <svg aria-hidden="true"><use href="#i-menu"/></svg>
         <span class="menu-btn__label">Menu</span>
         <span class="sr-only">Apri il menu di navigazione</span>
@@ -632,7 +804,7 @@ html.lenis, html.lenis body { height: auto; }
       <div class="hero-grid">
         <div class="hero-left">
           <p class="eyebrow rv" data-hero="200">Hair studio · Genova centro</p>
-          <h1 class="hero-title" id="hero-title" data-hero="250" data-lines>
+          <h1 class="hero-title" id="hero-title" data-hero="250" data-lines data-glow="display">
             <span class="line"><span class="line-inner">Il tuo stile,</span></span>
             <span class="line"><span class="line-inner">coltivato</span></span>
             <span class="line"><span class="line-inner tone">con cura.</span></span>
@@ -643,11 +815,11 @@ html.lenis, html.lenis body { height: auto; }
             <li><svg aria-hidden="true"><use href="#i-flower"/></svg>Prenotazioni per telefono</li>
           </ul>
           <div class="hero-ctas rv" data-hero="750">
-            <button class="pill pill--dark" type="button" data-open-modal data-hover="fast">
+            <button class="pill pill--dark" type="button" data-open-modal data-hover="fast" data-glow="surface self">
               Prenota un appuntamento
               <span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></span>
             </button>
-            <a class="pill pill--light" href="#works" data-hover="fast">
+            <a class="pill pill--light" href="#works" data-hover="fast" data-glow="surface self">
               Scopri i saloni
               <span class="pill__badge"><svg class="mv-r" aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
             </a>
@@ -656,7 +828,7 @@ html.lenis, html.lenis body { height: auto; }
 
         <div class="hero-right">
           <div class="rv" data-hero="400">
-            <div class="hero-card" data-carousel role="group" aria-roledescription="carosello" aria-label="Fiore in breve">
+            <div class="hero-card" data-carousel data-glow="surface" role="group" aria-roledescription="carosello" aria-label="Fiore in breve">
               <div class="hc-tile" aria-hidden="true">
                 <svg data-carousel-flower><use href="#i-flower"/></svg>
                 <span class="hc-tile__num" data-carousel-num>01 / 03</span>
@@ -694,10 +866,10 @@ html.lenis, html.lenis body { height: auto; }
             </div>
           </div>
           <ul class="hero-feats rv" data-hero="550" aria-label="Aree di servizio">
-            <li><a class="hero-feat" href="#services" data-hover="fast"><svg aria-hidden="true"><use href="#i-scissors"/></svg>Taglio</a></li>
-            <li><a class="hero-feat" href="#services" data-hover="fast"><svg aria-hidden="true"><use href="#i-drop"/></svg>Colore</a></li>
-            <li><a class="hero-feat" href="#services" data-hover="fast"><svg aria-hidden="true"><use href="#i-leaf"/></svg>Cura</a></li>
-            <li><a class="hero-feat" href="#services" data-hover="fast"><svg aria-hidden="true"><use href="#i-logomark"/></svg>Eventi</a></li>
+            <li><a class="hero-feat" href="#services" data-hover="fast" data-glow="surface"><svg aria-hidden="true"><use href="#i-scissors"/></svg>Taglio</a></li>
+            <li><a class="hero-feat" href="#services" data-hover="fast" data-glow="surface"><svg aria-hidden="true"><use href="#i-drop"/></svg>Colore</a></li>
+            <li><a class="hero-feat" href="#services" data-hover="fast" data-glow="surface"><svg aria-hidden="true"><use href="#i-leaf"/></svg>Cura</a></li>
+            <li><a class="hero-feat" href="#services" data-hover="fast" data-glow="surface"><svg aria-hidden="true"><use href="#i-logomark"/></svg>Eventi</a></li>
           </ul>
         </div>
       </div>
@@ -727,10 +899,10 @@ html.lenis, html.lenis body { height: auto; }
         <div class="about-foot rv">
           <div class="about-links">
             <span class="about-links__label">Indicazioni stradali</span>
-            <a class="alink" href="https://www.google.com/maps/search/?api=1&amp;query=Galleria+Giuseppe+Mazzini+7R+16121+Genova" target="_blank" rel="noopener noreferrer" data-hover="link"><span>Galleria Mazzini</span><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg><span class="sr-only">(apre Google Maps in una nuova scheda)</span></a>
-            <a class="alink" href="https://www.google.com/maps/search/?api=1&amp;query=Via+Cesarea+34r+16121+Genova" target="_blank" rel="noopener noreferrer" data-hover="link"><span>Via Cesarea</span><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg><span class="sr-only">(apre Google Maps in una nuova scheda)</span></a>
+            <a class="alink" href="https://www.google.com/maps/search/?api=1&amp;query=Galleria+Giuseppe+Mazzini+7R+16121+Genova" target="_blank" rel="noopener noreferrer" data-hover="link" data-glow-group><span data-glow="text">Galleria Mazzini</span><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg><span class="sr-only">(apre Google Maps in una nuova scheda)</span></a>
+            <a class="alink" href="https://www.google.com/maps/search/?api=1&amp;query=Via+Cesarea+34r+16121+Genova" target="_blank" rel="noopener noreferrer" data-hover="link" data-glow-group><span data-glow="text">Via Cesarea</span><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg><span class="sr-only">(apre Google Maps in una nuova scheda)</span></a>
           </div>
-          <a class="pill pill--outline" href="#services" data-hover="fast">
+          <a class="pill pill--outline" href="#services" data-hover="fast" data-glow="surface self">
             Scopri i servizi
             <span class="pill__badge"><svg class="mv-r" aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
           </a>
@@ -744,10 +916,10 @@ html.lenis, html.lenis body { height: auto; }
   <!-- ==================================================================== -->
   <section class="band" aria-label="Taglio, colore, per te">
     <ul class="shell band-row" data-stagger="120">
-      <li class="st"><div class="band-tile band-tile--light" data-hover="fast">Taglio</div></li>
-      <li class="st"><div class="band-tile band-tile--accent" data-hover="fast">Colore</div></li>
-      <li class="st"><div class="band-tile band-tile--dark" data-hover="fast"><svg aria-hidden="true"><use href="#i-arrow-r"/></svg></div></li>
-      <li class="st"><div class="band-tile band-tile--muted" data-hover="fast">Tu</div></li>
+      <li class="st"><div class="band-tile band-tile--light" data-hover="fast" data-glow="surface" data-glow-group><span class="band-word" data-glow="display">Taglio</span></div></li>
+      <li class="st"><div class="band-tile band-tile--accent" data-hover="fast" data-glow="surface" data-glow-group data-glow-surface="dark"><span class="band-word" data-glow="display">Colore</span></div></li>
+      <li class="st"><div class="band-tile band-tile--dark" data-hover="fast" data-glow="surface"><svg aria-hidden="true"><use href="#i-arrow-r"/></svg></div></li>
+      <li class="st"><div class="band-tile band-tile--muted" data-hover="fast" data-glow="surface" data-glow-group><span class="band-word" data-glow="display">Tu</span></div></li>
     </ul>
   </section>
 
@@ -758,7 +930,7 @@ html.lenis, html.lenis body { height: auto; }
     <div class="shell">
       <div class="section-head">
         <p class="eyebrow rv">I saloni</p>
-        <h2 class="section-title" id="works-title" data-lines>
+        <h2 class="section-title" id="works-title" data-lines data-glow="display">
           <span class="line"><span class="line-inner">Due saloni,</span></span>
           <span class="line"><span class="line-inner tone">due atmosfere.</span></span>
         </h2>
@@ -766,7 +938,7 @@ html.lenis, html.lenis body { height: auto; }
 
       <ul class="works-grid" data-stagger="90">
         <li class="st">
-          <article class="work-card" data-hover="card" aria-labelledby="salon-1">
+          <article class="work-card" data-hover="card" data-glow="surface" data-glow-group data-glow-surface="dark" aria-labelledby="salon-1">
             <div class="work-top">
               <p class="work-meta"><strong>Salone 01</strong>Galleria Mazzini</p>
               <a class="round-badge" href="https://www.google.com/maps/search/?api=1&amp;query=Galleria+Giuseppe+Mazzini+7R+16121+Genova" target="_blank" rel="noopener noreferrer" aria-label="Galleria Mazzini su Google Maps (nuova scheda)" data-hover="fast"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></a>
@@ -783,7 +955,7 @@ html.lenis, html.lenis body { height: auto; }
               </svg>
             </div>
             <div>
-              <h3 class="work-title" id="salon-1">Galleria Mazzini</h3>
+              <h3 class="work-title" id="salon-1" data-glow="display">Galleria Mazzini</h3>
               <p class="work-address">Galleria Giuseppe Mazzini, 7 R · 16121 Genova</p>
               <p class="work-desc">Il salone dentro la galleria: boiserie in legno chiaro, specchi ovali illuminati, sedute morbide e una parete verde di muschio.</p>
               <div class="chips"><span class="chip">Legno chiaro</span><span class="chip">Specchi ovali</span><span class="chip">Parete verde</span></div>
@@ -792,13 +964,13 @@ html.lenis, html.lenis body { height: auto; }
                 <div><dt>Telefono</dt><dd><a href="tel:+390100011047">+39 010 001 1047</a></dd></div>
               </dl>
               <div class="work-actions">
-                <a class="pill pill--white" href="tel:+390100011047" data-hover="fast">Chiama il salone<span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-phone"/></svg></span></a>
+                <a class="pill pill--white" href="tel:+390100011047" data-hover="fast" data-glow="surface self">Chiama il salone<span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-phone"/></svg></span></a>
               </div>
             </div>
           </article>
         </li>
         <li class="st">
-          <article class="work-card" data-hover="card" aria-labelledby="salon-2">
+          <article class="work-card" data-hover="card" data-glow="surface" data-glow-group data-glow-surface="dark" aria-labelledby="salon-2">
             <div class="work-top">
               <p class="work-meta"><strong>Salone 02</strong>Via Cesarea</p>
               <a class="round-badge" href="https://www.google.com/maps/search/?api=1&amp;query=Via+Cesarea+34r+16121+Genova" target="_blank" rel="noopener noreferrer" aria-label="Via Cesarea su Google Maps (nuova scheda)" data-hover="fast"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></a>
@@ -815,7 +987,7 @@ html.lenis, html.lenis body { height: auto; }
               </svg>
             </div>
             <div>
-              <h3 class="work-title" id="salon-2">Via Cesarea</h3>
+              <h3 class="work-title" id="salon-2" data-glow="display">Via Cesarea</h3>
               <p class="work-address">Via Cesarea, 34r · 16121 Genova</p>
               <p class="work-desc">Lo spazio più contemporaneo: marmo bianco, linee di luce LED, specchi circolari e poltrone verde salvia.</p>
               <div class="chips"><span class="chip">Marmo bianco</span><span class="chip">Luce LED</span><span class="chip">Verde salvia</span></div>
@@ -824,7 +996,7 @@ html.lenis, html.lenis body { height: auto; }
                 <div><dt>Telefono</dt><dd><a href="tel:+390105960056">+39 010 596 0056</a></dd></div>
               </dl>
               <div class="work-actions">
-                <a class="pill pill--white" href="tel:+390105960056" data-hover="fast">Chiama il salone<span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-phone"/></svg></span></a>
+                <a class="pill pill--white" href="tel:+390105960056" data-hover="fast" data-glow="surface self">Chiama il salone<span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-phone"/></svg></span></a>
               </div>
             </div>
           </article>
@@ -841,7 +1013,7 @@ html.lenis, html.lenis body { height: auto; }
       <div class="services-head">
         <div>
           <p class="eyebrow rv">Servizi</p>
-          <h2 class="section-title" id="services-title" data-lines style="margin-top:1.25rem">
+          <h2 class="section-title" id="services-title" data-lines data-glow="display" style="margin-top:1.25rem">
             <span class="line"><span class="line-inner">Dal taglio</span></span>
             <span class="line"><span class="line-inner tone">al trattamento.</span></span>
           </h2>
@@ -850,35 +1022,35 @@ html.lenis, html.lenis body { height: auto; }
       </div>
       <ul class="svc-list" data-stagger="80">
         <li class="st">
-          <div class="svc-row" data-hover="row">
+          <div class="svc-row" data-hover="row" data-glow-group>
             <span class="svc-index">01</span>
-            <h3 class="svc-title">Taglio e styling</h3>
+            <h3 class="svc-title" data-glow="display">Taglio e styling</h3>
             <p class="svc-desc">Consulenza sulla forma del viso, taglio su misura e piega: liscia, mossa o beach waves.</p>
-            <button class="svc-btn" type="button" data-open-modal data-service="Taglio e styling" aria-label="Richiedi un appuntamento per taglio e styling"><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></button>
+            <button class="svc-btn" type="button" data-glow="ring" data-open-modal data-service="Taglio e styling" aria-label="Richiedi un appuntamento per taglio e styling"><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></button>
           </div>
         </li>
         <li class="st">
-          <div class="svc-row" data-hover="row">
+          <div class="svc-row" data-hover="row" data-glow-group>
             <span class="svc-index">02</span>
-            <h3 class="svc-title">Colore</h3>
+            <h3 class="svc-title" data-glow="display">Colore</h3>
             <p class="svc-desc">Balayage, babylights, schiariture naturali, tonalizzanti e glossing. Anche correzioni colore.</p>
-            <button class="svc-btn" type="button" data-open-modal data-service="Colore" aria-label="Richiedi un appuntamento per il colore"><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></button>
+            <button class="svc-btn" type="button" data-glow="ring" data-open-modal data-service="Colore" aria-label="Richiedi un appuntamento per il colore"><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></button>
           </div>
         </li>
         <li class="st">
-          <div class="svc-row" data-hover="row">
+          <div class="svc-row" data-hover="row" data-glow-group>
             <span class="svc-index">03</span>
-            <h3 class="svc-title">Trattamenti</h3>
+            <h3 class="svc-title" data-glow="display">Trattamenti</h3>
             <p class="svc-desc">Cheratina, ricostruzione molecolare e cura del cuoio capelluto, per capelli più sani.</p>
-            <button class="svc-btn" type="button" data-open-modal data-service="Trattamenti" aria-label="Richiedi un appuntamento per un trattamento"><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></button>
+            <button class="svc-btn" type="button" data-glow="ring" data-open-modal data-service="Trattamenti" aria-label="Richiedi un appuntamento per un trattamento"><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></button>
           </div>
         </li>
         <li class="st">
-          <div class="svc-row" data-hover="row">
+          <div class="svc-row" data-hover="row" data-glow-group>
             <span class="svc-index">04</span>
-            <h3 class="svc-title">Eventi e cerimonie</h3>
+            <h3 class="svc-title" data-glow="display">Eventi e cerimonie</h3>
             <p class="svc-desc">Acconciature per matrimoni, cerimonie e serate importanti.</p>
-            <button class="svc-btn" type="button" data-open-modal data-service="Eventi e cerimonie" aria-label="Richiedi un appuntamento per eventi e cerimonie"><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></button>
+            <button class="svc-btn" type="button" data-glow="ring" data-open-modal data-service="Eventi e cerimonie" aria-label="Richiedi un appuntamento per eventi e cerimonie"><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></button>
           </div>
         </li>
       </ul>
@@ -890,10 +1062,10 @@ html.lenis, html.lenis body { height: auto; }
   <!-- ==================================================================== -->
   <section class="stats" id="stats" aria-labelledby="stats-title">
     <div class="shell">
-      <div class="stats-panel">
+      <div class="stats-panel" data-glow-surface="dark">
         <div class="stats-head">
           <p class="eyebrow eyebrow--light rv">In breve</p>
-          <h2 class="stats-title" id="stats-title" data-lines>
+          <h2 class="stats-title" id="stats-title" data-lines data-glow="display">
             <span class="line"><span class="line-inner">Fiore,</span></span>
             <span class="line"><span class="line-inner tone">in quattro cifre.</span></span>
           </h2>
@@ -912,19 +1084,20 @@ html.lenis, html.lenis body { height: auto; }
 <!-- ====================================================================== -->
 <!-- Footer                                                                  -->
 <!-- ====================================================================== -->
-<footer class="footer" id="contatti" tabindex="-1">
-  <div class="footer-watermark" aria-hidden="true"><span class="wordmark">FI<svg class="wordmark__flower"><use href="#i-flower"/></svg>RE</span></div>
+<footer class="footer" id="contatti" tabindex="-1" data-glow-surface="dark">
   <div class="shell">
     <div class="footer-cta">
-      <h2 class="footer-title" data-lines data-line-stagger="100">
+      <h2 class="footer-title" data-lines data-line-stagger="100" data-glow="display">
         <span class="line"><span class="line-inner">Voglia di</span></span>
         <span class="line"><span class="line-inner">cambiare?</span></span>
         <span class="line"><span class="line-inner tone">Parliamone.</span></span>
       </h2>
-      <button class="pill pill--white rv" type="button" data-open-modal data-hover="fast">
-        Prenota un appuntamento
-        <span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></span>
-      </button>
+      <div class="rv">
+        <button class="pill pill--white" type="button" data-open-modal data-hover="fast" data-glow="surface self">
+          Prenota un appuntamento
+          <span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></span>
+        </button>
+      </div>
     </div>
 
     <div class="footer-cols">
@@ -938,19 +1111,19 @@ html.lenis, html.lenis body { height: auto; }
       <nav class="footer-col" aria-labelledby="f-studio">
         <h3 id="f-studio">Studio</h3>
         <ul>
-          <li><a class="alink" href="#home" data-hover="link"><span>Home</span></a></li>
-          <li><a class="alink" href="#works" data-hover="link"><span>Saloni</span></a></li>
-          <li><a class="alink" href="#about" data-hover="link"><span>Lo studio</span></a></li>
-          <li><button class="alink" type="button" data-open-modal data-hover="link"><span>Prenota</span></button></li>
+          <li><a class="alink" href="#home" data-hover="link" data-glow-group><span data-glow="text">Home</span></a></li>
+          <li><a class="alink" href="#works" data-hover="link" data-glow-group><span data-glow="text">Saloni</span></a></li>
+          <li><a class="alink" href="#about" data-hover="link" data-glow-group><span data-glow="text">Lo studio</span></a></li>
+          <li><button class="alink" type="button" data-open-modal data-hover="link" data-glow-group><span data-glow="text">Prenota</span></button></li>
         </ul>
       </nav>
       <nav class="footer-col" aria-labelledby="f-servizi">
         <h3 id="f-servizi">Servizi</h3>
         <ul>
-          <li><a class="alink" href="#services" data-hover="link"><span>Taglio e styling</span></a></li>
-          <li><a class="alink" href="#services" data-hover="link"><span>Colore</span></a></li>
-          <li><a class="alink" href="#services" data-hover="link"><span>Trattamenti</span></a></li>
-          <li><a class="alink" href="#services" data-hover="link"><span>Eventi e cerimonie</span></a></li>
+          <li><a class="alink" href="#services" data-hover="link" data-glow-group><span data-glow="text">Taglio e styling</span></a></li>
+          <li><a class="alink" href="#services" data-hover="link" data-glow-group><span data-glow="text">Colore</span></a></li>
+          <li><a class="alink" href="#services" data-hover="link" data-glow-group><span data-glow="text">Trattamenti</span></a></li>
+          <li><a class="alink" href="#services" data-hover="link" data-glow-group><span data-glow="text">Eventi e cerimonie</span></a></li>
         </ul>
       </nav>
       <div class="footer-col">
@@ -959,12 +1132,12 @@ html.lenis, html.lenis body { height: auto; }
           <div>
             <strong>Galleria Mazzini</strong>
             <span>Galleria Giuseppe Mazzini, 7 R<br>16121 Genova (GE)</span>
-            <a class="alink" href="tel:+390100011047" data-hover="link"><span>+39 010 001 1047</span></a>
+            <a class="alink" href="tel:+390100011047" data-hover="link" data-glow-group><span data-glow="text">+39 010 001 1047</span></a>
           </div>
           <div>
             <strong>Via Cesarea</strong>
             <span>Via Cesarea, 34r<br>16121 Genova (GE)</span>
-            <a class="alink" href="tel:+390105960056" data-hover="link"><span>+39 010 596 0056</span></a>
+            <a class="alink" href="tel:+390105960056" data-hover="link" data-glow-group><span data-glow="text">+39 010 596 0056</span></a>
           </div>
         </div>
       </div>
@@ -972,7 +1145,14 @@ html.lenis, html.lenis body { height: auto; }
 
     <div class="footer-legal">
       <span>© <span data-year>2026</span> Fiore Hair Studio · Genova</span>
-      <a class="alink alink--legal" href="#home" data-hover="link"><span>Torna su ↑</span></a>
+      <a class="alink alink--legal" href="#home" data-hover="link" data-glow-group><span data-glow="text">Torna su ↑</span></a>
+    </div>
+
+    <div class="signature">
+      <p class="signature__name" data-glow="signature">
+        <span class="sr-only">Fiore</span>
+        <span class="signature__word" data-glow-glyphs aria-hidden="true">FI<span class="signature__flower" data-glow-glyphs></span>RE</span>
+      </p>
     </div>
   </div>
 </footer>
@@ -980,7 +1160,7 @@ html.lenis, html.lenis body { height: auto; }
 <!-- ====================================================================== -->
 <!-- Navigation overlay                                                      -->
 <!-- ====================================================================== -->
-<div class="nav" id="nav" role="dialog" aria-modal="true" aria-label="Menu di navigazione" aria-hidden="true" inert>
+<div class="nav" id="nav" data-glow-surface="dark" role="dialog" aria-modal="true" aria-label="Menu di navigazione" aria-hidden="true" inert>
   <div class="shell nav-top">
     <button class="brand brand--light" type="button" data-scroll-top data-hover="fast" aria-label="Fiore Hair Studio, torna all'inizio">
       <span class="brand__mark"><svg aria-hidden="true"><use href="#i-flower"/></svg></span>
@@ -990,18 +1170,18 @@ html.lenis, html.lenis body { height: auto; }
   </div>
   <nav class="shell nav-body" aria-label="Sezioni">
     <ul class="nav-list">
-      <li><a class="nav-link" href="#home" data-hover="link"><span class="nav-index">01</span><span>Home</span></a></li>
-      <li><a class="nav-link" href="#works" data-hover="link"><span class="nav-index">02</span><span>Saloni</span></a></li>
-      <li><a class="nav-link" href="#services" data-hover="link"><span class="nav-index">03</span><span>Servizi</span></a></li>
-      <li><a class="nav-link" href="#about" data-hover="link"><span class="nav-index">04</span><span>Lo studio</span></a></li>
-      <li><a class="nav-link" href="#contatti" data-hover="link"><span class="nav-index">05</span><span>Contatti</span></a></li>
-      <li><button class="nav-link" type="button" data-open-modal data-hover="link"><span class="nav-index">06</span><span>Prenota</span></button></li>
+      <li><a class="nav-link" href="#home" data-hover="link" data-glow-group><span class="nav-index">01</span><span data-glow="display">Home</span></a></li>
+      <li><a class="nav-link" href="#works" data-hover="link" data-glow-group><span class="nav-index">02</span><span data-glow="display">Saloni</span></a></li>
+      <li><a class="nav-link" href="#services" data-hover="link" data-glow-group><span class="nav-index">03</span><span data-glow="display">Servizi</span></a></li>
+      <li><a class="nav-link" href="#about" data-hover="link" data-glow-group><span class="nav-index">04</span><span data-glow="display">Lo studio</span></a></li>
+      <li><a class="nav-link" href="#contatti" data-hover="link" data-glow-group><span class="nav-index">05</span><span data-glow="display">Contatti</span></a></li>
+      <li><button class="nav-link" type="button" data-open-modal data-hover="link" data-glow-group><span class="nav-index">06</span><span data-glow="display">Prenota</span></button></li>
     </ul>
   </nav>
   <div class="shell">
     <div class="nav-bottom">
       <p class="nav-time"><strong data-clock-time>--:--</strong><span data-clock-date>Ora locale</span></p>
-      <button class="pill pill--white" type="button" data-open-modal data-hover="fast">
+      <button class="pill pill--white" type="button" data-open-modal data-hover="fast" data-glow="surface self">
         Prenota un appuntamento
         <span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></span>
       </button>
@@ -1038,7 +1218,7 @@ html.lenis, html.lenis body { height: auto; }
           <span class="field-error" id="f-request-err" aria-live="polite"></span>
         </div>
         <p class="form-note">Anteprima del modulo: per ora la richiesta non viene inviata al salone. Per prenotare subito chiama Galleria Mazzini al <a href="tel:+390100011047">+39 010 001 1047</a> o Via Cesarea al <a href="tel:+390105960056">+39 010 596 0056</a>.</p>
-        <button class="pill pill--dark" type="submit" data-hover="fast">
+        <button class="pill pill--dark" type="submit" data-hover="fast" data-glow="surface self">
           <span data-submit-label>Invia richiesta</span>
           <span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></span>
         </button>
@@ -1054,7 +1234,7 @@ html.lenis, html.lenis body { height: auto; }
         <li><a href="tel:+390105960056"><strong>Via Cesarea</strong><span>+39 010 596 0056</span></a></li>
       </ul>
       <div class="success__actions">
-        <button class="pill pill--dark pill--plain" type="button" data-modal-close data-hover="fast">Chiudi</button>
+        <button class="pill pill--dark pill--plain" type="button" data-modal-close data-hover="fast" data-glow="surface self">Chiudi</button>
       </div>
     </div>
   </div>
@@ -1173,6 +1353,48 @@ function bindHover(el) {
   el.addEventListener('focusout', () => spring.set(0));
 }
 if (canHover && !reduce) $$('[data-hover]').forEach(bindHover);
+
+/* ==========================================================================
+   Glow system — cursor-reactive light (CSS does the rest)
+   ========================================================================== */
+const GLOW_TRIGGERS = '[data-glow], [data-glow-group]';
+function glowMembers(trigger) {
+  const own = trigger.matches('[data-glow]') ? [trigger] : [];
+  const inside = trigger.matches('[data-glow-group]') ? $$('[data-glow]:not([data-glow~="self"])', trigger) : [];
+  return own.concat(inside);
+}
+function lightTargets(glowEl) {
+  if (glowEl.matches('[data-lines]')) return $$('.line-inner', glowEl);
+  const glyphs = $$('[data-glow-glyphs]', glowEl);
+  return glyphs.length ? glyphs : [glowEl];
+}
+function placeLight(e) {
+  let trigger = e.target instanceof Element ? e.target.closest(GLOW_TRIGGERS) : null;
+  while (trigger) {
+    glowMembers(trigger).forEach((member) => {
+      lightTargets(member).forEach((t) => {
+        const r = t.getBoundingClientRect();
+        t.style.setProperty('--lx', `${(e.clientX - r.left).toFixed(1)}px`);
+        t.style.setProperty('--ly', `${(e.clientY - r.top).toFixed(1)}px`);
+      });
+    });
+    trigger = trigger.parentElement?.closest(GLOW_TRIGGERS);
+  }
+}
+if (canHover && !reduce) {
+  let lastMove = null;
+  document.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
+    if (!lastMove) requestAnimationFrame(() => { placeLight(lastMove); lastMove = null; });
+    lastMove = e;
+  }, { passive: true });
+}
+// Touch screens have no hover: light the signature while it is on screen instead.
+if (!canHover) {
+  $$('[data-glow~="signature"]').forEach((sig) => {
+    new IntersectionObserver(([entry]) => sig.classList.toggle('is-lit', entry.isIntersecting), { threshold: 0.6 }).observe(sig);
+  });
+}
 
 /* ==========================================================================
    Text + block reveals
