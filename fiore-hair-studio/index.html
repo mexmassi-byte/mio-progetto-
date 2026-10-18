@@ -13,7 +13,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>
   // Boot flag: hidden entrance states only apply once JS runs; if the module never boots, show everything.
-  document.documentElement.className = 'js';
+  document.documentElement.classList.remove('no-js');
+  document.documentElement.classList.add('js');
   window.__fioreBoot = setTimeout(function () { document.documentElement.classList.add('js-failed'); }, 6000);
 </script>
 <script type="importmap">
@@ -56,6 +57,7 @@
   --ease-word: cubic-bezier(.165, .84, .44, 1);
   --ease-out: cubic-bezier(.22, 1, .36, 1);
   --ease-soft: cubic-bezier(.25, .9, .3, 1);
+  color-scheme: light;
 }
 
 /* ==========================================================================
@@ -63,7 +65,7 @@
    ========================================================================== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; -webkit-font-smoothing: antialiased; }
-body { background: #ffffff; color: var(--foreground); font-family: 'Onest', sans-serif; overflow-x: hidden; line-height: 1.5; }
+body { background: var(--background); color: var(--foreground); font-family: 'Onest', sans-serif; overflow-x: hidden; line-height: 1.5; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 ul, ol { list-style: none; }
@@ -93,7 +95,7 @@ html.lenis, html.lenis body { height: auto; }
    ========================================================================== */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .skip-link {
-  position: fixed; left: 1rem; top: 1rem; z-index: 1100;
+  position: fixed; left: calc(1rem + env(safe-area-inset-left, 0px)); top: calc(1rem + env(safe-area-inset-top, 0px)); z-index: 1100;
   padding: .75rem 1.25rem; border-radius: var(--radius-pill);
   background: var(--ink); color: #fff; font-size: .875rem; font-weight: 500;
   transform: translateY(-200%); transition: transform .25s var(--ease-out);
@@ -186,7 +188,7 @@ html.lenis, html.lenis body { height: auto; }
 .loader__studio { margin-top: 1.5rem; font-family: var(--serif); font-size: 1.125rem; letter-spacing: .5em; padding-left: .5em; }
 .loader__rule { width: 100%; max-width: 22rem; height: 1px; background: rgba(255,255,255,.75); margin-top: .9rem; }
 .loader__tagline { margin-top: 1.75rem; font-size: .875rem; letter-spacing: .02em; opacity: .92; }
-.loader__progress { position: absolute; left: 50%; bottom: 3.5rem; width: min(26rem, calc(100% - 2.5rem)); transform: translateX(-50%); }
+.loader__progress { position: absolute; left: 50%; bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px)); width: min(26rem, calc(100% - 2.5rem)); transform: translateX(-50%); }
 .loader__track { height: 2px; background: rgba(255,255,255,.28); border-radius: 2px; overflow: hidden; }
 .loader__fill { height: 100%; background: #fff; transform-origin: left center; transform: scaleX(0); }
 .loader__meta { display: flex; justify-content: space-between; margin-top: .75rem; font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
@@ -447,7 +449,7 @@ html.lenis, html.lenis body { height: auto; }
    ========================================================================== */
 .nav { position: fixed; inset: 0; z-index: 900; display: flex; flex-direction: column; background: var(--ink); color: #fff; opacity: 0; visibility: hidden; transition: opacity .45s var(--ease-out), visibility 0s linear .45s; }
 .nav.is-open { opacity: 1; visibility: visible; transition: opacity .45s var(--ease-out), visibility 0s; }
-.nav-top { display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; }
+.nav-top { display: flex; justify-content: space-between; align-items: center; padding-top: calc(1.5rem + env(safe-area-inset-top, 0px)); }
 .nav-close { --h: 0; width: 3rem; height: 3rem; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); transform: rotate(calc(90deg * var(--h))); }
 .nav-close svg { width: 1.125rem; height: 1.125rem; }
 .nav-body { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
@@ -457,7 +459,7 @@ html.lenis, html.lenis body { height: auto; }
 .nav.is-open .nav-link { opacity: 1; transform: none; }
 .nav-link:hover, .nav-link:focus-visible { color: var(--subtle); }
 .nav-index { font-family: var(--sans); font-size: .75rem; letter-spacing: .14em; color: var(--accent); font-variant-numeric: tabular-nums; }
-.nav-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.5rem 0 2rem; border-top: 1px solid rgba(255,255,255,.12); }
+.nav-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.5rem 0 calc(2rem + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(255,255,255,.12); }
 .nav-time { font-size: .875rem; color: var(--subtle); font-variant-numeric: tabular-nums; }
 .nav-time strong { color: #fff; font-weight: 600; margin-right: .5rem; }
 
@@ -491,10 +493,15 @@ html.lenis, html.lenis body { height: auto; }
 .success { text-align: left; }
 .success__icon { width: 3.5rem; height: 3.5rem; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; --flower-eye: var(--accent); }
 .success__icon svg { width: 2rem; height: 2rem; }
-.success__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.75rem; }
+.success__list { display: grid; gap: .5rem; margin-top: 1.5rem; }
+.success__list a { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .25rem 1rem; padding: .875rem 1.125rem; border-radius: var(--radius-control); background: var(--surface); font-size: .9375rem; transition: background-color .25s; }
+.success__list a:hover { background: var(--surface-2); }
+.success__list strong { font-weight: 500; }
+.success__list span { font-variant-numeric: tabular-nums; color: var(--muted); user-select: all; }
+.success__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.5rem; }
 @media (max-width:640px) {
   .modal { align-items: end; padding: 0; }
-  .modal-panel { width: 100%; max-height: 92svh; padding: 2rem 1.25rem 1.5rem; border-radius: 1.5rem 1.5rem 0 0; transform: translateY(100%); }
+  .modal-panel { width: 100%; max-height: 92svh; padding: 2rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px)); border-radius: 1.5rem 1.5rem 0 0; transform: translateY(100%); }
   .modal-title { font-size: 2rem; }
 }
 </style>
@@ -1030,7 +1037,7 @@ html.lenis, html.lenis body { height: auto; }
           <textarea id="f-request" name="request" rows="4" required placeholder="Servizio, salone preferito e giorni in cui sei disponibile." aria-describedby="f-request-err"></textarea>
           <span class="field-error" id="f-request-err" aria-live="polite"></span>
         </div>
-        <p class="form-note">Anteprima del modulo: per ora la richiesta non viene inviata al salone. Per prenotare subito chiama <a href="tel:+390100011047">Galleria Mazzini</a> o <a href="tel:+390105960056">Via Cesarea</a>.</p>
+        <p class="form-note">Anteprima del modulo: per ora la richiesta non viene inviata al salone. Per prenotare subito chiama Galleria Mazzini al <a href="tel:+390100011047">+39 010 001 1047</a> o Via Cesarea al <a href="tel:+390105960056">+39 010 596 0056</a>.</p>
         <button class="pill pill--dark" type="submit" data-hover="fast">
           <span data-submit-label>Invia richiesta</span>
           <span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></span>
@@ -1042,9 +1049,11 @@ html.lenis, html.lenis body { height: auto; }
       <span class="success__icon" aria-hidden="true"><svg><use href="#i-flower"/></svg></span>
       <h2 class="modal-title" tabindex="-1" data-success-title>Grazie!</h2>
       <p class="modal-intro">La tua richiesta è pronta, ma questo modulo è ancora dimostrativo e non ha inviato dati. Per fissare l'appuntamento chiama il salone che preferisci.</p>
+      <ul class="success__list">
+        <li><a href="tel:+390100011047"><strong>Galleria Mazzini</strong><span>+39 010 001 1047</span></a></li>
+        <li><a href="tel:+390105960056"><strong>Via Cesarea</strong><span>+39 010 596 0056</span></a></li>
+      </ul>
       <div class="success__actions">
-        <a class="pill pill--light" href="tel:+390100011047" data-hover="fast">Galleria Mazzini<span class="pill__badge"><svg aria-hidden="true"><use href="#i-phone"/></svg></span></a>
-        <a class="pill pill--light" href="tel:+390105960056" data-hover="fast">Via Cesarea<span class="pill__badge"><svg aria-hidden="true"><use href="#i-phone"/></svg></span></a>
         <button class="pill pill--dark pill--plain" type="button" data-modal-close data-hover="fast">Chiudi</button>
       </div>
     </div>
