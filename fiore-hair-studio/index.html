@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="it" class="no-js">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fiore Hair Studio — Genova</title>
+<meta name="description" content="Fiore Hair Studio, hair studio fondato da Gaetano Fiore a Genova: taglio, colore, trattamenti e acconciature per eventi nei saloni di Galleria Mazzini e Via Cesarea." />
+<meta name="theme-color" content="#9c959d" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='24' fill='%239c959d'/%3E%3Cg fill='%23fff' transform='translate(9.6 9.6) scale(.6)'%3E%3Cellipse cx='24' cy='13' rx='6.4' ry='10.6'/%3E%3Cellipse cx='24' cy='13' rx='6.4' ry='10.6' transform='rotate(72 24 24)'/%3E%3Cellipse cx='24' cy='13' rx='6.4' ry='10.6' transform='rotate(144 24 24)'/%3E%3Cellipse cx='24' cy='13' rx='6.4' ry='10.6' transform='rotate(216 24 24)'/%3E%3Cellipse cx='24' cy='13' rx='6.4' ry='10.6' transform='rotate(288 24 24)'/%3E%3C/g%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
+<link href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  // Boot flag: hidden entrance states only apply once JS runs; if the module never boots, show everything.
+  document.documentElement.className = 'js';
+  window.__fioreBoot = setTimeout(function () { document.documentElement.classList.add('js-failed'); }, 6000);
+</script>
+<script type="importmap">
+{
+  "imports": {
+    "lenis": "https://unpkg.com/lenis@1.3.23/dist/lenis.mjs"
+  }
+}
+</script>
+<style>
+/* ==========================================================================
+   Tokens — palette taken from the Fiore logo (mauve circle, white serif)
+   ========================================================================== */
+:root {
+  --background: #ffffff;
+  --foreground: #1f1b20;
+  --ink: #29242a;
+  --muted: #6f6871;
+  --muted-large: #8f8890;
+  --subtle: #b4adb5;
+  --line: #e8e5e9;
+  --surface: #f4f2f4;
+  --surface-2: #e7e3e8;
+  --accent: #9c959d;
+  --accent-strong: #6f6871;
+  --accent-from: #968f97;
+  --accent-to: #6f6871;
+  --hero-from: #f3f1f3;
+  --hero-to: #cdc7ce;
+  --danger: #9b2c3a;
+  --radius-pill: 9999px;
+  --radius-card: 2rem;
+  --radius-card-sm: 1.25rem;
+  --radius-control: 0.875rem;
+  --text-watermark: 13rem;
+  --container-shell: 88rem;
+  --serif: 'Gilda Display', 'Times New Roman', serif;
+  --sans: 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ease-line: cubic-bezier(.215, .61, .355, 1);
+  --ease-word: cubic-bezier(.165, .84, .44, 1);
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-soft: cubic-bezier(.25, .9, .3, 1);
+}
+
+/* ==========================================================================
+   Reset
+   ========================================================================== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { background: #ffffff; color: var(--foreground); font-family: 'Onest', sans-serif; overflow-x: hidden; line-height: 1.5; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+ul, ol { list-style: none; }
+img { display: block; max-width: 100%; }
+svg { display: block; flex-shrink: 0; }
+input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+[tabindex="-1"]:focus { outline: none; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* Adaptive grid: rem scales with the viewport (above 1920px JS takes over) */
+@media (max-width:1920px) { html { font-size:0.833333vw; } }
+@media (max-width:1440px) { html { font-size:1.111111vw; } }
+@media (max-width:1024px) { html { font-size:1.5625vw; } }
+@media (max-width:640px)  { html { font-size:4.444444vw; } }
+
+/* Lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip-link {
+  position: fixed; left: 1rem; top: 1rem; z-index: 1100;
+  padding: .75rem 1.25rem; border-radius: var(--radius-pill);
+  background: var(--ink); color: #fff; font-size: .875rem; font-weight: 500;
+  transform: translateY(-200%); transition: transform .25s var(--ease-out);
+}
+.skip-link:focus { transform: none; }
+.shell { width: 100%; max-width: var(--container-shell); margin-inline: auto; padding-inline: 1.25rem; }
+@media (min-width:640px) { .shell { padding-inline: 2rem; } }
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.ic { width: 1em; height: 1em; }
+
+/* Wordmark: FI✿RE, the flower replaces the O like in the logo */
+.wordmark { display: inline-flex; align-items: center; font-family: var(--serif); font-weight: 400; line-height: 1; letter-spacing: .12em; white-space: nowrap; }
+.wordmark__flower { width: .98em; height: .98em; margin: 0 .16em 0 .02em; transform: translateY(-.035em); }
+
+/* Eyebrow */
+.eyebrow { display: inline-flex; align-items: center; gap: .5rem; font-size: .75rem; font-weight: 500; letter-spacing: .24em; text-transform: uppercase; color: var(--foreground); }
+.eyebrow::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.eyebrow--light { color: #fff; }
+.eyebrow--light::before { background: var(--subtle); }
+
+/* Pill buttons */
+.pill {
+  --h: 0;
+  display: inline-flex; align-items: center; gap: .875rem;
+  height: 3.5rem; padding: 0 .5rem 0 1.5rem;
+  border-radius: var(--radius-pill);
+  font-size: .9375rem; font-weight: 500; white-space: nowrap;
+  transform: scale(calc(1 + .04 * var(--h)));
+  transition: background-color .3s, color .3s, border-color .3s;
+}
+.pill--plain { padding: 0 1.5rem; }
+.pill__badge { width: 2.5rem; height: 2.5rem; border-radius: 50%; display: grid; place-items: center; }
+.pill__badge svg { width: 1rem; height: 1rem; }
+.pill--dark { background: var(--ink); color: #fff; }
+.pill--dark .pill__badge { background: rgba(255,255,255,.14); }
+.pill--light { background: var(--surface); color: var(--foreground); }
+.pill--light .pill__badge { background: var(--ink); color: #fff; }
+.pill--white { background: #fff; color: var(--ink); }
+.pill--white .pill__badge { background: var(--ink); color: #fff; }
+.pill--outline { border: 1px solid var(--line); color: var(--foreground); background: transparent; }
+.pill--outline .pill__badge { background: var(--surface); }
+.pill--ghost-light { border: 1px solid rgba(255,255,255,.22); color: #fff; }
+.pill--ghost-light .pill__badge { background: rgba(255,255,255,.1); }
+.mv-r { transform: translateX(calc(.22rem * var(--h, 0))); }
+.mv-ur { transform: translate(calc(.16rem * var(--h, 0)), calc(-.16rem * var(--h, 0))); }
+
+/* Tag chips */
+.chip { display: inline-flex; align-items: center; height: 1.875rem; padding: 0 .8rem; border-radius: var(--radius-pill); border: 1px solid rgba(255,255,255,.24); font-size: .75rem; color: rgba(255,255,255,.88); }
+
+/* Animated links */
+.alink { --h: 0; display: inline-flex; align-items: center; gap: .4rem; }
+.alink > span { display: inline-block; transform: translateX(calc(4px * var(--h))); opacity: calc(.72 + .28 * var(--h)); }
+.alink--legal > span { transform: translateX(calc(3px * var(--h))); }
+.alink svg { width: .875rem; height: .875rem; }
+@media (hover: none), (pointer: coarse) { .alink > span { opacity: 1; } }
+
+/* ==========================================================================
+   Reveal system (only when JS is running)
+   ========================================================================== */
+.line { display: block; overflow: hidden; padding-bottom: .1em; margin-bottom: -.1em; }
+.line-inner { display: block; }
+.js .line-inner { transform: translateY(100%); opacity: 0; transition: transform 900ms var(--ease-line), opacity 900ms var(--ease-line); }
+.js .is-in .line-inner, .js .is-in.line-inner { transform: none; opacity: 1; }
+.js [data-words] .w { display: inline-block; transform: translateY(24px); opacity: 0; transition: transform 700ms var(--ease-word), opacity 700ms var(--ease-word); }
+.js [data-words].is-in .w { transform: none; opacity: 1; }
+.js .rv { opacity: 0; transform: translateY(1.75rem); transition: opacity .8s var(--ease-soft), transform .8s var(--ease-soft); }
+.js .rv.is-in { opacity: 1; transform: none; }
+.js [data-stagger] .st { opacity: 0; transform: translateY(2.5rem); transition: opacity .75s var(--ease-soft), transform .85s var(--ease-soft); }
+.js [data-stagger].is-in .st { opacity: 1; transform: none; }
+.js-failed .line-inner, .js-failed [data-words] .w, .js-failed .rv, .js-failed [data-stagger] .st, .js-failed .header, .js-failed .stats-panel { opacity: 1 !important; transform: none !important; }
+.js-failed .hero-watermark { opacity: .06 !important; transform: translateX(-50%) !important; }
+.js-failed .loader { display: none !important; }
+
+/* ==========================================================================
+   Page loader
+   ========================================================================== */
+.loader {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--accent); color: #fff;
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
+  transition: transform .7s cubic-bezier(.76, 0, .24, 1);
+}
+.no-js .loader { display: none; }
+.loader.is-leaving { transform: translateY(-100%); }
+.loader__content { display: flex; flex-direction: column; align-items: center; text-align: center; transition: opacity .45s ease, transform .7s cubic-bezier(.76, 0, .24, 1); }
+.loader.is-leaving .loader__content { opacity: 0; transform: translateY(-2rem); }
+.loader__mark { font-size: 6rem; }
+.loader__mark .wordmark__flower { --flower-eye: #7b747c; }
+.loader__studio { margin-top: 1.5rem; font-family: var(--serif); font-size: 1.125rem; letter-spacing: .5em; padding-left: .5em; }
+.loader__rule { width: 100%; max-width: 22rem; height: 1px; background: rgba(255,255,255,.75); margin-top: .9rem; }
+.loader__tagline { margin-top: 1.75rem; font-size: .875rem; letter-spacing: .02em; opacity: .92; }
+.loader__progress { position: absolute; left: 50%; bottom: 3.5rem; width: min(26rem, calc(100% - 2.5rem)); transform: translateX(-50%); }
+.loader__track { height: 2px; background: rgba(255,255,255,.28); border-radius: 2px; overflow: hidden; }
+.loader__fill { height: 100%; background: #fff; transform-origin: left center; transform: scaleX(0); }
+.loader__meta { display: flex; justify-content: space-between; margin-top: .75rem; font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.header { position: absolute; inset: 0 0 auto 0; z-index: 60; padding-top: 1.5rem; }
+.js .header { opacity: 0; transform: translateY(-1rem); transition: opacity .7s var(--ease-soft), transform .8s var(--ease-soft); }
+.js .header.is-in { opacity: 1; transform: none; }
+.header__bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; }
+.brand { --h: 0; justify-self: start; display: inline-flex; align-items: center; gap: .75rem; text-align: left; }
+.brand__mark { width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; transform: rotate(calc(36deg * var(--h))); --flower-eye: var(--accent); }
+.brand__mark svg { width: 1.6rem; height: 1.6rem; }
+.brand__name { display: flex; flex-direction: column; line-height: 1; }
+.brand__name strong { font-family: var(--serif); font-weight: 400; font-size: 1.375rem; letter-spacing: .14em; }
+.brand__name small { margin-top: .3rem; font-size: .5625rem; letter-spacing: .42em; text-transform: uppercase; color: var(--muted); }
+.brand--light .brand__name small { color: var(--subtle); }
+.nav-desktop { display: flex; gap: .125rem; padding: .375rem; border-radius: var(--radius-pill); background: rgba(255,255,255,.58); border: 1px solid rgba(255,255,255,.75); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+.nav-desktop a, .nav-desktop button { --h: 0; padding: .625rem 1.05rem; border-radius: var(--radius-pill); font-size: .875rem; font-weight: 500; transition: background-color .3s; }
+.nav-desktop a > span, .nav-desktop button > span { display: inline-block; transform: translateY(calc(-1px * var(--h))); }
+.nav-desktop a:hover, .nav-desktop button:hover { background: rgba(255,255,255,.9); }
+.nav-desktop .nav-desktop__cta { background: var(--ink); color: #fff; }
+.nav-desktop .nav-desktop__cta:hover { background: #3a343b; }
+.header__right { justify-self: end; display: flex; align-items: center; gap: 1rem; }
+.clock { text-align: right; line-height: 1.3; }
+.clock__time { display: block; font-size: .875rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.clock__date { display: block; font-size: .75rem; color: var(--muted); }
+.menu-btn { --h: 0; display: inline-flex; align-items: center; gap: .625rem; height: 3rem; padding: 0 1.25rem 0 1rem; border-radius: var(--radius-pill); background: rgba(255,255,255,.58); border: 1px solid rgba(255,255,255,.75); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); font-size: .875rem; font-weight: 500; transform: scale(calc(1 + .04 * var(--h))); }
+.menu-btn svg { width: 1.125rem; height: 1.125rem; }
+@media (max-width:1024px) { .nav-desktop { display: none; } .header__bar { grid-template-columns: 1fr auto; } }
+@media (max-width:768px)  { .clock { display: none; } }
+@media (max-width:640px)  { .menu-btn__label { display: none; } .menu-btn { width: 3rem; padding: 0; justify-content: center; } }
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+.hero {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; flex-direction: column;
+  min-height: max(100vh, 50rem); min-height: max(100svh, 50rem);
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
+  background: linear-gradient(180deg, var(--hero-from), var(--hero-to));
+}
+.hero-media { position: absolute; inset: 0; z-index: -2; }
+.hero-base { width: 100%; height: 100%; object-fit: cover; object-position: 62% 50%; filter: url(#fiore-duotone); }
+.hero-media.is-fallback .hero-base { display: none; }
+.hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hero-vignette {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.7) 0%, rgba(255,255,255,.34) 36%, rgba(255,255,255,0) 60%),
+    linear-gradient(0deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,0) 26%),
+    linear-gradient(180deg, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 20%);
+}
+.hero-watermark {
+  position: absolute; left: 50%; bottom: -.4em; z-index: -1; pointer-events: none;
+  font-size: var(--text-watermark); color: var(--ink); opacity: .06;
+  transform: translateX(-50%);
+}
+.js .hero-watermark { opacity: 0; transform: translate(-50%, 2rem); transition: opacity 1.2s var(--ease-soft), transform 1.2s var(--ease-soft); }
+.js .hero-watermark.is-in { opacity: .06; transform: translateX(-50%); }
+.hero-inner { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding-top: 9rem; padding-bottom: 1.75rem; }
+.hero-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 2rem; align-items: end; padding-bottom: 3rem; }
+.hero-left { grid-column: 1 / span 7; }
+.hero-right { grid-column: 8 / span 5; display: flex; flex-direction: column; gap: .625rem; }
+.hero-title { margin: 1.5rem 0 2rem; font-family: var(--serif); font-weight: 400; font-size: 6.5rem; line-height: .98; letter-spacing: -.005em; }
+.hero-title .tone { color: var(--accent-strong); }
+.hero-proof { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin-bottom: 2rem; font-size: .8125rem; color: var(--muted); }
+.hero-proof li { display: inline-flex; align-items: center; gap: .5rem; }
+.hero-proof svg { width: .9rem; height: .9rem; color: var(--accent); --flower-eye: #fff; }
+.hero-ctas { display: flex; flex-wrap: wrap; gap: .75rem; }
+
+.hero-card {
+  position: relative; display: grid; grid-template-columns: 8.5rem minmax(0, 1fr); gap: 1.25rem;
+  padding: .875rem; border-radius: 1.75rem; cursor: pointer;
+  background: rgba(255,255,255,.72); border: 1px solid rgba(255,255,255,.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.15); backdrop-filter: blur(20px) saturate(1.15);
+  box-shadow: 0 1.5rem 3rem -1.75rem rgba(41,36,42,.45);
+}
+.hc-tile { position: relative; align-self: start; aspect-ratio: 1; border-radius: 1.25rem; background: var(--ink); color: var(--accent); display: grid; place-items: center; overflow: hidden; --flower-eye: var(--ink); }
+.hc-tile svg { width: 56%; height: 56%; transition: transform .9s var(--ease-out); }
+.hc-tile__num { position: absolute; left: .75rem; bottom: .6rem; font-size: .6875rem; letter-spacing: .14em; color: rgba(255,255,255,.66); font-variant-numeric: tabular-nums; }
+.hc-body { display: flex; flex-direction: column; justify-content: space-between; min-width: 0; padding: .25rem .25rem .125rem 0; }
+.hc-stage { display: grid; }
+.hc-slide { grid-area: 1 / 1; transition: opacity .55s var(--ease-out), transform .6s var(--ease-out); }
+.hc-slide:not(.is-active) { opacity: 0; transform: translateX(1.25rem); pointer-events: none; }
+.hc-slide.is-before { transform: translateX(-1.25rem); }
+.hc-slide.no-t { transition: none; }
+.hc-kicker { font-size: .6875rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.hc-title { margin: .5rem 0 .375rem; font-family: var(--serif); font-weight: 400; font-size: 1.75rem; line-height: 1.1; }
+.hc-text { font-size: .8125rem; line-height: 1.5; color: var(--muted); }
+.hc-controls { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; }
+.hc-dots { display: flex; gap: .375rem; }
+.hc-dot { position: relative; width: 1.25rem; height: .25rem; border-radius: var(--radius-pill); background: rgba(41,36,42,.18); transition: width .35s var(--ease-out), background-color .35s; }
+.hc-dot::before { content: ""; position: absolute; inset: -.75rem -.2rem; }
+.hc-dot[aria-current="true"] { width: 2.25rem; background: var(--ink); }
+.hc-arrows { display: flex; gap: .375rem; }
+.hc-btn { --h: 0; width: 2.375rem; height: 2.375rem; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.75); border: 1px solid rgba(41,36,42,.14); transform: scale(calc(1 + .06 * var(--h))); }
+.hc-btn svg { width: .875rem; height: .875rem; }
+.hc-btn--prev svg { transform: rotate(180deg); }
+
+.hero-feats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
+.hero-feat { --h: 0; display: flex; flex-direction: column; align-items: flex-start; gap: .75rem; padding: .875rem; border-radius: 1.125rem; background: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.7); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); font-size: .8125rem; font-weight: 500; transform: translateY(calc(-.25rem * var(--h))); }
+.hero-feat svg { width: 1.25rem; height: 1.25rem; color: var(--accent-strong); transform: rotate(calc(-10deg * var(--h))); }
+.hero-status { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-top: 1.25rem; border-top: 1px solid rgba(41,36,42,.14); font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; }
+.hero-status a { display: inline-flex; align-items: center; gap: .5rem; }
+.hero-status svg { width: .875rem; height: .875rem; }
+
+@media (max-width:1024px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr); row-gap: 2.5rem; }
+  .hero-left, .hero-right { grid-column: 1 / -1; }
+  .hero-right { max-width: 34rem; }
+  .hero-title { font-size: 4.75rem; }
+  .hero-base { object-position: 70% 50%; }
+  .hero-vignette { background: linear-gradient(180deg, rgba(255,255,255,.78) 0%, rgba(255,255,255,.42) 45%, rgba(255,255,255,.68) 100%); }
+}
+@media (max-width:640px) {
+  .hero-inner { padding-top: 7rem; }
+  .hero-title { font-size: 3rem; margin: 1.25rem 0 1.5rem; }
+  .hero-grid { padding-bottom: 2rem; }
+  .hero-card { grid-template-columns: 5.75rem minmax(0, 1fr); gap: .875rem; }
+  .hc-title { font-size: 1.375rem; }
+  .hero-feat { padding: .75rem .625rem; font-size: .75rem; }
+  .hero-status .hero-status__mid { display: none; }
+  .hero-watermark { font-size: 6rem; }
+  .pill { height: 3.25rem; }
+}
+
+/* ==========================================================================
+   About
+   ========================================================================== */
+.about { padding: 9rem 0 8rem; }
+.about-grid { display: grid; grid-template-columns: 5fr 7fr; gap: 4rem; }
+.about-left { display: flex; flex-direction: column; justify-content: space-between; gap: 3rem; }
+.about-symbol { width: 19rem; height: 19rem; color: var(--accent); opacity: .3; }
+.about-support { max-width: 21rem; margin-top: 1.25rem; font-size: .9375rem; line-height: 1.6; color: var(--muted); }
+.about-statement { font-family: var(--serif); font-weight: 400; font-size: 3.5rem; line-height: 1.12; letter-spacing: -.005em; }
+.about-statement .tone { color: var(--muted-large); }
+.about-foot { margin-top: 3.5rem; padding-top: 1.75rem; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; }
+.about-links { display: flex; flex-wrap: wrap; gap: .75rem 1.75rem; font-size: .9375rem; font-weight: 500; }
+.about-links__label { width: 100%; font-size: .6875rem; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+@media (max-width:1024px) { .about-grid { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; } .about-symbol { width: 11rem; height: 11rem; } .about-statement { font-size: 2.75rem; } .about-left { flex-direction: column-reverse; align-items: flex-start; } }
+@media (max-width:640px) { .about { padding: 6rem 0 5rem; } .about-statement { font-size: 1.875rem; } .about-symbol { width: 7rem; height: 7rem; } }
+
+/* ==========================================================================
+   Create band
+   ========================================================================== */
+.band { padding: 0 0 8rem; }
+.band-row { display: grid; grid-template-columns: 1.3fr 1.4fr .8fr 1fr; gap: .75rem; }
+.band-tile { --h: 0; height: 11rem; border-radius: var(--radius-pill); display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 5.5rem; line-height: 1; transform: scale(calc(1 + .03 * var(--h))); }
+.band-tile--light { background: var(--surface); }
+.band-tile--accent { background: linear-gradient(135deg, var(--accent-from), var(--accent-to)); color: #fff; }
+.band-tile--dark { background: var(--ink); color: #fff; }
+.band-tile--dark svg { width: 3.75rem; height: 3.75rem; transform: translateX(calc(.6rem * var(--h))); }
+.band-tile--muted { background: var(--surface-2); }
+@media (max-width:1024px) { .band-row { grid-template-columns: 1fr 1fr; } .band-tile { height: 8rem; font-size: 4rem; } }
+@media (max-width:640px) { .band { padding-bottom: 5rem; } .band-row { grid-template-columns: minmax(0, 1fr); gap: .5rem; } .band-tile { height: 5.5rem; font-size: 3rem; } .band-tile--dark svg { width: 2.5rem; height: 2.5rem; } }
+
+/* ==========================================================================
+   Saloni (portfolio grid)
+   ========================================================================== */
+.works { padding: 0 0 8rem; }
+.section-head { max-width: 50rem; margin: 0 auto 4rem; text-align: center; }
+.section-title { margin-top: 1.25rem; font-family: var(--serif); font-weight: 400; font-size: 4.5rem; line-height: 1.02; }
+.section-title .tone { color: var(--muted-large); }
+.works-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.work-card { --h: 0; position: relative; height: 100%; display: flex; flex-direction: column; min-height: 46rem; padding: 2rem; border-radius: var(--radius-card); background: var(--ink); color: #fff; overflow: hidden; transform: translateY(calc(-.5rem * var(--h))); }
+.work-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.work-meta { font-size: .75rem; letter-spacing: .18em; text-transform: uppercase; color: var(--subtle); line-height: 1.7; }
+.work-meta strong { display: block; color: #fff; font-weight: 500; }
+.round-badge { --h: 0; width: 3.25rem; height: 3.25rem; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); transition: background-color .3s, color .3s; }
+.round-badge svg { width: 1.125rem; height: 1.125rem; }
+.round-badge:hover { background: #fff; color: var(--ink); }
+.work-art { flex: 1; display: grid; place-items: center; padding: 2rem 0; }
+.work-art svg { width: 15rem; height: 15rem; color: var(--accent); --flower-eye: var(--ink); transform: rotate(calc(14deg * var(--h))) scale(calc(1 + .03 * var(--h))); }
+.work-title { font-family: var(--serif); font-weight: 400; font-size: 2.75rem; line-height: 1; }
+.work-address { margin: .625rem 0 1rem; font-size: .875rem; color: var(--subtle); }
+.work-desc { max-width: 32rem; font-size: .9375rem; line-height: 1.6; color: rgba(255,255,255,.8); }
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.25rem 0 1.5rem; }
+.work-info { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,.12); font-size: .8125rem; }
+.work-info dt { margin-bottom: .375rem; font-size: .6875rem; letter-spacing: .16em; text-transform: uppercase; color: var(--subtle); }
+.work-info dd { line-height: 1.6; }
+.work-info a { text-decoration: underline; text-decoration-color: rgba(255,255,255,.3); text-underline-offset: .2em; }
+.work-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.5rem; }
+.works-note { margin-top: 1.5rem; text-align: center; font-size: .8125rem; color: var(--muted); }
+@media (max-width:1024px) { .section-title { font-size: 3.5rem; } .work-card { min-height: 0; } .work-art svg { width: 11rem; height: 11rem; } }
+@media (max-width:768px) { .works-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width:640px) { .works { padding-bottom: 5rem; } .section-title { font-size: 2.5rem; } .work-card { padding: 1.5rem; } .work-title { font-size: 2.25rem; } .work-info { grid-template-columns: minmax(0, 1fr); } }
+
+/* ==========================================================================
+   Services
+   ========================================================================== */
+.services { padding: 0 0 8rem; }
+.services-head { display: grid; grid-template-columns: 5fr 7fr; gap: 2rem; align-items: end; margin-bottom: 3.5rem; }
+.services-head .section-title { margin-top: 0; }
+.services-intro { max-width: 26rem; font-size: .9375rem; line-height: 1.6; color: var(--muted); justify-self: end; }
+.svc-list > li { border-top: 1px solid var(--line); }
+.svc-list > li:last-child { border-bottom: 1px solid var(--line); }
+.svc-row { --h: 0; position: relative; isolation: isolate; display: grid; grid-template-columns: 5rem minmax(0, 1.1fr) minmax(0, 1.4fr) auto; align-items: center; gap: 2rem; padding: 2.25rem calc(1.5rem * var(--h)); }
+.svc-row::before { content: ""; position: absolute; inset: .375rem 0; z-index: -1; border-radius: 1.5rem; background: var(--surface); opacity: var(--h); transform: scaleY(calc(.82 + .18 * var(--h))); }
+.svc-index { font-size: .875rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.svc-title { font-family: var(--serif); font-weight: 400; font-size: 2.5rem; line-height: 1.05; }
+.svc-desc { max-width: 32rem; font-size: .9375rem; line-height: 1.6; color: var(--muted); }
+.svc-btn { width: 3.25rem; height: 3.25rem; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line); background: #fff; transition: background-color .3s, color .3s, border-color .3s; }
+.svc-btn svg { width: 1.125rem; height: 1.125rem; transform: translate(calc(.14rem * var(--h)), calc(-.14rem * var(--h))); }
+.svc-btn::after { content: ""; position: absolute; inset: 0; border-radius: 1.5rem; }
+.svc-row:hover .svc-btn, .svc-btn:focus-visible { background: var(--ink); color: #fff; border-color: var(--ink); }
+.svc-btn:focus-visible { outline: none; }
+.svc-btn:focus-visible::after { outline: 2px solid var(--accent-strong); outline-offset: -2px; }
+@media (max-width:1024px) {
+  .services-head { grid-template-columns: minmax(0, 1fr); }
+  .services-intro { justify-self: start; }
+  .svc-row { grid-template-columns: 3rem minmax(0, 1fr) auto; row-gap: .75rem; }
+  .svc-desc { grid-column: 2 / 3; grid-row: 2; }
+  .svc-btn { grid-column: 3; grid-row: 1 / span 2; }
+}
+@media (max-width:640px) { .services { padding-bottom: 5rem; } .svc-row { grid-template-columns: 2.25rem minmax(0, 1fr) auto; gap: .75rem 1rem; padding-block: 1.75rem; } .svc-title { font-size: 1.75rem; } .svc-btn { width: 2.75rem; height: 2.75rem; } }
+
+/* ==========================================================================
+   Stats
+   ========================================================================== */
+.stats { padding: 0 0 1.25rem; }
+.stats-panel { padding: 6rem 4rem 4.5rem; border-radius: var(--radius-card); background: var(--ink); color: #fff; }
+.js .stats-panel { opacity: 0; transform: translateY(4rem) scale(.96); transition: opacity 1s var(--ease-soft), transform 1.1s var(--ease-soft); }
+.js .stats-panel.is-in { opacity: 1; transform: none; }
+.stats-head { max-width: 46rem; }
+.stats-title { margin-top: 1.25rem; font-family: var(--serif); font-weight: 400; font-size: 4rem; line-height: 1.05; }
+.stats-title .tone { color: var(--subtle); }
+.stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2rem; margin-top: 5rem; padding-top: 2.5rem; border-top: 1px solid rgba(255,255,255,.12); }
+.stat-num { font-family: var(--serif); font-weight: 400; font-size: 6rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat-label { max-width: 15rem; margin-top: 1rem; font-size: .9375rem; line-height: 1.5; color: var(--subtle); }
+@media (max-width:1024px) { .stats-panel { padding: 4rem 2.5rem 3rem; } .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 3rem; } .stats-title { font-size: 3rem; } }
+@media (max-width:640px) { .stats-panel { padding: 3rem 1.5rem 2.5rem; } .stats-title { font-size: 2.25rem; } .stat-num { font-size: 3.5rem; } .stats-grid { margin-top: 3rem; gap: 2rem 1rem; } .stat-label { font-size: .8125rem; } }
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.footer { position: relative; overflow: hidden; padding: 7rem 0 2rem; border-radius: var(--radius-card) var(--radius-card) 0 0; background: var(--ink); color: #fff; }
+.footer-watermark { position: absolute; left: 50%; bottom: -.16em; transform: translateX(-50%); font-size: calc(var(--text-watermark) * 1.7); color: #fff; opacity: .04; pointer-events: none; --flower-eye: transparent; }
+.footer-cta { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 2rem; }
+.footer-title { font-family: var(--serif); font-weight: 400; font-size: 5.5rem; line-height: 1.02; }
+.footer-title .tone { color: var(--subtle); }
+.footer-cols { position: relative; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.3fr; gap: 2.5rem; margin-top: 6rem; padding-top: 3rem; border-top: 1px solid rgba(255,255,255,.12); }
+.footer-col h3 { margin-bottom: 1.25rem; font-size: .6875rem; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: var(--subtle); }
+.footer-col ul { display: flex; flex-direction: column; gap: .75rem; font-size: .9375rem; }
+.footer-col .brand { margin-bottom: 1.25rem; }
+.footer-tagline { max-width: 18rem; font-size: .875rem; line-height: 1.6; color: var(--subtle); }
+.footer-contact { display: flex; flex-direction: column; gap: 1.25rem; font-size: .875rem; }
+.footer-contact strong { display: block; margin-bottom: .25rem; font-weight: 500; font-size: .9375rem; }
+.footer-contact span { display: block; color: var(--subtle); line-height: 1.6; }
+.footer-legal { position: relative; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; margin-top: 5rem; padding-top: 1.75rem; border-top: 1px solid rgba(255,255,255,.12); font-size: .8125rem; color: var(--subtle); }
+@media (max-width:1024px) { .footer-title { font-size: 4rem; } .footer-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width:640px) { .footer { padding-top: 5rem; } .footer-cta { grid-template-columns: minmax(0, 1fr); } .footer-title { font-size: 2.75rem; } .footer-cols { grid-template-columns: minmax(0, 1fr); margin-top: 4rem; } .footer-watermark { font-size: 7rem; } }
+
+/* ==========================================================================
+   Navigation overlay
+   ========================================================================== */
+.nav { position: fixed; inset: 0; z-index: 900; display: flex; flex-direction: column; background: var(--ink); color: #fff; opacity: 0; visibility: hidden; transition: opacity .45s var(--ease-out), visibility 0s linear .45s; }
+.nav.is-open { opacity: 1; visibility: visible; transition: opacity .45s var(--ease-out), visibility 0s; }
+.nav-top { display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; }
+.nav-close { --h: 0; width: 3rem; height: 3rem; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); transform: rotate(calc(90deg * var(--h))); }
+.nav-close svg { width: 1.125rem; height: 1.125rem; }
+.nav-body { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+.nav-list { display: flex; flex-direction: column; gap: .125rem; }
+.nav-link { --h: 0; display: inline-flex; align-items: baseline; gap: 1.5rem; font-family: var(--serif); font-size: clamp(2.25rem, 8.5vh, 5rem); line-height: 1.12; text-align: left; opacity: 0; transform: translateY(2rem); transition: opacity .6s var(--ease-soft), transform .7s var(--ease-soft), color .3s; }
+.nav-link > span:last-child { display: inline-block; transform: translateX(calc(.75rem * var(--h))); }
+.nav.is-open .nav-link { opacity: 1; transform: none; }
+.nav-link:hover, .nav-link:focus-visible { color: var(--subtle); }
+.nav-index { font-family: var(--sans); font-size: .75rem; letter-spacing: .14em; color: var(--accent); font-variant-numeric: tabular-nums; }
+.nav-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.5rem 0 2rem; border-top: 1px solid rgba(255,255,255,.12); }
+.nav-time { font-size: .875rem; color: var(--subtle); font-variant-numeric: tabular-nums; }
+.nav-time strong { color: #fff; font-weight: 600; margin-right: .5rem; }
+
+/* ==========================================================================
+   Request modal
+   ========================================================================== */
+.modal { position: fixed; inset: 0; z-index: 950; display: grid; place-items: center; padding: 1.25rem; visibility: hidden; pointer-events: none; transition: visibility 0s linear .5s; }
+.modal.is-open { visibility: visible; pointer-events: auto; transition: visibility 0s; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(28,24,29,.5); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); opacity: 0; transition: opacity .4s ease; }
+.modal.is-open .modal-backdrop { opacity: 1; }
+.modal-panel { position: relative; width: min(100%, 36rem); max-height: calc(100vh - 2.5rem); max-height: calc(100svh - 2.5rem); overflow: auto; padding: 2.5rem; border-radius: var(--radius-card); background: #fff; opacity: 0; transform: translateY(2rem) scale(.97); transition: opacity .45s var(--ease-out), transform .55s cubic-bezier(.2, 1, .3, 1); }
+.modal.is-open .modal-panel { opacity: 1; transform: none; }
+.modal-close { --h: 0; position: absolute; top: 1.25rem; right: 1.25rem; width: 2.75rem; height: 2.75rem; border-radius: 50%; display: grid; place-items: center; background: var(--surface); transform: rotate(calc(90deg * var(--h))); }
+.modal-close svg { width: 1rem; height: 1rem; }
+.modal-title { margin: 1rem 0 .75rem; padding-right: 3rem; font-family: var(--serif); font-weight: 400; font-size: 2.5rem; line-height: 1.05; }
+.modal-intro { font-size: .9375rem; line-height: 1.6; color: var(--muted); }
+.form { display: flex; flex-direction: column; gap: 1.125rem; margin-top: 1.75rem; }
+.field label { display: block; margin-bottom: .5rem; font-size: .75rem; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; }
+.field input, .field textarea { width: 100%; padding: 0 1rem; border: 1px solid var(--line); border-radius: var(--radius-control); background: #fff; font-size: 1rem; transition: border-color .25s, box-shadow .25s; }
+.field input { height: 3.25rem; }
+.field textarea { padding-block: .875rem; resize: vertical; min-height: 7.5rem; line-height: 1.5; }
+.field input::placeholder, .field textarea::placeholder { color: #8f8890; }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(156,149,157,.3); }
+.field [aria-invalid="true"] { border-color: var(--danger); }
+.field-error { display: block; min-height: 0; margin-top: .375rem; font-size: .8125rem; color: var(--danger); }
+.field-error:empty { display: none; }
+.form-note { padding: 1rem 1.125rem; border-radius: var(--radius-control); background: var(--surface); font-size: .8125rem; line-height: 1.55; color: var(--muted); }
+.form-note a { color: var(--foreground); font-weight: 500; text-decoration: underline; text-underline-offset: .18em; white-space: nowrap; }
+.form .pill { align-self: flex-start; }
+.form .pill[disabled] { opacity: .7; cursor: progress; }
+.success { text-align: left; }
+.success__icon { width: 3.5rem; height: 3.5rem; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; --flower-eye: var(--accent); }
+.success__icon svg { width: 2rem; height: 2rem; }
+.success__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.75rem; }
+@media (max-width:640px) {
+  .modal { align-items: end; padding: 0; }
+  .modal-panel { width: 100%; max-height: 92svh; padding: 2rem 1.25rem 1.5rem; border-radius: 1.5rem 1.5rem 0 0; transform: translateY(100%); }
+  .modal-title { font-size: 2rem; }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Vai al contenuto</a>
+
+<!-- Icon sprite: inline SVG, currentColor -->
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Five-petal flower from the Fiore logo -->
+    <symbol id="i-flower" viewBox="0 0 48 48">
+      <g fill="currentColor">
+        <ellipse cx="24" cy="13" rx="6.4" ry="10.6"/>
+        <ellipse cx="24" cy="13" rx="6.4" ry="10.6" transform="rotate(72 24 24)"/>
+        <ellipse cx="24" cy="13" rx="6.4" ry="10.6" transform="rotate(144 24 24)"/>
+        <ellipse cx="24" cy="13" rx="6.4" ry="10.6" transform="rotate(216 24 24)"/>
+        <ellipse cx="24" cy="13" rx="6.4" ry="10.6" transform="rotate(288 24 24)"/>
+      </g>
+      <circle cx="24" cy="24" r="1.9" style="fill: var(--flower-eye, rgba(41,36,42,.4))"/>
+    </symbol>
+    <symbol id="i-flower-line" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width=".3">
+        <ellipse cx="24" cy="13" rx="6.4" ry="10.6"/>
+        <ellipse cx="24" cy="13" rx="6.4" ry="10.6" transform="rotate(72 24 24)"/>
+        <ellipse cx="24" cy="13" rx="6.4" ry="10.6" transform="rotate(144 24 24)"/>
+        <ellipse cx="24" cy="13" rx="6.4" ry="10.6" transform="rotate(216 24 24)"/>
+        <ellipse cx="24" cy="13" rx="6.4" ry="10.6" transform="rotate(288 24 24)"/>
+        <circle cx="24" cy="24" r="1.9"/>
+        <circle cx="24" cy="24" r="23.4" stroke-dasharray=".6 1.4"/>
+      </g>
+    </symbol>
+    <symbol id="i-logomark" viewBox="0 0 48 48"><path fill="currentColor" d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/></symbol>
+    <symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow-ur" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow-d" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M4 4l16 16M20 4 4 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9.25"/><path d="M12 2.75c2.6 2.3 4 5.8 4 9.25s-1.4 6.95-4 9.25c-2.6-2.3-4-5.8-4-9.25s1.4-6.95 4-9.25zM2.75 12h18.5"/></g></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.9l-5.8 3.05 1.1-6.46-4.69-4.58 6.49-.94L12 2.5z"/></symbol>
+    <symbol id="i-circle-dot" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></g></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-scissors" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></g></symbol>
+    <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2.7s-6.5 7.1-6.5 11.8a6.5 6.5 0 0 0 13 0C18.5 9.8 12 2.7 12 2.7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></g></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+    <!-- Duotone in the logo mauve for the hero base image -->
+    <filter id="fiore-duotone" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/>
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0.40 0.612 0.975"/>
+        <feFuncG type="table" tableValues="0.37 0.584 0.965"/>
+        <feFuncB type="table" tableValues="0.41 0.616 0.975"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+</svg>
+
+<!-- ====================================================================== -->
+<!-- PageLoader                                                              -->
+<!-- ====================================================================== -->
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader__content">
+    <span class="wordmark loader__mark">FI<svg class="wordmark__flower"><use href="#i-flower"/></svg>RE</span>
+    <span class="loader__studio">HAIR STUDIO</span>
+    <span class="loader__rule"></span>
+    <p class="loader__tagline">Taglio, colore e cura nel centro di Genova</p>
+  </div>
+  <div class="loader__progress">
+    <div class="loader__track"><div class="loader__fill"></div></div>
+    <div class="loader__meta"><span>Caricamento</span><span class="loader__count">000</span></div>
+  </div>
+</div>
+
+<!-- ====================================================================== -->
+<!-- Header                                                                  -->
+<!-- ====================================================================== -->
+<header class="header" id="header">
+  <div class="shell header__bar">
+    <button class="brand" type="button" data-scroll-top data-hover="fast" aria-label="Fiore Hair Studio, torna all'inizio">
+      <span class="brand__mark"><svg aria-hidden="true"><use href="#i-flower"/></svg></span>
+      <span class="brand__name" aria-hidden="true"><strong>FIORE</strong><small>Hair Studio</small></span>
+    </button>
+    <nav class="nav-desktop" aria-label="Navigazione principale">
+      <a href="#home" data-hover="link"><span>Home</span></a>
+      <a href="#works" data-hover="link"><span>Saloni</span></a>
+      <a href="#services" data-hover="link"><span>Servizi</span></a>
+      <a href="#about" data-hover="link"><span>Studio</span></a>
+      <a href="#contatti" data-hover="link"><span>Contatti</span></a>
+      <button type="button" class="nav-desktop__cta" data-open-modal data-hover="link"><span>Prenota</span></button>
+    </nav>
+    <div class="header__right">
+      <div class="clock" aria-label="Ora locale">
+        <time class="clock__time" data-clock-time>--:--</time>
+        <span class="clock__date" data-clock-date>Genova</span>
+      </div>
+      <button class="menu-btn" id="menu-btn" type="button" aria-controls="nav" aria-expanded="false" data-hover="fast">
+        <svg aria-hidden="true"><use href="#i-menu"/></svg>
+        <span class="menu-btn__label">Menu</span>
+        <span class="sr-only">Apri il menu di navigazione</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <!-- ==================================================================== -->
+  <!-- Hero                                                                 -->
+  <!-- ==================================================================== -->
+  <section class="hero" id="home" aria-labelledby="hero-title">
+    <div class="hero-media" data-liquid>
+      <img class="hero-base"
+           src="https://images.unsplash.com/photo-1789766602007-e8299b6781c5?auto=format&fit=crop&q=72&w=2000"
+           srcset="https://images.unsplash.com/photo-1789766602007-e8299b6781c5?auto=format&fit=crop&q=72&w=1200 1200w,
+                   https://images.unsplash.com/photo-1789766602007-e8299b6781c5?auto=format&fit=crop&q=72&w=2000 2000w,
+                   https://images.unsplash.com/photo-1789766602007-e8299b6781c5?auto=format&fit=crop&q=72&w=2800 2800w"
+           sizes="100vw" width="2000" height="1333"
+           alt="Capelli mossi in controluce, mossi dal vento"
+           fetchpriority="high" decoding="async">
+      <canvas class="hero-canvas" aria-hidden="true"></canvas>
+      <div class="hero-vignette"></div>
+    </div>
+    <div class="hero-watermark" data-hero="300" aria-hidden="true">
+      <span class="wordmark">FI<svg class="wordmark__flower"><use href="#i-flower"/></svg>RE</span>
+    </div>
+
+    <div class="shell hero-inner">
+      <div class="hero-grid">
+        <div class="hero-left">
+          <p class="eyebrow rv" data-hero="200">Hair studio · Genova centro</p>
+          <h1 class="hero-title" id="hero-title" data-hero="250" data-lines>
+            <span class="line"><span class="line-inner">Il tuo stile,</span></span>
+            <span class="line"><span class="line-inner">coltivato</span></span>
+            <span class="line"><span class="line-inner tone">con cura.</span></span>
+          </h1>
+          <ul class="hero-proof rv" data-hero="650">
+            <li><svg aria-hidden="true"><use href="#i-flower"/></svg>Due saloni: Galleria Mazzini e Via Cesarea</li>
+            <li><svg aria-hidden="true"><use href="#i-flower"/></svg>Da martedì a sabato</li>
+            <li><svg aria-hidden="true"><use href="#i-flower"/></svg>Prenotazioni per telefono</li>
+          </ul>
+          <div class="hero-ctas rv" data-hero="750">
+            <button class="pill pill--dark" type="button" data-open-modal data-hover="fast">
+              Prenota un appuntamento
+              <span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></span>
+            </button>
+            <a class="pill pill--light" href="#works" data-hover="fast">
+              Scopri i saloni
+              <span class="pill__badge"><svg class="mv-r" aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-right">
+          <div class="rv" data-hero="400">
+            <div class="hero-card" data-carousel role="group" aria-roledescription="carosello" aria-label="Fiore in breve">
+              <div class="hc-tile" aria-hidden="true">
+                <svg data-carousel-flower><use href="#i-flower"/></svg>
+                <span class="hc-tile__num" data-carousel-num>01 / 03</span>
+              </div>
+              <div class="hc-body">
+                <div class="hc-stage" aria-live="polite">
+                  <div class="hc-slide is-active" data-slide>
+                    <p class="hc-kicker">01 — Galleria Mazzini</p>
+                    <p class="hc-title">Legno, specchi, verde.</p>
+                    <p class="hc-text">Boiserie chiara e specchi ovali illuminati, dentro la galleria.</p>
+                  </div>
+                  <div class="hc-slide" data-slide aria-hidden="true">
+                    <p class="hc-kicker">02 — Via Cesarea</p>
+                    <p class="hc-title">Geometrie di luce.</p>
+                    <p class="hc-text">Marmo bianco, linee LED e poltrone color salvia.</p>
+                  </div>
+                  <div class="hc-slide" data-slide aria-hidden="true">
+                    <p class="hc-kicker">03 — Prenotazioni</p>
+                    <p class="hc-title">Da martedì a sabato.</p>
+                    <p class="hc-text">Chiama il salone che preferisci per fissare il tuo appuntamento.</p>
+                  </div>
+                </div>
+                <div class="hc-controls">
+                  <div class="hc-dots">
+                    <button class="hc-dot" type="button" data-dot="0" aria-label="Scheda 1 di 3" aria-current="true"></button>
+                    <button class="hc-dot" type="button" data-dot="1" aria-label="Scheda 2 di 3" aria-current="false"></button>
+                    <button class="hc-dot" type="button" data-dot="2" aria-label="Scheda 3 di 3" aria-current="false"></button>
+                  </div>
+                  <div class="hc-arrows">
+                    <button class="hc-btn hc-btn--prev" type="button" data-prev aria-label="Scheda precedente" data-hover="fast"><svg aria-hidden="true"><use href="#i-arrow-r"/></svg></button>
+                    <button class="hc-btn" type="button" data-next aria-label="Scheda successiva" data-hover="fast"><svg aria-hidden="true"><use href="#i-arrow-r"/></svg></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ul class="hero-feats rv" data-hero="550" aria-label="Aree di servizio">
+            <li><a class="hero-feat" href="#services" data-hover="fast"><svg aria-hidden="true"><use href="#i-scissors"/></svg>Taglio</a></li>
+            <li><a class="hero-feat" href="#services" data-hover="fast"><svg aria-hidden="true"><use href="#i-drop"/></svg>Colore</a></li>
+            <li><a class="hero-feat" href="#services" data-hover="fast"><svg aria-hidden="true"><use href="#i-leaf"/></svg>Cura</a></li>
+            <li><a class="hero-feat" href="#services" data-hover="fast"><svg aria-hidden="true"><use href="#i-logomark"/></svg>Eventi</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="hero-status rv" data-hero="900">
+        <span>Fiore Hair Studio — Genova</span>
+        <span class="hero-status__mid">16121 · Centro città</span>
+        <a href="#about">Scorri <svg aria-hidden="true"><use href="#i-arrow-d"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <!-- About                                                                -->
+  <!-- ==================================================================== -->
+  <section class="about" id="about" aria-labelledby="about-title">
+    <div class="shell about-grid">
+      <div class="about-left">
+        <svg class="about-symbol rv" aria-hidden="true"><use href="#i-flower-line"/></svg>
+        <div class="rv">
+          <h2 class="eyebrow" id="about-title">Lo studio</h2>
+          <p class="about-support">Fiore Hair Studio è stato fondato da Gaetano Fiore, hair stylist. Oggi accoglie i suoi clienti in due saloni nel centro di Genova.</p>
+        </div>
+      </div>
+      <div>
+        <p class="about-statement" data-words>Ogni appuntamento comincia da una conversazione. <span class="tone">Ci racconti come vivi i tuoi capelli e cosa desideri; da lì prendono forma il taglio, il colore e i trattamenti giusti per te.</span></p>
+        <div class="about-foot rv">
+          <div class="about-links">
+            <span class="about-links__label">Indicazioni stradali</span>
+            <a class="alink" href="https://www.google.com/maps/search/?api=1&amp;query=Galleria+Giuseppe+Mazzini+7R+16121+Genova" target="_blank" rel="noopener noreferrer" data-hover="link"><span>Galleria Mazzini</span><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg><span class="sr-only">(apre Google Maps in una nuova scheda)</span></a>
+            <a class="alink" href="https://www.google.com/maps/search/?api=1&amp;query=Via+Cesarea+34r+16121+Genova" target="_blank" rel="noopener noreferrer" data-hover="link"><span>Via Cesarea</span><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg><span class="sr-only">(apre Google Maps in una nuova scheda)</span></a>
+          </div>
+          <a class="pill pill--outline" href="#services" data-hover="fast">
+            Scopri i servizi
+            <span class="pill__badge"><svg class="mv-r" aria-hidden="true"><use href="#i-arrow-r"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <!-- Create band                                                          -->
+  <!-- ==================================================================== -->
+  <section class="band" aria-label="Taglio, colore, per te">
+    <ul class="shell band-row" data-stagger="120">
+      <li class="st"><div class="band-tile band-tile--light" data-hover="fast">Taglio</div></li>
+      <li class="st"><div class="band-tile band-tile--accent" data-hover="fast">Colore</div></li>
+      <li class="st"><div class="band-tile band-tile--dark" data-hover="fast"><svg aria-hidden="true"><use href="#i-arrow-r"/></svg></div></li>
+      <li class="st"><div class="band-tile band-tile--muted" data-hover="fast">Tu</div></li>
+    </ul>
+  </section>
+
+  <!-- ==================================================================== -->
+  <!-- Saloni (portfolio grid)                                              -->
+  <!-- ==================================================================== -->
+  <section class="works" id="works" aria-labelledby="works-title">
+    <div class="shell">
+      <div class="section-head">
+        <p class="eyebrow rv">I saloni</p>
+        <h2 class="section-title" id="works-title" data-lines>
+          <span class="line"><span class="line-inner">Due saloni,</span></span>
+          <span class="line"><span class="line-inner tone">due atmosfere.</span></span>
+        </h2>
+      </div>
+
+      <ul class="works-grid" data-stagger="90">
+        <li class="st">
+          <article class="work-card" data-hover="card" aria-labelledby="salon-1">
+            <div class="work-top">
+              <p class="work-meta"><strong>Salone 01</strong>Galleria Mazzini</p>
+              <a class="round-badge" href="https://www.google.com/maps/search/?api=1&amp;query=Galleria+Giuseppe+Mazzini+7R+16121+Genova" target="_blank" rel="noopener noreferrer" aria-label="Galleria Mazzini su Google Maps (nuova scheda)" data-hover="fast"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></a>
+            </div>
+            <div class="work-art" aria-hidden="true">
+              <svg viewBox="0 0 200 200">
+                <g fill="none" stroke="currentColor" stroke-width=".8">
+                  <ellipse cx="100" cy="100" rx="58" ry="86"/>
+                  <ellipse cx="100" cy="100" rx="70" ry="97" opacity=".35"/>
+                  <ellipse cx="100" cy="100" rx="82" ry="99" opacity=".15"/>
+                  <path d="M42 100h-30M188 100h-30" opacity=".35"/>
+                </g>
+                <use href="#i-flower" x="70" y="70" width="60" height="60"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="work-title" id="salon-1">Galleria Mazzini</h3>
+              <p class="work-address">Galleria Giuseppe Mazzini, 7 R · 16121 Genova</p>
+              <p class="work-desc">Il salone dentro la galleria: boiserie in legno chiaro, specchi ovali illuminati, sedute morbide e una parete verde di muschio.</p>
+              <div class="chips"><span class="chip">Legno chiaro</span><span class="chip">Specchi ovali</span><span class="chip">Parete verde</span></div>
+              <dl class="work-info">
+                <div><dt>Orari</dt><dd>Mar – Ven 9:00 – 18:00<br>Sab 9:00 – 17:00<br>Dom e lun chiuso</dd></div>
+                <div><dt>Telefono</dt><dd><a href="tel:+390100011047">+39 010 001 1047</a></dd></div>
+              </dl>
+              <div class="work-actions">
+                <a class="pill pill--white" href="tel:+390100011047" data-hover="fast">Chiama il salone<span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-phone"/></svg></span></a>
+              </div>
+            </div>
+          </article>
+        </li>
+        <li class="st">
+          <article class="work-card" data-hover="card" aria-labelledby="salon-2">
+            <div class="work-top">
+              <p class="work-meta"><strong>Salone 02</strong>Via Cesarea</p>
+              <a class="round-badge" href="https://www.google.com/maps/search/?api=1&amp;query=Via+Cesarea+34r+16121+Genova" target="_blank" rel="noopener noreferrer" aria-label="Via Cesarea su Google Maps (nuova scheda)" data-hover="fast"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></a>
+            </div>
+            <div class="work-art" aria-hidden="true">
+              <svg viewBox="0 0 200 200">
+                <g fill="none" stroke="currentColor" stroke-width=".8">
+                  <circle cx="100" cy="100" r="74"/>
+                  <circle cx="100" cy="100" r="92" opacity=".25"/>
+                  <path d="M8 62h184M8 138h184" opacity=".35"/>
+                  <path d="M40 22 160 178M160 22 40 178" opacity=".18"/>
+                </g>
+                <use href="#i-flower" x="70" y="70" width="60" height="60"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="work-title" id="salon-2">Via Cesarea</h3>
+              <p class="work-address">Via Cesarea, 34r · 16121 Genova</p>
+              <p class="work-desc">Lo spazio più contemporaneo: marmo bianco, linee di luce LED, specchi circolari e poltrone verde salvia.</p>
+              <div class="chips"><span class="chip">Marmo bianco</span><span class="chip">Luce LED</span><span class="chip">Verde salvia</span></div>
+              <dl class="work-info">
+                <div><dt>Orari</dt><dd>Mar – Sab 9:00 – 19:00<br>Dom e lun chiuso</dd></div>
+                <div><dt>Telefono</dt><dd><a href="tel:+390105960056">+39 010 596 0056</a></dd></div>
+              </dl>
+              <div class="work-actions">
+                <a class="pill pill--white" href="tel:+390105960056" data-hover="fast">Chiama il salone<span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-phone"/></svg></span></a>
+              </div>
+            </div>
+          </article>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <!-- Services                                                             -->
+  <!-- ==================================================================== -->
+  <section class="services" id="services" aria-labelledby="services-title">
+    <div class="shell">
+      <div class="services-head">
+        <div>
+          <p class="eyebrow rv">Servizi</p>
+          <h2 class="section-title" id="services-title" data-lines style="margin-top:1.25rem">
+            <span class="line"><span class="line-inner">Dal taglio</span></span>
+            <span class="line"><span class="line-inner tone">al trattamento.</span></span>
+          </h2>
+        </div>
+        <p class="services-intro rv">Quattro aree di lavoro, disponibili in entrambi i saloni. Tocca un servizio per preparare la tua richiesta.</p>
+      </div>
+      <ul class="svc-list" data-stagger="80">
+        <li class="st">
+          <div class="svc-row" data-hover="row">
+            <span class="svc-index">01</span>
+            <h3 class="svc-title">Taglio e styling</h3>
+            <p class="svc-desc">Consulenza sulla forma del viso, taglio su misura e piega: liscia, mossa o beach waves.</p>
+            <button class="svc-btn" type="button" data-open-modal data-service="Taglio e styling" aria-label="Richiedi un appuntamento per taglio e styling"><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></button>
+          </div>
+        </li>
+        <li class="st">
+          <div class="svc-row" data-hover="row">
+            <span class="svc-index">02</span>
+            <h3 class="svc-title">Colore</h3>
+            <p class="svc-desc">Balayage, babylights, schiariture naturali, tonalizzanti e glossing. Anche correzioni colore.</p>
+            <button class="svc-btn" type="button" data-open-modal data-service="Colore" aria-label="Richiedi un appuntamento per il colore"><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></button>
+          </div>
+        </li>
+        <li class="st">
+          <div class="svc-row" data-hover="row">
+            <span class="svc-index">03</span>
+            <h3 class="svc-title">Trattamenti</h3>
+            <p class="svc-desc">Cheratina, ricostruzione molecolare e cura del cuoio capelluto, per capelli più sani.</p>
+            <button class="svc-btn" type="button" data-open-modal data-service="Trattamenti" aria-label="Richiedi un appuntamento per un trattamento"><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></button>
+          </div>
+        </li>
+        <li class="st">
+          <div class="svc-row" data-hover="row">
+            <span class="svc-index">04</span>
+            <h3 class="svc-title">Eventi e cerimonie</h3>
+            <p class="svc-desc">Acconciature per matrimoni, cerimonie e serate importanti.</p>
+            <button class="svc-btn" type="button" data-open-modal data-service="Eventi e cerimonie" aria-label="Richiedi un appuntamento per eventi e cerimonie"><svg aria-hidden="true"><use href="#i-arrow-ur"/></svg></button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ==================================================================== -->
+  <!-- Stats                                                                -->
+  <!-- ==================================================================== -->
+  <section class="stats" id="stats" aria-labelledby="stats-title">
+    <div class="shell">
+      <div class="stats-panel">
+        <div class="stats-head">
+          <p class="eyebrow eyebrow--light rv">In breve</p>
+          <h2 class="stats-title" id="stats-title" data-lines>
+            <span class="line"><span class="line-inner">Fiore,</span></span>
+            <span class="line"><span class="line-inner tone">in quattro cifre.</span></span>
+          </h2>
+        </div>
+        <ul class="stats-grid" data-stats data-stagger="90">
+          <li class="st"><p class="stat-num" data-count="2">2</p><p class="stat-label">Saloni nel centro di Genova</p></li>
+          <li class="st"><p class="stat-num" data-count="4">4</p><p class="stat-label">Aree di servizio, dal taglio agli eventi</p></li>
+          <li class="st"><p class="stat-num" data-count="5">5</p><p class="stat-label">Giorni di apertura, da martedì a sabato</p></li>
+          <li class="st"><p class="stat-num" data-count="19" data-suffix=":00">19:00</p><p class="stat-label">Orario di chiusura di Via Cesarea</p></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ====================================================================== -->
+<!-- Footer                                                                  -->
+<!-- ====================================================================== -->
+<footer class="footer" id="contatti" tabindex="-1">
+  <div class="footer-watermark" aria-hidden="true"><span class="wordmark">FI<svg class="wordmark__flower"><use href="#i-flower"/></svg>RE</span></div>
+  <div class="shell">
+    <div class="footer-cta">
+      <h2 class="footer-title" data-lines data-line-stagger="100">
+        <span class="line"><span class="line-inner">Voglia di</span></span>
+        <span class="line"><span class="line-inner">cambiare?</span></span>
+        <span class="line"><span class="line-inner tone">Parliamone.</span></span>
+      </h2>
+      <button class="pill pill--white rv" type="button" data-open-modal data-hover="fast">
+        Prenota un appuntamento
+        <span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></span>
+      </button>
+    </div>
+
+    <div class="footer-cols">
+      <div class="footer-col">
+        <button class="brand brand--light" type="button" data-scroll-top data-hover="fast" aria-label="Fiore Hair Studio, torna all'inizio">
+          <span class="brand__mark"><svg aria-hidden="true"><use href="#i-flower"/></svg></span>
+          <span class="brand__name" aria-hidden="true"><strong>FIORE</strong><small>Hair Studio</small></span>
+        </button>
+        <p class="footer-tagline">Hair studio fondato da Gaetano Fiore. Due saloni a Genova: Galleria Mazzini e Via Cesarea.</p>
+      </div>
+      <nav class="footer-col" aria-labelledby="f-studio">
+        <h3 id="f-studio">Studio</h3>
+        <ul>
+          <li><a class="alink" href="#home" data-hover="link"><span>Home</span></a></li>
+          <li><a class="alink" href="#works" data-hover="link"><span>Saloni</span></a></li>
+          <li><a class="alink" href="#about" data-hover="link"><span>Lo studio</span></a></li>
+          <li><button class="alink" type="button" data-open-modal data-hover="link"><span>Prenota</span></button></li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-labelledby="f-servizi">
+        <h3 id="f-servizi">Servizi</h3>
+        <ul>
+          <li><a class="alink" href="#services" data-hover="link"><span>Taglio e styling</span></a></li>
+          <li><a class="alink" href="#services" data-hover="link"><span>Colore</span></a></li>
+          <li><a class="alink" href="#services" data-hover="link"><span>Trattamenti</span></a></li>
+          <li><a class="alink" href="#services" data-hover="link"><span>Eventi e cerimonie</span></a></li>
+        </ul>
+      </nav>
+      <div class="footer-col">
+        <h3>Contatti</h3>
+        <div class="footer-contact">
+          <div>
+            <strong>Galleria Mazzini</strong>
+            <span>Galleria Giuseppe Mazzini, 7 R<br>16121 Genova (GE)</span>
+            <a class="alink" href="tel:+390100011047" data-hover="link"><span>+39 010 001 1047</span></a>
+          </div>
+          <div>
+            <strong>Via Cesarea</strong>
+            <span>Via Cesarea, 34r<br>16121 Genova (GE)</span>
+            <a class="alink" href="tel:+390105960056" data-hover="link"><span>+39 010 596 0056</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-legal">
+      <span>© <span data-year>2026</span> Fiore Hair Studio · Genova</span>
+      <a class="alink alink--legal" href="#home" data-hover="link"><span>Torna su ↑</span></a>
+    </div>
+  </div>
+</footer>
+
+<!-- ====================================================================== -->
+<!-- Navigation overlay                                                      -->
+<!-- ====================================================================== -->
+<div class="nav" id="nav" role="dialog" aria-modal="true" aria-label="Menu di navigazione" aria-hidden="true" inert>
+  <div class="shell nav-top">
+    <button class="brand brand--light" type="button" data-scroll-top data-hover="fast" aria-label="Fiore Hair Studio, torna all'inizio">
+      <span class="brand__mark"><svg aria-hidden="true"><use href="#i-flower"/></svg></span>
+      <span class="brand__name" aria-hidden="true"><strong>FIORE</strong><small>Hair Studio</small></span>
+    </button>
+    <button class="nav-close" type="button" data-nav-close aria-label="Chiudi il menu" data-hover="fast"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+  </div>
+  <nav class="shell nav-body" aria-label="Sezioni">
+    <ul class="nav-list">
+      <li><a class="nav-link" href="#home" data-hover="link"><span class="nav-index">01</span><span>Home</span></a></li>
+      <li><a class="nav-link" href="#works" data-hover="link"><span class="nav-index">02</span><span>Saloni</span></a></li>
+      <li><a class="nav-link" href="#services" data-hover="link"><span class="nav-index">03</span><span>Servizi</span></a></li>
+      <li><a class="nav-link" href="#about" data-hover="link"><span class="nav-index">04</span><span>Lo studio</span></a></li>
+      <li><a class="nav-link" href="#contatti" data-hover="link"><span class="nav-index">05</span><span>Contatti</span></a></li>
+      <li><button class="nav-link" type="button" data-open-modal data-hover="link"><span class="nav-index">06</span><span>Prenota</span></button></li>
+    </ul>
+  </nav>
+  <div class="shell">
+    <div class="nav-bottom">
+      <p class="nav-time"><strong data-clock-time>--:--</strong><span data-clock-date>Ora locale</span></p>
+      <button class="pill pill--white" type="button" data-open-modal data-hover="fast">
+        Prenota un appuntamento
+        <span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================================== -->
+<!-- Request modal                                                           -->
+<!-- ====================================================================== -->
+<div class="modal" id="modal" aria-hidden="true" inert>
+  <div class="modal-backdrop" data-modal-close></div>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title" data-lenis-prevent>
+    <button class="modal-close" type="button" data-modal-close aria-label="Chiudi" data-hover="fast"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+
+    <div data-modal-form-view>
+      <p class="eyebrow">Fiore Hair Studio</p>
+      <h2 class="modal-title" id="modal-title">Richiedi un appuntamento</h2>
+      <p class="modal-intro">Lasciaci il tuo nome, un contatto e cosa desideri.</p>
+      <form class="form" id="request-form" novalidate>
+        <div class="field">
+          <label for="f-name">Nome</label>
+          <input id="f-name" name="name" type="text" required autocomplete="name" placeholder="Il tuo nome" aria-describedby="f-name-err">
+          <span class="field-error" id="f-name-err" aria-live="polite"></span>
+        </div>
+        <div class="field">
+          <label for="f-email">Email</label>
+          <input id="f-email" name="email" type="email" required autocomplete="email" inputmode="email" placeholder="nome@email.it" aria-describedby="f-email-err">
+          <span class="field-error" id="f-email-err" aria-live="polite"></span>
+        </div>
+        <div class="field">
+          <label for="f-request">La tua richiesta</label>
+          <textarea id="f-request" name="request" rows="4" required placeholder="Servizio, salone preferito e giorni in cui sei disponibile." aria-describedby="f-request-err"></textarea>
+          <span class="field-error" id="f-request-err" aria-live="polite"></span>
+        </div>
+        <p class="form-note">Anteprima del modulo: per ora la richiesta non viene inviata al salone. Per prenotare subito chiama <a href="tel:+390100011047">Galleria Mazzini</a> o <a href="tel:+390105960056">Via Cesarea</a>.</p>
+        <button class="pill pill--dark" type="submit" data-hover="fast">
+          <span data-submit-label>Invia richiesta</span>
+          <span class="pill__badge"><svg class="mv-ur" aria-hidden="true"><use href="#i-arrow-ur"/></svg></span>
+        </button>
+      </form>
+    </div>
+
+    <div class="success" data-modal-success hidden>
+      <span class="success__icon" aria-hidden="true"><svg><use href="#i-flower"/></svg></span>
+      <h2 class="modal-title" tabindex="-1" data-success-title>Grazie!</h2>
+      <p class="modal-intro">La tua richiesta è pronta, ma questo modulo è ancora dimostrativo e non ha inviato dati. Per fissare l'appuntamento chiama il salone che preferisci.</p>
+      <div class="success__actions">
+        <a class="pill pill--light" href="tel:+390100011047" data-hover="fast">Galleria Mazzini<span class="pill__badge"><svg aria-hidden="true"><use href="#i-phone"/></svg></span></a>
+        <a class="pill pill--light" href="tel:+390105960056" data-hover="fast">Via Cesarea<span class="pill__badge"><svg aria-hidden="true"><use href="#i-phone"/></svg></span></a>
+        <button class="pill pill--dark pill--plain" type="button" data-modal-close data-hover="fast">Chiudi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+/* ==========================================================================
+   Boot + Lenis
+   ========================================================================== */
+const root = document.documentElement;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+
+let Lenis = null;
+try {
+  ({ default: Lenis } = await import('lenis'));
+} catch (err) {
+  console.warn('Lenis non disponibile: uso lo scroll nativo.', err);
+}
+clearTimeout(window.__fioreBoot);
+const bootFailed = root.classList.contains('js-failed');
+
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+// Native fallback with the same surface, used if the CDN is unreachable.
+const lenis = Lenis ? new Lenis({ smoothWheel: !reduce }) : {
+  raf() {}, stop() {}, start() {}, on() {},
+  scrollTo(target, { offset = 0 } = {}) {
+    const top = typeof target === 'number' ? target : target.getBoundingClientRect().top + scrollY + offset;
+    window.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
+  },
+};
+function raf(t) {
+  lenis.raf(t);
+  requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
+
+/* ==========================================================================
+   Adaptive grid (scale up above 1920px)
+   ========================================================================== */
+function applyAdaptiveGrid() {
+  const FONT_BASE = 16;
+  const baseWidth = 1920;
+  const coef = 0.6666;
+  const w = window.innerWidth;
+  const widthReduction = ((baseWidth - w) / baseWidth) * 100;
+  const size = FONT_BASE - (FONT_BASE * (widthReduction * coef)) / 100;
+  if (size > FONT_BASE) {
+    document.documentElement.style.fontSize = size + 'px';
+  } else {
+    document.documentElement.style.removeProperty('font-size');
+  }
+}
+applyAdaptiveGrid();
+addEventListener('resize', applyAdaptiveGrid);
+
+/* ==========================================================================
+   Scroll lock — one model shared by loader, nav and modal
+   ========================================================================== */
+const scrollLocks = new Set();
+function stopScroll(key = 'default') {
+  scrollLocks.add(key);
+  lenis.stop();
+  root.style.position = 'relative';
+  root.style.overflow = 'hidden';
+  root.style.height = '100%';
+}
+function startScroll(key = 'default') {
+  scrollLocks.delete(key);
+  if (scrollLocks.size) return; // another overlay still holds the lock
+  lenis.start();
+  root.style.removeProperty('position');
+  root.style.removeProperty('overflow');
+  root.style.removeProperty('height');
+}
+
+/* ==========================================================================
+   Spring (tension/friction, mass 1, dt 1/60) + hover bindings
+   ========================================================================== */
+class Spring {
+  constructor(onUpdate, { tension = 320, friction = 18 } = {}) {
+    this.x = 0; this.v = 0; this.target = 0;
+    this.tension = tension; this.friction = friction;
+    this.onUpdate = onUpdate; this.id = 0;
+    this.tick = this.tick.bind(this);
+  }
+  set(target) {
+    this.target = target;
+    if (!this.id) this.id = requestAnimationFrame(this.tick);
+  }
+  tick() {
+    const dt = 1 / 60;
+    const accel = this.tension * (this.target - this.x) - this.friction * this.v;
+    this.v += accel * dt;
+    this.x += this.v * dt;
+    const settled = Math.abs(this.target - this.x) < 0.001 && Math.abs(this.v) < 0.001;
+    if (settled) { this.x = this.target; this.v = 0; }
+    this.onUpdate(this.x);
+    this.id = settled ? 0 : requestAnimationFrame(this.tick);
+  }
+}
+const SPRINGS = {
+  fast: { tension: 320, friction: 18 },
+  link: { tension: 320, friction: 22 },
+  row:  { tension: 240, friction: 26 },
+  card: { tension: 210, friction: 26 },
+};
+function bindHover(el) {
+  const spring = new Spring((v) => el.style.setProperty('--h', v.toFixed(4)), SPRINGS[el.dataset.hover] || SPRINGS.fast);
+  el.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' || e.pointerType === 'pen') spring.set(1); });
+  el.addEventListener('pointerleave', () => spring.set(0));
+  el.addEventListener('focusin', (e) => { if (e.target.matches(':focus-visible')) spring.set(1); });
+  el.addEventListener('focusout', () => spring.set(0));
+}
+if (canHover && !reduce) $$('[data-hover]').forEach(bindHover);
+
+/* ==========================================================================
+   Text + block reveals
+   ========================================================================== */
+function splitWords(el) {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  let i = 0;
+  nodes.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    node.textContent.split(/(\s+)/).forEach((part) => {
+      if (!part) return;
+      if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+      const w = document.createElement('span');
+      w.className = 'w';
+      w.textContent = part;
+      w.style.transitionDelay = `${i++ * 35}ms`;
+      frag.appendChild(w);
+    });
+    node.replaceWith(frag);
+  });
+}
+function prepareLines(el, base = 0) {
+  const stagger = Number(el.dataset.lineStagger || 120);
+  $$('.line-inner', el).forEach((line, i) => { line.style.transitionDelay = `${base + i * stagger}ms`; });
+}
+function prepareStagger(el) {
+  const stagger = Number(el.dataset.stagger || 90);
+  $$('.st', el).forEach((child, i) => { child.style.transitionDelay = `${i * stagger}ms`; });
+}
+
+const revealTargets = $$('.rv:not([data-hero]), [data-lines]:not([data-hero]), [data-words], [data-stagger], .stats-panel');
+if (reduce || bootFailed) {
+  revealTargets.forEach((el) => el.classList.add('is-in'));
+} else {
+  $$('[data-words]').forEach(splitWords);
+  $$('[data-lines]:not([data-hero])').forEach((el) => prepareLines(el));
+  $$('[data-stagger]').forEach(prepareStagger);
+  const revealIO = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-in');
+      revealIO.unobserve(entry.target);
+    });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: 0 });
+  revealTargets.forEach((el) => revealIO.observe(el));
+}
+
+/* ==========================================================================
+   Page loader → ready
+   ========================================================================== */
+window.__fioreReady = false;
+const header = $('#header');
+function heroEntrance() {
+  header.style.transitionDelay = '150ms';
+  header.classList.add('is-in');
+  $$('[data-hero]').forEach((el) => {
+    const delay = Number(el.dataset.hero) || 0;
+    if (el.hasAttribute('data-lines')) prepareLines(el, delay);
+    else el.style.transitionDelay = `${delay}ms`;
+    el.classList.add('is-in');
+  });
+  // Drop entrance delays so later transitions on these nodes react instantly.
+  setTimeout(() => {
+    header.style.transitionDelay = '';
+    $$('[data-hero]').forEach((el) => { el.style.transitionDelay = ''; });
+  }, 2600);
+}
+function markReady() {
+  window.__fioreReady = true;
+  document.dispatchEvent(new CustomEvent('fiore:ready'));
+  heroEntrance();
+}
+function runLoader() {
+  const loader = $('#loader');
+  if (!loader || bootFailed) { loader?.remove(); markReady(); return; }
+  stopScroll('loader');
+  const fill = $('.loader__fill', loader);
+  const count = $('.loader__count', loader);
+  const duration = reduce ? 300 : 1300;
+  const easeInOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const t0 = performance.now();
+  function step(now) {
+    const p = Math.min((now - t0) / duration, 1);
+    const v = easeInOutCubic(p);
+    fill.style.transform = `scaleX(${v})`;
+    count.textContent = String(Math.round(v * 100)).padStart(3, '0');
+    if (p < 1) { requestAnimationFrame(step); return; }
+    loader.classList.add('is-leaving');
+    setTimeout(() => {
+      loader.remove();
+      startScroll('loader');
+      markReady();
+    }, reduce ? 0 : 720);
+  }
+  requestAnimationFrame(step);
+}
+runLoader();
+
+/* ==========================================================================
+   Live clock (visitor's local time, Italian format)
+   ========================================================================== */
+const timeFmt = new Intl.DateTimeFormat('it-IT', { hour: '2-digit', minute: '2-digit' });
+const dateFmt = new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+function tickClock() {
+  const now = new Date();
+  const time = timeFmt.format(now);
+  const date = dateFmt.format(now);
+  $$('[data-clock-time]').forEach((n) => {
+    n.textContent = time;
+    if (n.tagName === 'TIME') n.dateTime = now.toISOString();
+  });
+  $$('[data-clock-date]').forEach((n) => { n.textContent = date; });
+}
+tickClock();
+setInterval(tickClock, 1000);
+$$('[data-year]').forEach((n) => { n.textContent = new Date().getFullYear(); });
+
+/* ==========================================================================
+   Hero — liquid image reveal
+   ========================================================================== */
+function initLiquid(media) {
+  const img = $('.hero-base', media);
+  const canvas = $('.hero-canvas', media);
+  img.addEventListener('error', () => media.classList.add('is-fallback'));
+  if (reduce || !canHover || !canvas.getContext) return; // static base image only
+
+  const ctx = canvas.getContext('2d');
+  const colour = document.createElement('canvas');
+  const cctx = colour.getContext('2d');
+  const mask = document.createElement('canvas');
+  const mctx = mask.getContext('2d');
+  const brush = document.createElement('canvas');
+  const bctx = brush.getContext('2d');
+
+  const brushRadius = 143;
+  const decay = 0.016;
+  const IDLE_FRAMES = 120;
+  const MAX_POINTS = 60;
+  let dpr = 1;
+  let imageReady = false;
+  let running = false;
+  let idle = 0;
+  let last = null;
+  let visible = true;
+  const queue = [];
+
+  function objectPosition() {
+    const [x = '50%', y = '50%'] = getComputedStyle(img).objectPosition.split(' ');
+    return [parseFloat(x) / 100, parseFloat(y) / 100];
+  }
+  function buildBrush() {
+    const r = brushRadius * dpr;
+    brush.width = brush.height = Math.ceil(r * 2);
+    const g = bctx.createRadialGradient(r, r, 0, r, r, r);
+    g.addColorStop(0, 'rgba(0,0,0,1)');
+    g.addColorStop(0.55, 'rgba(0,0,0,0.82)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    bctx.fillStyle = g;
+    bctx.fillRect(0, 0, brush.width, brush.height);
+  }
+  function drawColourLayer() {
+    if (!imageReady) return;
+    const iw = img.naturalWidth;
+    const ih = img.naturalHeight;
+    const scale = Math.max(colour.width / iw, colour.height / ih); // cover, no distortion
+    const dw = iw * scale;
+    const dh = ih * scale;
+    const [px, py] = objectPosition();
+    cctx.clearRect(0, 0, colour.width, colour.height);
+    cctx.drawImage(img, (colour.width - dw) * px, (colour.height - dh) * py, dw, dh);
+  }
+  function clearAll() {
+    mctx.clearRect(0, 0, mask.width, mask.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    [canvas, colour, mask].forEach((c) => {
+      c.width = Math.max(1, Math.round(rect.width * dpr));
+      c.height = Math.max(1, Math.round(rect.height * dpr));
+    });
+    buildBrush();
+    drawColourLayer();
+    clearAll();
+  }
+  function frame() {
+    const fade = decay + Math.min(idle * 0.004, 0.5);
+    mctx.globalCompositeOperation = 'destination-out';
+    mctx.fillStyle = `rgba(0,0,0,${fade})`;
+    mctx.fillRect(0, 0, mask.width, mask.height);
+    mctx.globalCompositeOperation = 'source-over';
+    const half = brush.width / 2;
+    for (const p of queue) mctx.drawImage(brush, p.x * dpr - half, p.y * dpr - half);
+    queue.length = 0;
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(colour, 0, 0);
+    ctx.globalCompositeOperation = 'destination-in';
+    ctx.drawImage(mask, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+
+    idle += 1;
+    if (idle > IDLE_FRAMES) { clearAll(); running = false; return; } // stop redrawing when idle
+    requestAnimationFrame(frame);
+  }
+  function start() {
+    if (running) return;
+    running = true;
+    requestAnimationFrame(frame);
+  }
+
+  window.addEventListener('pointermove', (e) => {
+    if (!imageReady || !visible || (e.pointerType !== 'mouse' && e.pointerType !== 'pen')) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    if (x < -brushRadius || y < -brushRadius || x > rect.width + brushRadius || y > rect.height + brushRadius) {
+      last = null;
+      return;
+    }
+    if (last) {
+      const dx = x - last.x;
+      const dy = y - last.y;
+      const step = Math.max(brushRadius * 0.3, 1);
+      const n = Math.min(Math.floor(Math.hypot(dx, dy) / step), MAX_POINTS);
+      for (let i = 1; i < n; i++) queue.push({ x: last.x + (dx * i) / n, y: last.y + (dy * i) / n });
+    }
+    queue.push({ x, y });
+    last = { x, y };
+    idle = 0;
+    start();
+  }, { passive: true });
+
+  new ResizeObserver(resize).observe(canvas);
+  new IntersectionObserver(([entry]) => {
+    visible = entry.isIntersecting;
+    if (!visible) last = null;
+  }).observe(media);
+
+  const onReady = () => { imageReady = img.naturalWidth > 0; drawColourLayer(); };
+  if (img.complete && img.naturalWidth) onReady();
+  else img.addEventListener('load', onReady, { once: true });
+}
+$$('[data-liquid]').forEach(initLiquid);
+
+/* ==========================================================================
+   Hero card carousel
+   ========================================================================== */
+function initCarousel(card) {
+  const slides = $$('[data-slide]', card);
+  const dots = $$('[data-dot]', card);
+  const flower = $('[data-carousel-flower]', card);
+  const num = $('[data-carousel-num]', card);
+  const total = slides.length;
+  let index = 0;
+
+  function go(next, dir) {
+    next = (next + total) % total;
+    if (next === index) return;
+    const from = slides[index];
+    const to = slides[next];
+    to.classList.add('no-t');
+    to.classList.toggle('is-before', dir < 0);
+    void to.offsetWidth; // commit the start position before animating
+    to.classList.remove('no-t', 'is-before');
+    to.classList.add('is-active');
+    to.removeAttribute('aria-hidden');
+    from.classList.remove('is-active');
+    from.classList.toggle('is-before', dir > 0);
+    from.setAttribute('aria-hidden', 'true');
+    index = next;
+    dots.forEach((d, i) => d.setAttribute('aria-current', String(i === index)));
+    flower.style.transform = `rotate(${index * 72}deg)`;
+    num.textContent = `${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+  }
+  $('[data-next]', card).addEventListener('click', () => go(index + 1, 1));
+  $('[data-prev]', card).addEventListener('click', () => go(index - 1, -1));
+  dots.forEach((d, i) => d.addEventListener('click', () => go(i, i > index ? 1 : -1)));
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('button, a')) return;
+    go(index + 1, 1);
+  });
+}
+$$('[data-carousel]').forEach(initCarousel);
+
+/* ==========================================================================
+   Stats — count up with scroll progress (top bottom → center center)
+   ========================================================================== */
+function initStats(grid) {
+  const nums = $$('[data-count]', grid);
+  const render = (p) => nums.forEach((n) => { n.textContent = Math.round(p * Number(n.dataset.count)) + (n.dataset.suffix || ''); });
+  if (reduce || bootFailed) { render(1); return; }
+  let lastRun = 0;
+  let queued = false;
+  function update() {
+    lastRun = performance.now();
+    const rect = grid.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const start = vh;                          // grid top reaches viewport bottom
+    const end = vh / 2 - rect.height / 2;      // grid centre reaches viewport centre
+    const p = Math.min(Math.max((start - rect.top) / (start - end), 0), 1);
+    render(p);
+  }
+  function onScroll() {
+    const wait = 30 - (performance.now() - lastRun);
+    if (wait <= 0) { update(); return; }
+    if (queued) return;
+    queued = true;
+    setTimeout(() => { queued = false; update(); }, wait);
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  update();
+}
+$$('[data-stats]').forEach(initStats);
+
+/* ==========================================================================
+   Overlays: focus trap helpers
+   ========================================================================== */
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select, [tabindex]:not([tabindex="-1"])';
+function trapFocus(container, e) {
+  const items = $$(FOCUSABLE, container).filter((el) => el.offsetParent !== null || el === document.activeElement);
+  if (!items.length) return;
+  const first = items[0];
+  const lastItem = items[items.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); lastItem.focus(); }
+  else if (!e.shiftKey && document.activeElement === lastItem) { e.preventDefault(); first.focus(); }
+}
+
+/* ==========================================================================
+   Navigation overlay
+   ========================================================================== */
+const nav = $('#nav');
+const menuBtn = $('#menu-btn');
+let navOpen = false;
+let navReturnFocus = null;
+function openNav() {
+  if (navOpen) return;
+  navOpen = true;
+  navReturnFocus = document.activeElement;
+  nav.inert = false;
+  nav.setAttribute('aria-hidden', 'false');
+  $$('.nav-link', nav).forEach((link, i) => { link.style.transitionDelay = `${i * 45 + 80}ms`; });
+  nav.classList.add('is-open');
+  menuBtn.setAttribute('aria-expanded', 'true');
+  stopScroll('nav');
+  setTimeout(() => $('[data-nav-close]', nav).focus(), 60);
+}
+function closeNav({ restoreFocus = true } = {}) {
+  if (!navOpen) return;
+  navOpen = false;
+  $$('.nav-link', nav).forEach((link) => { link.style.transitionDelay = '0ms'; });
+  nav.classList.remove('is-open');
+  nav.setAttribute('aria-hidden', 'true');
+  nav.inert = true;
+  menuBtn.setAttribute('aria-expanded', 'false');
+  startScroll('nav');
+  if (restoreFocus) (navReturnFocus || menuBtn).focus({ preventScroll: true });
+}
+menuBtn.addEventListener('click', openNav);
+$('[data-nav-close]', nav).addEventListener('click', () => closeNav());
+
+/* ==========================================================================
+   Request modal
+   ========================================================================== */
+const modal = $('#modal');
+const form = $('#request-form');
+const formView = $('[data-modal-form-view]', modal);
+const successView = $('[data-modal-success]', modal);
+const submitBtn = $('button[type="submit"]', form);
+const submitLabel = $('[data-submit-label]', form);
+const fields = {
+  name: $('#f-name'),
+  email: $('#f-email'),
+  request: $('#f-request'),
+};
+let modalOpen = false;
+let modalReturnFocus = null;
+let resetTimer = 0;
+let submitTimer = 0;
+
+function setError(input, message) {
+  const err = $(`#${input.id}-err`);
+  err.textContent = message;
+  if (message) input.setAttribute('aria-invalid', 'true');
+  else input.removeAttribute('aria-invalid');
+}
+function resetModal() {
+  clearTimeout(submitTimer);
+  form.reset();
+  Object.values(fields).forEach((input) => setError(input, ''));
+  submitBtn.disabled = false;
+  submitLabel.textContent = 'Invia richiesta';
+  formView.hidden = false;
+  successView.hidden = true;
+}
+function openModal({ service = '', returnFocus = null } = {}) {
+  if (modalOpen) return;
+  clearTimeout(resetTimer);
+  modalOpen = true;
+  modalReturnFocus = returnFocus || document.activeElement;
+  if (service && !fields.request.value.trim()) fields.request.value = `Vorrei prenotare: ${service}. `;
+  modal.inert = false;
+  modal.setAttribute('aria-hidden', 'false');
+  modal.classList.add('is-open');
+  stopScroll('modal');
+  setTimeout(() => fields.name.focus({ preventScroll: true }), 80);
+}
+function closeModal() {
+  if (!modalOpen) return;
+  modalOpen = false;
+  modal.classList.remove('is-open');
+  modal.setAttribute('aria-hidden', 'true');
+  modal.inert = true;
+  startScroll('modal');
+  modalReturnFocus?.focus?.({ preventScroll: true });
+  resetTimer = setTimeout(resetModal, 300 + (reduce ? 0 : 450)); // ~300ms after the exit animation
+}
+$$('[data-modal-close]', modal).forEach((el) => el.addEventListener('click', closeModal));
+Object.values(fields).forEach((input) => input.addEventListener('input', () => setError(input, '')));
+
+function validate() {
+  const checks = [
+    [fields.name, (v) => (v ? '' : 'Inserisci il tuo nome.')],
+    [fields.email, (v) => (!v ? 'Inserisci la tua email.' : (fields.email.validity.typeMismatch || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) ? 'Inserisci un indirizzo email valido.' : '')],
+    [fields.request, (v) => (v ? '' : 'Scrivi due parole sulla tua richiesta.')],
+  ];
+  let firstInvalid = null;
+  checks.forEach(([input, rule]) => {
+    const message = rule(input.value.trim());
+    setError(input, message);
+    if (message && !firstInvalid) firstInvalid = input;
+  });
+  firstInvalid?.focus();
+  return !firstInvalid;
+}
+form.addEventListener('submit', (e) => {
+  e.preventDefault(); // local demo: nothing is sent anywhere
+  if (!validate()) return;
+  submitBtn.disabled = true;
+  submitLabel.textContent = 'Un momento…';
+  submitTimer = setTimeout(() => {
+    const firstName = fields.name.value.trim().split(/\s+/)[0];
+    $('[data-success-title]', modal).textContent = `Grazie, ${firstName}!`;
+    formView.hidden = true;
+    successView.hidden = false;
+    $('[data-success-title]', modal).focus({ preventScroll: true });
+  }, 900);
+});
+
+/* ==========================================================================
+   Global wiring: modal triggers, anchors, keyboard
+   ========================================================================== */
+document.addEventListener('click', (e) => {
+  const trigger = e.target.closest('[data-open-modal]');
+  if (trigger) {
+    e.preventDefault();
+    const fromNav = navOpen && nav.contains(trigger);
+    openModal({ service: trigger.dataset.service || '', returnFocus: fromNav ? menuBtn : trigger });
+    if (fromNav) closeNav({ restoreFocus: false }); // modal already holds the scroll lock
+    return;
+  }
+  if (e.target.closest('[data-scroll-top]')) {
+    const wasOpen = navOpen;
+    closeNav({ restoreFocus: false });
+    setTimeout(() => lenis.scrollTo(0), wasOpen ? 380 : 0);
+    return;
+  }
+  const link = e.target.closest('a[href^="#"]');
+  if (!link) return;
+  const hash = link.getAttribute('href');
+  const target = hash.length > 1 ? document.querySelector(hash) : null;
+  if (!target) return;
+  e.preventDefault();
+  const wasOpen = navOpen;
+  closeNav({ restoreFocus: false });
+  setTimeout(() => {
+    if (hash === '#home') lenis.scrollTo(0);
+    else lenis.scrollTo(target, { offset: 0 });
+    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
+  }, wasOpen ? 380 : 0);
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (modalOpen) closeModal();
+    else if (navOpen) closeNav();
+    return;
+  }
+  if (e.key !== 'Tab') return;
+  if (modalOpen) trapFocus($('.modal-panel', modal), e);
+  else if (navOpen) trapFocus(nav, e);
+});
+</script>
+</body>
+</html>
