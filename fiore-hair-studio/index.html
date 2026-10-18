@@ -732,13 +732,27 @@ html.lenis, html.lenis body { height: auto; }
         <feFuncB type="table" tableValues="0.48 0.651 0.882"/>
       </feComponentTransfer>
     </filter>
+    <!-- Cursor reveal: sage duotone around, while the hair (the dark areas) keeps its own colour lifted to a natural brown -->
     <filter id="fiore-duotone-deep" color-interpolation-filters="sRGB">
-      <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/>
-      <feComponentTransfer>
+      <feColorMatrix in="SourceGraphic" type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/>
+      <feComponentTransfer result="duo">
         <feFuncR type="table" tableValues="0.13 0.42 0.655 0.949"/>
         <feFuncG type="table" tableValues="0.14 0.45 0.698 0.914"/>
         <feFuncB type="table" tableValues="0.13 0.42 0.651 0.882"/>
       </feComponentTransfer>
+      <feColorMatrix in="SourceGraphic" type="saturate" values="0.92"/>
+      <feComponentTransfer result="brown">
+        <feFuncR type="gamma" amplitude="1" exponent="0.6" offset="0"/>
+        <feFuncG type="gamma" amplitude="1" exponent="0.67" offset="0"/>
+        <feFuncB type="gamma" amplitude="1" exponent="0.78" offset="0"/>
+      </feComponentTransfer>
+      <feColorMatrix in="SourceGraphic" type="luminanceToAlpha"/>
+      <feComponentTransfer result="hair">
+        <feFuncA type="table" tableValues="1 1 0.7 0.1 0 0"/>
+      </feComponentTransfer>
+      <feComposite in="duo" in2="hair" operator="out" result="around"/>
+      <feComposite in="brown" in2="hair" operator="in" result="hairBrown"/>
+      <feComposite in="around" in2="hairBrown" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
     </filter>
   </defs>
 </svg>
