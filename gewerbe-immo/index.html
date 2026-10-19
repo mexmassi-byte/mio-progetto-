@@ -29,6 +29,14 @@
   (function () {
     var d = document.documentElement;
     d.classList.add('js');
+    // Language: ?lang= in the address wins, then the stored choice, then German (authored in this file).
+    var lang = 'de';
+    try {
+      var asked = new URLSearchParams(location.search).get('lang');
+      lang = asked === 'en' || asked === 'de' ? asked : (localStorage.getItem('gi-lang') === 'en' ? 'en' : 'de');
+    } catch (e) {}
+    d.setAttribute('data-lang', lang);
+    if (lang === 'en') { d.lang = 'en'; d.classList.add('i18n-pending'); }
     // Topic pages are hash routes; show the requested one before first paint.
     var pages = ['unternehmensprofil', 'immobilieninvestments', 'beratung-kreditconsult', 'sparkassen-service', 'referenzen'];
     var hash = location.hash.slice(1);
@@ -335,7 +343,7 @@ html.loader-on .loader.is-exit { transform: translateY(-100%); }
   box-shadow: 0 1px 0 var(--line-dark);
 }
 .site-header.is-scrolled::before { opacity: 0; }
-.header__inner { position: relative; height: 100%; display: flex; align-items: center; gap: 2rem; }
+.header__inner { position: relative; height: 100%; display: flex; align-items: center; gap: clamp(1rem, 1.5vw, 1.5rem); }
 
 .brand { display: inline-flex; align-items: center; gap: .85rem; text-decoration: none; color: inherit; margin-right: auto; min-width: 0; }
 .brand__mark { width: 28px; height: auto; flex: none; }
@@ -352,11 +360,11 @@ html.loader-on .loader.is-exit { transform: translateY(-100%); }
 }
 .nav a:hover { color: var(--white); background: rgba(247, 243, 234, .1); }
 .nav a[aria-current="true"] { color: var(--white); background: rgba(247, 243, 234, .16); }
-.header__cta { min-height: 44px; padding: .6rem 1.25rem; }
+.header__cta { min-height: 44px; min-width: 8.25rem; padding: .6rem 1.25rem; }
 
 .menu-toggle {
   display: none; align-items: center; gap: .7rem;
-  min-height: 44px; padding: .5rem 1rem .5rem 1.15rem; background: none; color: inherit;
+  min-height: 44px; min-width: 6.75rem; justify-content: center; padding: .5rem 1rem .5rem 1.15rem; background: none; color: inherit;
   border: 1px solid rgba(247, 243, 234, .35); border-radius: var(--pill);
   font-size: .8rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
   transition: background-color .3s var(--ease), border-color .3s var(--ease);
@@ -370,12 +378,84 @@ html.loader-on .loader.is-exit { transform: translateY(-100%); }
 .menu-toggle__icon::before { top: 0; }
 .menu-toggle__icon::after { bottom: 0; }
 
-@media (max-width: 1179px) {
+@media (max-width: 1279px) {
   .nav, .header__cta { display: none; }
   .menu-toggle { display: inline-flex; }
   html:not(.js) .menu-toggle { display: none; }
   html:not(.js) .header__cta { display: inline-flex; }
 }
+
+/* ==========================================================================
+   Language switch (DE/EN): a segmented pill on the dark header and menu.
+   The light indicator follows data-active (the real language). Its two edges
+   travel separately – the leading edge first – so it reaches toward the new
+   option and settles there instead of jumping. The indicator lies over the
+   light labels and carries its own dark copy of them, held in place while it
+   moves and clipped to its shape, so every letter stays legible mid-way.
+   ========================================================================== */
+:root { --ease-switch: cubic-bezier(.4, 0, .2, 1); }
+.lang-switch {
+  --ls-w: 2.75rem; --ls-h: 2.125rem; --ls-pad: 3px;
+  position: relative; isolation: isolate; flex: none;
+  display: inline-grid; grid-template-columns: repeat(2, var(--ls-w));
+  padding: var(--ls-pad); border-radius: var(--pill);
+  background: rgba(247, 243, 234, .07); border: 1px solid rgba(247, 243, 234, .24);
+  transition: border-color .25s var(--ease), background-color .25s var(--ease);
+}
+.lang-switch:hover { border-color: rgba(247, 243, 234, .42); background: rgba(247, 243, 234, .1); }
+.lang-switch__option, .lang-switch__ink > span {
+  display: grid; place-items: center; height: var(--ls-h); padding: 0 0 0 .14em;
+  font: 600 .72rem/1 var(--font); letter-spacing: .14em;
+}
+.lang-switch__indicator {
+  position: absolute; z-index: 1; top: var(--ls-pad); bottom: var(--ls-pad);
+  left: var(--ls-pad); right: calc(var(--ls-pad) + var(--ls-w));
+  overflow: hidden; pointer-events: none;
+  border-radius: var(--pill); background: var(--paper);
+  box-shadow: 0 1px 2px rgba(12, 27, 48, .3), 0 6px 14px -6px rgba(12, 27, 48, .5);
+}
+.lang-switch__ink {
+  position: absolute; top: 0; left: 0; width: calc(2 * var(--ls-w));
+  display: grid; grid-template-columns: repeat(2, var(--ls-w)); color: var(--ink);
+}
+.lang-switch[data-active="en"] .lang-switch__indicator { left: calc(var(--ls-pad) + var(--ls-w)); right: var(--ls-pad); }
+.lang-switch[data-active="en"] .lang-switch__ink { left: calc(-1 * var(--ls-w)); }
+/* the dark copy shares the timing of the indicator's left edge, so it stays put on screen */
+.lang-switch.is-ready[data-active="en"] .lang-switch__indicator { transition: right .24s var(--ease-switch), left .26s var(--ease-switch) .07s; }
+.lang-switch.is-ready[data-active="en"] .lang-switch__ink { transition: left .26s var(--ease-switch) .07s; }
+.lang-switch.is-ready[data-active="de"] .lang-switch__indicator { transition: left .24s var(--ease-switch), right .26s var(--ease-switch) .07s; }
+.lang-switch.is-ready[data-active="de"] .lang-switch__ink { transition: left .24s var(--ease-switch); }
+.lang-switch__option {
+  position: relative; border: 0; border-radius: var(--pill); background: none; cursor: pointer;
+  color: rgba(247, 243, 234, .72);
+  transition: color .2s var(--ease-switch), transform .18s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+/* a 44px tall hit area without enlarging the drawn pill */
+.lang-switch__option::before { content: ""; position: absolute; inset: -5px 0; }
+.lang-switch__option:hover { color: var(--text-on-dark); }
+.lang-switch__option[aria-pressed="true"] { cursor: default; }
+.lang-switch__option:active { transform: scale(.94); }
+/* the focus ring is drawn above the indicator, which covers the selected button */
+.lang-switch__option:focus-visible { outline: none; }
+.lang-switch__option:focus-visible::after { content: ""; position: absolute; z-index: 2; inset: -2px; border-radius: var(--pill); box-shadow: 0 0 0 2px var(--text-on-dark); }
+.lang-switch--menu { --ls-w: 3.5rem; --ls-h: 2.5rem; }
+.menu__lang { display: none; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--line-dark); font-size: var(--fs-xs); font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--muted-on-dark); }
+@media (max-width: 599px) {
+  .header__inner > .lang-switch { display: none; }
+  .menu__lang { display: flex; }
+}
+html:not(.js) .lang-switch, html:not(.js) .menu__lang { display: none !important; }
+
+/* Text cross-fade while the language changes: only the translated text fades
+   ([data-i18n] is set by the language script), never images or surfaces */
+html.lang-out [data-i18n] { opacity: 0 !important; transition: opacity .16s var(--ease) !important; }
+html.lang-in [data-i18n] { transition: opacity .26s var(--ease) !important; }
+/* the page script keeps the reader's place itself */
+html.lang-out, html.lang-in, html.lang-swap { overflow-anchor: none; }
+/* English chosen: keep text hidden until it is translated (CSS failsafe reveals it regardless) */
+html.i18n-pending :is(.site-header, main, .site-footer, .loader__inner, .skip-link) { visibility: hidden; animation: i18n-failsafe 0s linear 1.5s forwards; }
+@keyframes i18n-failsafe { to { visibility: visible; } }
 
 /* ==========================================================================
    Mobile menu (dialog)
@@ -904,6 +984,11 @@ html.motion-ready [data-reveal="image"].is-visible img { scale: 1; }
         <li><a href="#ansprechpartner" data-nav>Ansprechpartner</a></li>
       </ul>
     </nav>
+    <div class="lang-switch" role="group" aria-label="Sprache wählen" data-lang-switch data-active="de" translate="no">
+      <span class="lang-switch__indicator" aria-hidden="true"><span class="lang-switch__ink"><span>DE</span><span>EN</span></span></span>
+      <button class="lang-switch__option" type="button" data-lang-option="de" lang="de" aria-label="Deutsch" aria-pressed="true">DE</button>
+      <button class="lang-switch__option" type="button" data-lang-option="en" lang="en" aria-label="English" aria-pressed="false">EN</button>
+    </div>
     <a class="btn btn--light header__cta" href="#kontakt">Kontakt
       <svg class="arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
     </a>
@@ -925,6 +1010,14 @@ html.motion-ready [data-reveal="image"].is-visible img { scale: 1; }
     </button>
   </div>
   <div class="container menu__body">
+    <div class="menu__lang">
+      <span>Sprache</span>
+      <div class="lang-switch lang-switch--menu" role="group" aria-label="Sprache wählen" data-lang-switch data-active="de" translate="no">
+        <span class="lang-switch__indicator" aria-hidden="true"><span class="lang-switch__ink"><span>DE</span><span>EN</span></span></span>
+        <button class="lang-switch__option" type="button" data-lang-option="de" lang="de" aria-label="Deutsch" aria-pressed="true">DE</button>
+        <button class="lang-switch__option" type="button" data-lang-option="en" lang="en" aria-label="English" aria-pressed="false">EN</button>
+      </div>
+    </div>
     <nav aria-label="Mobile Navigation">
       <ul class="menu__list">
         <li><a href="#geschaeftsfelder" data-menu-link>Geschäftsfelder</a></li>
@@ -1206,7 +1299,7 @@ html.motion-ready [data-reveal="image"].is-visible img { scale: 1; }
         <li class="node" data-l="9,68,.20" data-p="18,88,.36"><span class="node__label">Bewertung</span></li>
         <li class="node" data-l="59,85,.19" data-p="82,88,.35"><span class="node__label">Beratung</span></li>
         <li class="node" data-l="41,15,.17" data-p="83.5,61,.32"><span class="node__label">Verkauf</span></li>
-        <li class="node node--solid" data-l="80,23,.29" data-p="52,74,.44" data-chars="9"><span class="node__label">Menschen&shy;kenntnis</span></li>
+        <li class="node node--solid" data-l="80,23,.29" data-p="52,74,.44"><span class="node__label">Menschen&shy;kenntnis</span></li>
         <li class="node node--solid" data-l="83,70,.27" data-p="37,37,.40"><span class="node__label">Erfahrung</span></li>
         <li class="node node--solid" data-l="17,30,.30" data-p="77,38,.44"><span class="node__label">Vertrauen</span></li>
       </ul>
@@ -2559,6 +2652,594 @@ html.motion-ready [data-reveal="image"].is-visible img { scale: 1; }
   </div>
 </footer>
 
+<!-- English for every German string on the page (German source text → English).
+     Strings kept identical on purpose: names, places, addresses, numbers. -->
+<script type="application/json" id="i18n-en">
+{
+"Zum Inhalt springen": "Skip to content",
+"GEWERBE-IMMO": "GEWERBE-IMMO",
+"Immobilienberatung GmbH": "Immobilienberatung GmbH",
+"Spezialist für Gewerbe- und Investmentimmobilien": "Specialist in commercial and investment real estate",
+"Geschäftsfelder": "Business areas",
+"Netzwerk": "Network",
+"Sparkassen-Service": "Sparkassen Service",
+"Referenzen": "References",
+"Ansprechpartner": "Key contact",
+"Kontakt": "Contact",
+"Menü": "Menu",
+"Schließen": "Close",
+"GEWERBE-IMMO Immobilienberatung GmbH · Rosenstraße 7 · 82049 Pullach im Isartal": "GEWERBE-IMMO Immobilienberatung GmbH · Rosenstraße 7 · 82049 Pullach im Isartal",
+"info@gi-immo.de": "info@gi-immo.de",
+"Immobilienberatung · Pullach im Isartal": "Real estate advisory · Pullach im Isartal",
+"Gewerbespezialist der Sparkassen-Immobilien-Vermittlungs-Gesellschaft, Bayerns größtem Maklerunternehmen.": "Commercial property specialist of Sparkassen-Immobilien-Vermittlungs-Gesellschaft, Bavaria’s largest real estate brokerage.",
+"Geschäftsfelder entdecken": "Explore our business areas",
+"Kontakt aufnehmen": "Get in touch",
+"Investmentimmobilien": "Investment properties",
+"Beratung": "Advisory",
+"Kreditconsult": "Credit consulting",
+"Unternehmen": "Company",
+"Über GEWERBE-IMMO": "About GEWERBE-IMMO",
+"Die": "",
+"GEWERBE-IMMO Immobilienberatung GmbH": "GEWERBE-IMMO Immobilienberatung GmbH",
+"agiert als selbständiger Dienstleister für Investment- und Gewerbeimmobilien unter dem Dach der Sparkassen-Immobilien-Vermittlungs-GmbH.": "operates as an independent service provider for investment and commercial real estate under the umbrella of Sparkassen-Immobilien-Vermittlungs-GmbH.",
+"Unsere Themen im Überblick": "Our topics at a glance",
+"Unternehmensprofil": "Company profile",
+"Selbständiger Dienstleister für Investment- und Gewerbeimmobilien unter dem Dach der Sparkassen-Immobilien-Vermittlungs-GmbH.": "Independent service provider for investment and commercial real estate under the umbrella of Sparkassen-Immobilien-Vermittlungs-GmbH.",
+"Zur Seite": "View page",
+"Vermittlung von Immobilieninvestments": "Real estate investment brokerage",
+"Beratungs- und Vermittlungsleistungen rund um die Immobilienanlage – von der ersten Analyse über die Bewertung bis zum Vertragsabschluss.": "Advisory and brokerage services for property investment – from the initial analysis and valuation through to the signed contract.",
+"Beratung und Kreditconsult": "Advisory and credit consulting",
+"Portfolioberatung für Privat- und Unternehmerkunden sowie Institutionelle – und Lösungen für Banken in Kreditconsult und Verwertung.": "Portfolio advisory for private and business clients and institutional investors – and solutions for banks in credit consulting and asset realisation.",
+"Zusammenarbeit, Strukturberatung und Coaching im Umfeld der Sparkassen in Bayern.": "Collaboration, structural advisory and coaching alongside the Sparkassen in Bavaria.",
+"Referenzen und Projekte": "References and projects",
+"29 Referenzprojekte vom Fachmarkt über Büro- und Geschäftshäuser bis zu Hotels und Wohnanlagen.": "29 reference projects – from retail stores to office and commercial buildings, hotels and residential complexes.",
+"Investmentimmobilien, Beratung und Kreditconsult": "Investment properties, advisory and credit consulting",
+"01 · Investmentimmobilien": "01 · Investment properties",
+"Unser Leistungsspektrum umfasst alle im Bereich der Immobilienanlage relevanten Beratungs- und Vermittlungsleistungen – von der ersten Analyse oder Plausibilitätsprüfung über die Bewertung bis zum Vertragsabschluss.": "Our range of services covers all advisory and brokerage services relevant to property investment – from the initial analysis or plausibility check and the valuation through to the signed contract.",
+"Diese Leistungen konzentrieren wir auf:": "We focus these services on:",
+"A": "A",
+"Wohn-, Büro- und Geschäftshäuser": "Residential, office and commercial buildings",
+"B": "B",
+"Mehrfamilienhäuser und Wohnanlagen": "Apartment buildings and residential complexes",
+"C": "C",
+"Handels- und Logistikimmobilien": "Retail and logistics properties",
+"D": "D",
+"Sozial- und Spezialimmobilien": "Social and special-purpose properties",
+"Unter dem Strich": "The bottom line",
+"Ganzheitlicher Dienstleistungsansatz, langjährig erfahrenes Beraterteam, außergewöhnliche Marktdurchdringung, qualitativ hochwertige Beratungsleistung.": "A holistic service approach, a team of long-standing advisers, exceptional market penetration and high-quality advice.",
+"Leistungen, Objektarten und Kunden": "Services, property types and clients",
+"02 · Beratung": "02 · Advisory",
+"Portfolioberatung": "Portfolio advisory",
+"Privat- und Unternehmerkunden sowie Institutionelle erhalten spezialisierte Beratungsleistungen, die je nach Bedarf modular abgerufen werden können.": "Private and business clients as well as institutional investors receive specialised advisory services that can be called upon in modules, as required.",
+"Vier Augen sehen mehr als zwei. Wir helfen Ihnen zu entscheiden.": "Four eyes see more than two. We help you decide.",
+"Mehr zur Portfolioberatung": "More on portfolio advisory",
+"Beratungsgespräch anfragen": "Request a consultation",
+"03 · Kreditconsult": "03 · Credit consulting",
+"KreditConsult": "Credit consulting",
+"Darüber hinaus werden Lösungen für Banken in den Bereichen Kreditconsult und Verwertung erarbeitet und umgesetzt.": "In addition, we develop and implement solutions for banks in credit consulting and asset realisation.",
+"Als verlängerter Arm der Kreditexperten bei der Bank setzen wir die Interessen unserer Auftraggeber durch.": "As an extension of the bank’s credit specialists, we assert the interests of our clients.",
+"Mehr zu Kreditconsult": "More on credit consulting",
+"Ein Netzwerk, das in die Tiefe geht!": "A network that runs deep!",
+"Beschaffung": "Sourcing",
+"Bewertung": "Valuation",
+"Verkauf": "Sales",
+"Menschenkenntnis": "Understanding people",
+"Erfahrung": "Experience",
+"Vertrauen": "Trust",
+"Der Markt für Anlageimmobilien ist eigentlich überschaubar. Und doch reicht es nicht, wenn jeder jeden kennt. Erfolg in der Beschaffung, in der Bewertung, Beratung und im Verkauf entsteht mehr denn je durch die individuelle Fähigkeit, Interessen und Bedürfnisse zu erkennen, manchmal auch erst zu wecken und mit Kreativität und Einsatz zusammenzuführen. Wir bezeichnen das als Netzwerk, das in die Tiefe geht.": "The market for investment properties is actually quite manageable. And yet it is not enough for everyone to know everyone. Success in sourcing, valuation, advisory and sales depends more than ever on the individual ability to recognise interests and needs – sometimes even to awaken them – and to bring them together with creativity and commitment. We call this a network that runs deep.",
+"Beratungserfolg setzt Menschenkenntnis voraus, Erfahrung und Vertrauen.": "Advisory success requires an understanding of people, experience and trust.",
+"Durch die Zusammenarbeit mit den Sparkassen in Bayern verfügt die GEWERBE-IMMO über eine außergewöhnliche Marktdurchdringung auch in Klein- und Mittelstädten. Bei Bedarf auch über Bayern hinaus.": "Thanks to our collaboration with the Sparkassen in Bavaria, GEWERBE-IMMO has exceptional market penetration, including in small and medium-sized towns – and beyond Bavaria where required.",
+"Mehr im Unternehmensprofil": "More in the company profile",
+"Sparkassen-Service · Zusammenarbeit": "Sparkassen Service · Collaboration",
+"Beratung im Umfeld der Sparkassen in Bayern": "Advisory alongside the Sparkassen in Bavaria",
+"Die Asset-Klasse Immobilie hat in den vergangenen Jahren gegenüber allen anderen Anlageformen an Bedeutung gewonnen. Immer mehr Privatkunden, aber auch immer mehr Unternehmen, entdecken oder wiederentdecken die Anlageimmobilie als kluges, als nachhaltiges Investment. Als Instrument zur Wertsicherung, zum Aufbau und Erhalt des eigenen Vermögens. Um Substanz zu schaffen oder einfach, um sichere Renditen zu erwirtschaften.": "Over recent years, real estate as an asset class has gained in importance compared with all other forms of investment. More and more private clients, and more and more companies, are discovering or rediscovering the investment property as a smart and sustainable investment: as a way of preserving value and of building and maintaining their own wealth – to create substance, or simply to generate secure returns.",
+"Mehr zum Sparkassen-Service": "More on Sparkassen Service",
+"Strukturberatung": "Structural advisory",
+"Die Bestandsanalyse für Sparkassen zeigt Alternativen zum Eigentum an selbstgenutzten Immobilien auf. Das Projektergebnis liefert dem Vorstand und dem Verwaltungsrat eine transparente Gegenüberstellung möglicher Alternativen und zeigt deren quantitative und qualitative Bewertung auf.": "Our portfolio analysis for Sparkassen sets out alternatives to owning the properties they occupy. The result gives the board of management and the supervisory board a transparent comparison of the possible alternatives, together with their quantitative and qualitative assessment.",
+"Szenarios und Kennzahlen": "Scenarios and key figures",
+"Coaching": "Coaching",
+"Als spezialisiertes Beratungs- und Vermittlungsunternehmen verfügen wir über langjährige Expertise im Bereich Anlage-/Gewerbeimmobilien. Auf Anfrage unterstützen wir die Kollegen aus dem Sparkassen-Verbund mit fachlichem Know-how und helfen bestmöglich z. B. bei der Einschätzung des Marktwertes oder der Entwicklung von Vermarktungsstrategien.": "As a specialist advisory and brokerage firm, we have many years of expertise in investment and commercial properties. On request, we support colleagues within the Sparkassen network with our professional know-how and help as best we can – for example with assessing market value or developing marketing strategies.",
+"Mehr zum Coaching": "More on coaching",
+"Qualifizierte Unterstützung unter dem Dach der Sparkassen-Finanzgruppe, Kundendaten bleiben im Haus, ganzheitlicher Dienstleistungsansatz.": "Qualified support under the umbrella of the Savings Banks Finance Group, client data stays in-house, a holistic service approach.",
+"Erfolge · Stolz wie Oskar!": "Track record · Proud as Punch!",
+"Unsere Referenzprojekte": "Our reference projects",
+"Referenzprojekte vom Fachmarkt über Büro- und Geschäftshäuser bis zu Hotels und Wohnanlagen – in Bayern und darüber hinaus.": "Reference projects from retail stores to office and commercial buildings, hotels and residential complexes – in Bavaria and beyond.",
+"München-Thalkirchen": "Munich-Thalkirchen",
+"Wohnanlage": "Residential complex",
+"Globalverkauf zweier Mehrfamilienhäuser nebst drei Reihenhäusern in beliebter Wohngegend.": "Portfolio sale of two apartment buildings and three terraced houses in a popular residential area.",
+"Erlangen-Tennenlohe": "Erlangen-Tennenlohe",
+"Bürokomplex mit Parkhaus": "Office complex with car park",
+"Neubau (GOLDBECK) in moderner Architektur mit Tiefgarage und separatem Parkdeck am High-Tech-Standort Tennenlohe.": "New build (GOLDBECK) with contemporary architecture, underground car park and separate parking deck at the Tennenlohe high-tech location.",
+"Bayreuth, Fußgängerzone": "Bayreuth, pedestrian zone",
+"B&B Hotel mit Einzelhandel": "B&B Hotel with retail",
+"Neubau eines B&B Hotels mit Einzelhandel in 1A-Lage in der Bayreuther Fußgängerzone.": "New-build B&B Hotel with retail units in a prime location in Bayreuth’s pedestrian zone.",
+"Berlin-Alexanderplatz": "Berlin-Alexanderplatz",
+"Hotel Motel One": "Hotel Motel One",
+"Neubau Flagship-Hotel der Kette Motel One mit 708 Zimmern und Skybar direkt am Berliner Alexanderplatz.": "New-build flagship hotel of the Motel One chain with 708 rooms and a sky bar right on Berlin’s Alexanderplatz.",
+"Stein": "Stein",
+"Einkaufszentrum FORUM Stein": "FORUM Stein shopping centre",
+"Neubau eines modernen Einkaufszentrums mit ansprechendem Mietermix im Landkreis Fürth.": "New-build modern shopping centre with an attractive tenant mix in the district of Fürth.",
+"Nürnberg-Bärenschanze": "Nuremberg-Bärenschanze",
+"Bürohaus NOVARTIS": "NOVARTIS office building",
+"Das Bürozentrum „Bärenschanze“ besteht aus drei Gebäuden mit moderner Architektur und Glasfassaden und ist individuell funktionsfähig.": "The “Bärenschanze” office centre consists of three buildings with modern architecture and glass façades, each of which can operate independently.",
+"Alle Referenzprojekte ansehen": "View all reference projects",
+"6 von 29 Referenzprojekten · nach Objektart geordnet auf der Referenzseite": "6 of 29 reference projects · all of them, sorted by property type, on the references page",
+"Ihr Ansprechpartner": "Your contact",
+"Dr. Oliver Breitenstein": "Dr. Oliver Breitenstein",
+"Geschäftsführer": "Managing Director",
+"Dr.-Ing. & Dipl.-Oec.": "Dr.-Ing. & Dipl.-Oec.",
+"Gründer und Gesellschafter der GEWERBE-IMMO. Der Bauingenieur und Wirtschaftswissenschaftler leitet neben der Betreuung der Sparkassen die Abwicklung sämtlicher Beratungsleistungen sowie die Großkundenbetreuung.": "Founder and shareholder of GEWERBE-IMMO. A civil engineer and economist, he is responsible for the delivery of all advisory services and for key account management, alongside his work with the Sparkassen.",
+"Telefon": "Phone",
+"Mobil": "Mobile",
+"E-Mail": "Email",
+"breitenstein@gi-immo.de": "breitenstein@gi-immo.de",
+"Sprechen Sie uns an.": "Talk to us.",
+"Rufen Sie uns an, schreiben Sie uns eine E-Mail oder bereiten Sie Ihre Nachricht direkt hier vor.": "Call us, send us an email or prepare your message right here.",
+"Direkter Kontakt": "Direct contact",
+"Rosenstraße 7": "Rosenstraße 7",
+"82049 Pullach im Isartal": "82049 Pullach im Isartal",
+"Fax": "Fax",
+"Ihr Ansprechpartner: Dr. Oliver Breitenstein": "Your contact: Dr. Oliver Breitenstein",
+"Nachricht vorbereiten": "Prepare your message",
+"Beim Absenden öffnet sich Ihr E-Mail-Programm mit einer vorbereiteten Nachricht an": "When you submit the form, your email client opens with a prepared message to",
+". Über diese Seite selbst werden keine Daten übertragen oder gespeichert.": ". No data is transmitted or stored by this website itself.",
+"Name": "Name",
+"Unternehmen / Institut": "Company / institution",
+"(optional)": "(optional)",
+"Thema": "Topic",
+"Allgemeine Anfrage": "General enquiry",
+"Beratung / Portfolioberatung": "Advisory / portfolio advisory",
+"Nachricht": "Message",
+"E-Mail vorbereiten": "Prepare email",
+"Name, E-Mail und Nachricht sind Pflichtfelder.": "Name, email and message are required.",
+"Startseite": "Home",
+"Die GEWERBE-IMMO Immobilienberatung GmbH agiert als selbständiger Dienstleister für Investment- und Gewerbeimmobilien unter dem Dach der Sparkassen-Immobilien-Vermittlungs-GmbH.": "GEWERBE-IMMO Immobilienberatung GmbH operates as an independent service provider for investment and commercial real estate under the umbrella of Sparkassen-Immobilien-Vermittlungs-GmbH.",
+"Sparkassen-Finanzgruppe": "Savings Banks Finance Group",
+"Unter dem Dach der Sparkassen-Finanzgruppe": "Under the umbrella of the Savings Banks Finance Group",
+"Die GEWERBE-IMMO ist Gewerbespezialist der Sparkassen-Immobilien-Vermittlungs-Gesellschaft, Bayerns größtem Maklerunternehmen.": "GEWERBE-IMMO is the commercial property specialist of Sparkassen-Immobilien-Vermittlungs-Gesellschaft, Bavaria’s largest real estate brokerage.",
+"Die Maklertätigkeit erfolgt in Vertretung der Sparkassen-Immobilien-Vermittlungs-GmbH, Karolinenplatz 1, 80333 München.": "Brokerage activities are carried out on behalf of Sparkassen-Immobilien-Vermittlungs-GmbH, Karolinenplatz 1, 80333 Munich.",
+"Ein Netzwerk, das in die Tiefe geht": "A network that runs deep",
+"Interessen erkennen und zusammenführen": "Recognising and connecting interests",
+"Zusammenarbeit mit den Banken": "Working with the banks",
+"Aber auch – und das ist vielleicht unsere wichtigste Besonderheit – die interdisziplinäre Zusammenarbeit mit den verschiedenen Privatkundenabteilungen oder Firmenkundenbetreuern der Banken. Nicht selten sind auch deren Vorstände fest eingebunden, die besondere Kunden aus Tradition direkt betreuen. Die Einbindung in das weit verzweigte Sparkassen-Netzwerk ermöglicht es der GEWERBE-IMMO, auf die Ressourcen der zahlreichen Verbundpartner zurückzugreifen. Im Ergebnis entstehen vielschichtige Kundenkontakte, unterschiedliche Lösungsansätze und ein bayernweit verzweigtes Netzwerk, das einzigartig ist!": "But also – and this is perhaps what sets us apart most – interdisciplinary collaboration with the banks’ private client departments and corporate relationship managers. Not infrequently, their boards of management are closely involved as well, looking after special clients personally by tradition. Being part of the widely branched Sparkassen network allows GEWERBE-IMMO to draw on the resources of its many network partners. The result is multi-layered client relationships, a variety of approaches to solutions and a network spanning all of Bavaria that is truly unique!",
+"Geschäftsführung": "Management",
+"Aufgaben": "Responsibilities",
+"Werdegang": "Career",
+"Nach Stationen im Immobilienmanagement von Konzernen wie ABB, Deutsche Bahn und Daimler Chrysler übernahm Dr. Breitenstein den Aufbau der Sparkassen-eigenen Groß- und Gewerbeimmobilientochter, die er nach dem Squeeze-out 2004 als Gesellschafter weiterführte.": "After positions in the real estate management of groups such as ABB, Deutsche Bahn and Daimler Chrysler, Dr. Breitenstein took on the development of the Sparkassen’s own subsidiary for large-scale and commercial properties, which he continued to run as a shareholder after the squeeze-out in 2004.",
+"Auf einen Blick": "At a glance",
+"Angaben zum Unternehmen": "Company information",
+"Auszug aus dem Impressum. Die vollständigen Angaben finden Sie auf": "Excerpt from the legal notice. The full details (in German) are available at",
+"gi-immo.de/impressum": "gi-immo.de/impressum",
+"Firma": "Company name",
+"Sitz": "Registered office",
+"Rosenstraße 7, 82049 Pullach im Isartal": "Rosenstraße 7, 82049 Pullach im Isartal",
+"Handelsregister": "Commercial register",
+"HRB 188864, Amtsgericht München": "HRB 188864, Munich Local Court",
+"Tätigkeit": "Licence",
+"nach § 34c GewO, zuständige Gewerbebehörde: Landratsamt München": "under Section 34c of the German Trade Regulation Act (GewO); responsible trade authority: Landratsamt München",
+"Maklertätigkeit": "Brokerage",
+"in Vertretung der Sparkassen-Immobilien-Vermittlungs-GmbH, München": "on behalf of Sparkassen-Immobilien-Vermittlungs-GmbH, Munich",
+"Weiterbildung": "Professional training",
+"Die Weiterbildungspflicht nach § 34c Absatz 2a GewO wird eingehalten – durch Schulungen der Sparkassen-Immobilien-Vermittlungs-GmbH sowie In-House-Schulungen.": "The continuing-education requirement under Section 34c (2a) GewO is met through training by Sparkassen-Immobilien-Vermittlungs-GmbH and in-house training.",
+"Berufsaufsicht": "Professional supervision",
+"IHK für München und Oberbayern": "Chamber of Commerce and Industry (IHK) for Munich and Upper Bavaria",
+"Weitere Themen": "More topics",
+"Zum Kontaktformular": "Go to the contact form",
+"· E-Mail": "· Email",
+"Immobilieninvestments": "Real estate investments",
+"Leistungen": "Services",
+"Von der ersten Analyse bis zum Vertragsabschluss": "From the first analysis to the signed contract",
+"Das Leistungsspektrum betrifft alle Themenbereiche um die Schwerpunkte Investmentberatung und Gewerbeimmobilien-Vermittlung.": "Our range of services covers every aspect of our two core areas: investment advisory and commercial property brokerage.",
+"Analyse und Bewertung": "Analysis and valuation",
+"Standortanalyse/Beschaffung, Bewertung und Aufbereitung relevanter Markt- und Objektdaten": "Location analysis/sourcing, valuation and preparation of relevant market and property data",
+"Objektanalyse und indikative Werteinschätzung": "Property analysis and indicative valuation",
+"Ankauf, Verkauf und Abschluss": "Acquisition, sale and closing",
+"Ankaufsberatung, Verkauf und Verwertung": "Acquisition advisory, sale and realisation",
+"Aufbau und Steuerung von strukturierten, transparenten Vermarktungsprozessen und Exitstrategien": "Setting up and managing structured, transparent marketing processes and exit strategies",
+"Begleitung und Durchführung von Verkaufsverhandlungen bis zum Abschluss": "Support with and conduct of sales negotiations through to closing",
+"Revisionssichere Dokumentation": "Audit-proof documentation",
+"Bestände und besondere Situationen": "Portfolios and special situations",
+"Umstrukturierungen und Optimierung von Immobilienbeständen und Immobilienportfolios": "Restructuring and optimisation of property holdings and real estate portfolios",
+"Beratung bei notleidenden Engagements": "Advice on non-performing loans",
+"Objektarten": "Property types",
+"Diese Leistungen konzentrieren wir auf": "Where we focus these services",
+"Kunden": "Clients",
+"Für wen wir tätig sind": "Who we work for",
+"Zu unseren Kunden zählen insbesondere Privatkunden im gehobenen Investmentbereich, Unternehmer und deren Unternehmen sowie institutionelle Kapitalsammelstellen und kommunale Verkäufer.": "Our clients include in particular high-end private investors, entrepreneurs and their companies, institutional investors and municipal sellers.",
+"Beispiele aus unserer Arbeit: Referenzen und Projekte": "Examples of our work: references and projects",
+"Beratung · Kreditconsult": "Advisory · Credit consulting",
+"Privat- und Unternehmerkunden sowie Institutionelle erhalten spezialisierte Beratungsleistungen, die je nach Bedarf modular abgerufen werden können. Darüber hinaus werden Lösungen für Banken in den Bereichen Kreditconsult und Verwertung erarbeitet und umgesetzt.": "Private and business clients as well as institutional investors receive specialised advisory services that can be called upon in modules, as required. In addition, we develop and implement solutions for banks in credit consulting and asset realisation.",
+"Der Blick von außen": "The outside view",
+"Ausgangslage": "The starting point",
+"Große Vermögen bestehen oft aus einer Vielzahl von Einzelobjekten, die im Laufe der Zeit, teilweise über Generationen, aus den unterschiedlichsten Gründen gekauft wurden. Nicht nur demographische Entwicklungen, sondern auch Parameter wie Ertragskraft und Potenzial sollten in einem Immobilienportfolio adäquat gewichtet werden.": "Large fortunes often consist of a multitude of individual properties purchased over time – sometimes over generations – for a wide variety of reasons. Not only demographic developments but also parameters such as earning power and potential should be given appropriate weight in a real estate portfolio.",
+"Unsere Unterstützung": "How we help",
+"Oftmals fehlt nur der Blick von außen, um Chancen und Risiken zu erkennen und den vorhandenen Bestand zu optimieren. Wir helfen Ihnen dabei und unterstützen Sie, im Bedarfsfall auch unter Hinzunahme von Partnern, bei der Umsetzung.": "Often all that is missing is an outside view to identify opportunities and risks and to optimise the existing portfolio. We help you do this and support you with the implementation, bringing in partners where necessary.",
+"Lösungen für Banken": "Solutions for banks",
+"Trotz akribischer Prüfung aller relevanten Parameter kann es gerade bei Immobilienfinanzierungen immer wieder zu Leistungsstörungen in der Geschäftsbeziehung zu Gläubigern kommen.": "Despite meticulous examination of all relevant parameters, real estate financing in particular can repeatedly run into payment difficulties in the relationship with creditors.",
+"Unsere Leistung": "Our service",
+"Die professionelle Erarbeitung von Sanierungskonzepten und die intensive Begleitung während der Durchführungsphase ist Teil unserer Dienstleistung. Als „externer Partner“ fällt es uns oftmals leichter als dem verantwortlichen Mitarbeiter der Bank, eine Einigung mit dem Kreditnehmer zu erzielen und so drohende Ausfälle zu verhindern bzw. zu minimieren.": "Developing restructuring concepts professionally and providing intensive support during the implementation phase are part of our service. As an “external partner”, we often find it easier than the responsible bank employee to reach an agreement with the borrower and so to prevent or minimise impending defaults.",
+"Nutzen für die Bank": "Benefits for the bank",
+"Etwaige Opportunitätskosten können vermieden werden und die Mitarbeiter sind in der Lage, sich dem originären Bankgeschäft besser zu widmen. Durch die bereits über 10-jährige Zusammenarbeit mit den Sparkassen sind wir mit der Bankpraxis bestens vertraut und sprechen die Sprache unserer Kunden.": "Any opportunity costs can be avoided, and staff are able to concentrate better on core banking business. Having worked with the Sparkassen for more than ten years, we are thoroughly familiar with banking practice and speak our clients’ language.",
+"Zusammenarbeit": "Collaboration",
+"Die Anlageimmobilie als nachhaltiges Investment": "The investment property as a sustainable investment",
+"Bedeutung der Anlageimmobilie": "The importance of investment property",
+"Orientierung für Sparkassenkunden": "Guidance for Sparkasse clients",
+"Für diejenigen Kunden der Sparkasse, die keine regelmäßigen Teilnehmer am Marktgeschehen sind, ist es gleichzeitig schwierig geworden, geeignete Berater zu finden und einen Überblick in einem unübersichtlichen Marktumfeld zu gewinnen. Oft lässt sich durch ein gemeinsames Gespräch ein klares Anforderungsprofil definieren und die Basis für ein nachhaltiges Immobilieninvestment schaffen.": "At the same time, for those Sparkasse clients who are not regular market participants, it has become difficult to find suitable advisers and to gain an overview of a confusing market environment. A joint conversation often makes it possible to define a clear requirements profile and lay the foundation for a sustainable real estate investment.",
+"Bestandsanalyse für Sparkassen": "Portfolio analysis for Sparkassen",
+"Mögliche Szenarios": "Possible scenarios",
+"Als Alternativen zum Eigentum können z. B. folgende Szenarios in Betracht kommen:": "Alternatives to ownership may include, for example, the following scenarios:",
+"Verkauf aller Immobilien an einen Investor und Abschluss von Mietverträgen für selbstgenutzte Sparkassen-Flächen": "Sale of all properties to an investor and conclusion of leases for the Sparkasse premises in own use",
+"Verkauf aller Geschäftsstellen an einen Investor und Abschluss von Mietverträgen für die selbstgenutzten Sparkassen-Flächen": "Sale of all branches to an investor and conclusion of leases for the Sparkasse premises in own use",
+"Ausgliederung aller Immobilien in einen Immobilien-Spezialfonds, der anschließend im Depot-A der Sparkasse gehalten wird": "Transfer of all properties into a special real estate fund, which is then held in the Sparkasse’s own investment portfolio (Depot A)",
+"Untersuchte Kennzahlen": "Key figures examined",
+"Um eine Entscheidung für oder gegen diese Szenarios zu erlangen, müssen solche Szenarios hinsichtlich ihrer Auswirkungen auf betriebswirtschaftliche Kennzahlen untersucht werden. Hierzu liefert das Projekt eine Gegenüberstellung der Auswirkungen auf Finanzparameter wie z. B.:": "To reach a decision for or against these scenarios, their impact on key business figures has to be examined. For this purpose, the project provides a comparison of the effects on financial parameters such as:",
+"GuV/Bilanz": "P&L/balance sheet",
+"Cashflow": "Cash flow",
+"Discounted Cashflow/Barwert": "Discounted cash flow/present value",
+"Cost-Income-Ratio": "Cost-income ratio",
+"Ergebnis": "Result",
+"Zusammen mit einer Risikoabwägung der Szenarios erlangt die Sparkasse mit diesem Projekt eine fundierte und vielfach bewährte Entscheidungsbasis, die ebenfalls als Kommunikationshilfe in Richtung Verwaltungsrat verwendet werden kann.": "Together with a risk assessment of the scenarios, the project gives the Sparkasse a sound and well-proven basis for decision-making, which can also be used to communicate with the supervisory board.",
+"Fachliches Know-how für den Sparkassen-Verbund": "Professional know-how for the Sparkassen network",
+"Dies betrifft in erster Linie Objekte, die überwiegend regionale Abnehmer finden.": "This applies primarily to properties that mainly attract regional buyers.",
+"Wohnen (3)": "Residential (3)",
+"Büro- und Geschäftshäuser (11)": "Office and commercial buildings (11)",
+"Handel und Fachmärkte (10)": "Retail and specialist stores (10)",
+"Hotel, Logistik und Gewerbe (5)": "Hotel, logistics and commercial (5)",
+"Wohnen": "Residential",
+"3 Projekte": "3 projects",
+"Ingolstadt": "Ingolstadt",
+"Wohnanlage Schanzer Carré": "Schanzer Carré residential complex",
+"Neubau-Investment mit anspruchsvoller Architektur, hochwertiger Bauausführung und nachhaltiger Energiewirtschaft.": "New-build investment with sophisticated architecture, high-quality construction and sustainable energy management.",
+"Leipzig": "Leipzig",
+"1999 erbaute Wohnanlage mit ca. 147 Wohneinheiten.": "Residential complex built in 1999 with approx. 147 units.",
+"Büro- und Geschäftshäuser": "Office and commercial buildings",
+"11 Projekte": "11 projects",
+"München-Freiham": "Munich-Freiham",
+"Büro- und Geschäftshaus": "Office and commercial building",
+"Modernes Gebäude mit klarer Formsprache und mit einer Glas-/Aluminiumfassade.": "Modern building with a clear design language and a glass/aluminium façade.",
+"München": "Munich",
+"1A-Lage im Zentrum von München mit Büros, Einzelhandel und Wohnen.": "Prime location in central Munich with offices, retail and residential.",
+"Erlangen": "Erlangen",
+"Bürohaus": "Office building",
+"Modernes Bürogebäude im Stadtzentrum mit den beiden Top-Mietern Siemens AG und Publicis Groupe S.A.": "Modern office building in the city centre with two major tenants, Siemens AG and Publicis Groupe S.A.",
+"Nürnberg": "Nuremberg",
+"Büro- & Geschäftshaus": "Office & commercial building",
+"Einzelhandels- und Gewerbeimmobilie direkt am Hauptmarkt, Standort des Nürnberger Christkindlmarktes.": "Retail and commercial property right on the Hauptmarkt, home of Nuremberg’s Christmas market.",
+"Fürth": "Fürth",
+"Medizin- & Businesszentrum": "Medical & business centre",
+"„Spectrum“ – Geschäftshaus mit integriertem Fachärztezentrum. Der Standort zeichnet sich durch seine Zentralität aus.": "“Spectrum” – commercial building with an integrated specialist medical centre. The location stands out for its central position.",
+"Neu-Ulm": "Neu-Ulm",
+"Bürokomplex Edison Center": "Edison Center office complex",
+"Modernes und hochwertig ausgestattetes Bürogebäude auf der ehemaligen Wiley-Kaserne.": "Modern, high-spec office building on the site of the former Wiley Barracks.",
+"Landshut": "Landshut",
+"Geschäftshaus": "Commercial building",
+"Geschäftshaus in der Landshuter Altstadt. 1A-Lage, direkt in der Fußgängerzone.": "Commercial building in Landshut’s old town. Prime location, right in the pedestrian zone.",
+"Bamberg": "Bamberg",
+"Geschäftshaus C&A": "C&A commercial building",
+"Kaufhaus der Kette C&A im historischen Zentrum von Bamberg. 1A-Lage direkt in der Fußgängerzone.": "C&A department store in Bamberg’s historic centre. Prime location right in the pedestrian zone.",
+"Neubau eines Bürohauses in bester Bürozentrumslage an der Allee am Röthelheimpark.": "New-build office building in a top office location on the Allee am Röthelheimpark.",
+"Handel und Fachmärkte": "Retail and specialist stores",
+"10 Projekte": "10 projects",
+"Schöllnach": "Schöllnach",
+"REWE Fachmarkt": "REWE supermarket",
+"2013 erbauter REWE Supermarkt mit Getränkemarkt im Landkreis Deggendorf.": "REWE supermarket with drinks store, built in 2013, in the district of Deggendorf.",
+"Vilgertshofen": "Vilgertshofen",
+"EDEKA Fachmarkt": "EDEKA supermarket",
+"3-jährig betriebenes Bestandsobjekt mit neuem 15-Jahres-Vertrag mit EDEKA Südbayern.": "Existing property, operated for three years, with a new 15-year lease with EDEKA Südbayern.",
+"Bad Reichenhall": "Bad Reichenhall",
+"Innerstädtischer EDEKA-Fachmarkt mit 20-jährigem Fest-Mietvertrag.": "Inner-city EDEKA supermarket with a 20-year fixed-term lease.",
+"Neuötting": "Neuötting",
+"EDEKA C+C": "EDEKA C+C",
+"Cash + Carry Großmarkt der Firma EDEKA zwischen Mühldorf und Altötting.": "EDEKA cash & carry wholesale market between Mühldorf and Altötting.",
+"Oberschleißheim": "Oberschleißheim",
+"Fachmarktagglomeration": "Retail cluster",
+"Fachmarktkombination dm / Takko / T€Di im Norden von München.": "Retail combination of dm / Takko / T€Di north of Munich.",
+"Straubing": "Straubing",
+"real,- Fachmarkt": "real,- hypermarket",
+"Bestehender real-Markt mit Umstrukturierungs-Potential in perfekter Stadtrandlage.": "Existing real hypermarket with restructuring potential in an ideal edge-of-town location.",
+"Altdorf": "Altdorf",
+"Fachmarktzentrum": "Retail park",
+"Fachmarktzentrum bei Landshut mit EDEKA, ALDI, Drogerie Markt Müller, Takko, Depot u. a.": "Retail park near Landshut with EDEKA, ALDI, Drogerie Markt Müller, Takko, Depot and others.",
+"Wittingen": "Wittingen",
+"Fachmarktzentrum mit REWE und LIDL in zentraler Lage als wichtiges Nahversorgungszentrum vor Ort.": "Retail park with REWE and LIDL in a central location, serving as an important local supply centre.",
+"Bad Wiessee": "Bad Wiessee",
+"2010 von EDEKA selbst entwickelter und gebauter Fachmarkt. Hohe Umsätze der ersten 3 Jahre führten zu einem Mietvertragsangebot mit 20 Jahren Festlaufzeit.": "Supermarket developed and built by EDEKA itself in 2010. High turnover in the first three years led to a lease offer with a 20-year fixed term.",
+"Hotel, Logistik und Gewerbe": "Hotel, logistics and commercial",
+"5 Projekte": "5 projects",
+"Augsburg": "Augsburg",
+"ABC Bohus Center": "ABC Bohus Center",
+"Innerstädtisches Center direkt neben dem Hauptbahnhof. Hauptmieter des Hotels, Geschäfts- und Ärztehauses ist die INTERCITY-Hotel GmbH.": "Inner-city centre right next to the main railway station. The main tenant of the hotel, commercial and medical building is INTERCITY-Hotel GmbH.",
+"Lagergebäude mit Verwaltungstrakt": "Warehouse with administration wing",
+"Ehemaliger Sitz des Gilde Fleischerei & Gastroservices im Ingolstädter Industriegebiet „Eriag Süd“.": "Former headquarters of Gilde Fleischerei & Gastroservices in Ingolstadt’s “Eriag Süd” industrial estate.",
+"Oberdolling bei Ingolstadt": "Oberdolling near Ingolstadt",
+"Logistikhalle": "Logistics hall",
+"Die Dolli-Werke mit einer Produktionshalle, Lagerhalle mit Kühlfunktion, Büro u. a.": "The Dolli-Werke with a production hall, refrigerated warehouse, offices and more.",
+"Spezialist für Gewerbe- und Investmentimmobilien. Die Maklertätigkeit erfolgt in Vertretung der Sparkassen-Immobilien-Vermittlungs-GmbH, Karolinenplatz 1, 80333 München.": "Specialist in commercial and investment real estate. Brokerage activities are carried out on behalf of Sparkassen-Immobilien-Vermittlungs-GmbH, Karolinenplatz 1, 80333 Munich.",
+"Themen": "Topics",
+"T +49 (0) 89 7908648-0": "T +49 (0) 89 7908648-0",
+"F +49 (0) 89 7908648-29": "F +49 (0) 89 7908648-29",
+"Impressum": "Legal notice",
+"Datenschutz": "Privacy policy",
+"GEWERBE-IMMO Immobilienberatung GmbH – zum Seitenanfang": "GEWERBE-IMMO Immobilienberatung GmbH – back to top",
+"Hauptnavigation": "Main navigation",
+"Hauptmenü": "Main menu",
+"GEWERBE-IMMO – zum Seitenanfang": "GEWERBE-IMMO – back to top",
+"Mobile Navigation": "Mobile navigation",
+"Geschäftsfelder im Überblick": "Business areas at a glance",
+"Logo der GEWERBE-IMMO Immobilienberatung GmbH": "GEWERBE-IMMO Immobilienberatung GmbH logo",
+"Maklertätigkeit erfolgt in Vertretung der Sparkassen Immobilien Vermittlungs-GmbH": "Brokerage activities carried out on behalf of Sparkassen Immobilien Vermittlungs-GmbH",
+"Menschen setzen gemeinsam eine große Wand aus Puzzleteilen zusammen": "People working together to assemble a large wall of puzzle pieces",
+"Hand im Anzug hält ein Modell einer Stadtsilhouette": "Hand in a suit holding a model of a city skyline",
+"Hand setzt einen Holzbaustein auf eine Pyramide aus Bausteinen": "Hand placing a wooden block on a pyramid of blocks",
+"Geschäftsleute im Gespräch an einem Besprechungstisch": "Business people talking at a meeting table",
+"Hotel Motel One am Berliner Alexanderplatz in der Abenddämmerung": "Motel One hotel on Berlin’s Alexanderplatz at dusk",
+"Glas mit Münzen, aus dem eine junge Pflanze wächst": "Jar of coins with a young plant growing out of it",
+"Architektur": "Architecture",
+"Hände arbeiten an Unterlagen mit Diagrammen und Haftnotizen": "Hands working on documents with charts and sticky notes",
+"Mehrere Hände zeigen gemeinsam auf Unterlagen auf einem Tisch": "Several hands pointing at documents on a table",
+"Bild nicht verfügbar": "Image not available",
+"Wohnanlage in München-Thalkirchen": "Residential complex in Munich-Thalkirchen",
+"Bürokomplex mit Parkhaus in Erlangen-Tennenlohe": "Office complex with car park in Erlangen-Tennenlohe",
+"B&B Hotel mit Einzelhandel in Bayreuth, Fußgängerzone": "B&B Hotel with retail in Bayreuth, pedestrian zone",
+"Hotel Motel One in Berlin-Alexanderplatz": "Hotel Motel One in Berlin-Alexanderplatz",
+"Einkaufszentrum FORUM Stein in Stein": "FORUM Stein shopping centre in Stein",
+"Bürohaus NOVARTIS in Nürnberg-Bärenschanze": "NOVARTIS office building in Nuremberg-Bärenschanze",
+"Porträt von Dr. Oliver Breitenstein": "Portrait of Dr. Oliver Breitenstein",
+"Kontakt Dr. Oliver Breitenstein": "Contact details for Dr. Oliver Breitenstein",
+"Wohnhaus mit Garten": "Residential building with garden",
+"Visualisierung eines Wohnhauses mit großem Garten, Sitzbank und Schaukel": "Visualisation of a residential building with a large garden, bench and swing",
+"Kontaktdaten": "Contact details",
+"Historische Fassade eines Stadthauses, daneben ein Baum": "Historic townhouse façade with a tree beside it",
+"Modernes Wohngebäude mit Balkonen und Bäumen": "Modern residential building with balconies and trees",
+"Finanzparameter": "Financial parameters",
+"Referenzprojekte nach Objektart": "Reference projects by property type",
+"Wohnanlage Schanzer Carré in Ingolstadt": "Schanzer Carré residential complex in Ingolstadt",
+"Wohnanlage in Leipzig": "Residential complex in Leipzig",
+"Büro- und Geschäftshaus in München-Freiham": "Office and commercial building in Munich-Freiham",
+"Büro- und Geschäftshaus in München": "Office and commercial building in Munich",
+"Bürohaus in Erlangen": "Office building in Erlangen",
+"Büro- & Geschäftshaus in Nürnberg": "Office & commercial building in Nuremberg",
+"Medizin- & Businesszentrum in Fürth": "Medical & business centre in Fürth",
+"Bürokomplex Edison Center in Neu-Ulm": "Edison Center office complex in Neu-Ulm",
+"Geschäftshaus in Landshut": "Commercial building in Landshut",
+"Geschäftshaus C&A in Bamberg": "C&A commercial building in Bamberg",
+"REWE Fachmarkt in Schöllnach": "REWE supermarket in Schöllnach",
+"EDEKA Fachmarkt in Vilgertshofen": "EDEKA supermarket in Vilgertshofen",
+"EDEKA Fachmarkt in Bad Reichenhall": "EDEKA supermarket in Bad Reichenhall",
+"EDEKA C+C in Neuötting": "EDEKA C+C in Neuötting",
+"Fachmarktagglomeration in Oberschleißheim": "Retail cluster in Oberschleißheim",
+"real,- Fachmarkt in Straubing": "real,- hypermarket in Straubing",
+"Fachmarktzentrum in Altdorf": "Retail park in Altdorf",
+"Fachmarktzentrum in Wittingen": "Retail park in Wittingen",
+"EDEKA Fachmarkt in Bad Wiessee": "EDEKA supermarket in Bad Wiessee",
+"ABC Bohus Center in Augsburg": "ABC Bohus Center in Augsburg",
+"Lagergebäude mit Verwaltungstrakt in Ingolstadt": "Warehouse with administration wing in Ingolstadt",
+"Logistikhalle in Oberdolling bei Ingolstadt": "Logistics hall in Oberdolling near Ingolstadt",
+"GEWERBE-IMMO Immobilienberatung GmbH – Spezialist für Gewerbe- und Investmentimmobilien": "GEWERBE-IMMO Immobilienberatung GmbH – Specialist in commercial and investment real estate",
+"Spezialist für Gewerbe- und Investmentimmobilien. Handelsvertretung der Sparkassen-Immobilien-Vermittlungs-Gesellschaft, Bayerns größtem Maklerunternehmen. Investmentimmobilien, Portfolioberatung, Kreditconsult und Sparkassen-Service aus Pullach im Isartal.": "Specialist in commercial and investment real estate. Commercial agency of Sparkassen-Immobilien-Vermittlungs-Gesellschaft, Bavaria’s largest real estate brokerage. Investment properties, portfolio advisory, credit consulting and Sparkassen Service from Pullach im Isartal.",
+"Sprache": "Language",
+"GEWERBE-IMMO Redesign": "GEWERBE-IMMO Redesign",
+"Redesign-Entwurf · nicht die offizielle Website": "Redesign draft · not the official website",
+"GEWERBE-IMMO Immobilienberatung GmbH ·": "GEWERBE-IMMO Immobilienberatung GmbH ·",
+"Redesign-Entwurf, nicht die offizielle Website. Inhalte und Bilder:": "Redesign draft, not the official website. Content and images:",
+"gi-immo.de": "gi-immo.de",
+"Das Formular bereitet Ihre Nachricht an info@gi-immo.de vor. Sie können sie anschließend kopieren oder in Ihrem E-Mail-Programm öffnen. Über diese Seite werden keine Daten übertragen oder gespeichert.": "The form prepares your message to info@gi-immo.de. You can then copy it or open it in your email client. No data is transmitted or stored by this website."
+}
+</script>
+
+<script>
+/* ==========================================================================
+   Language (DE/EN)
+   German is authored in the markup; English comes from #i18n-en, and UI holds
+   the strings that only exist in script. <head> picks the language (?lang= →
+   stored choice → German). Switching swaps text nodes and attributes in place,
+   so nothing is re-rendered and form input is kept; the page script re-renders
+   only what it generated itself (it listens for gi:langchange).
+   ========================================================================== */
+(function () {
+  var doc = document.documentElement;
+  var EN = JSON.parse(document.getElementById('i18n-en').textContent);
+  var UI = {
+    "de": {
+      "lang.group": "Sprache wählen",
+      "form.name": "Bitte geben Sie Ihren Namen an.",
+      "form.email.invalid": "Bitte geben Sie eine gültige E-Mail-Adresse an.",
+      "form.email.missing": "Bitte geben Sie Ihre E-Mail-Adresse an.",
+      "form.message": "Bitte beschreiben Sie Ihr Anliegen in einigen Worten.",
+      "form.check.one": "Bitte prüfen Sie das markierte Feld.",
+      "form.check.many": "Bitte prüfen Sie die {n} markierten Felder.",
+      "mail.subject": "Anfrage über die Website – {topic}",
+      "mail.to": "An",
+      "mail.subjectLabel": "Betreff",
+      "mail.name": "Name",
+      "mail.company": "Unternehmen / Institut",
+      "mail.email": "E-Mail",
+      "mail.phone": "Telefon",
+      "mail.opened": "Ihr E-Mail-Programm sollte sich jetzt mit dieser Nachricht öffnen. Falls nicht, kopieren Sie den Text und senden Sie ihn an info@gi-immo.de oder rufen Sie an: +49 (0) 89 7908648-0.",
+      "mail.prepared": "Ihre Nachricht ist vorbereitet. Bitte senden Sie sie selbst an info@gi-immo.de – über diese Seite wird nichts verschickt.",
+      "mail.copy": "Text kopieren",
+      "mail.copied": "Kopiert",
+      "mail.selected": "Text markiert – mit Strg/⌘+C kopieren",
+      "mail.open": "Im E-Mail-Programm öffnen"
+    },
+    "en": {
+      "lang.group": "Choose language",
+      "form.name": "Please enter your name.",
+      "form.email.invalid": "Please enter a valid email address.",
+      "form.email.missing": "Please enter your email address.",
+      "form.message": "Please describe your enquiry in a few words.",
+      "form.check.one": "Please check the highlighted field.",
+      "form.check.many": "Please check the {n} highlighted fields.",
+      "mail.subject": "Enquiry via the website – {topic}",
+      "mail.to": "To",
+      "mail.subjectLabel": "Subject",
+      "mail.name": "Name",
+      "mail.company": "Company / institution",
+      "mail.email": "Email",
+      "mail.phone": "Phone",
+      "mail.opened": "Your email client should now open with this message. If it does not, copy the text and send it to info@gi-immo.de, or call us on +49 (0) 89 7908648-0.",
+      "mail.prepared": "Your message is ready. Please send it yourself to info@gi-immo.de – nothing is sent from this page.",
+      "mail.copy": "Copy text",
+      "mail.copied": "Copied",
+      "mail.selected": "Text selected – press Ctrl/⌘+C to copy",
+      "mail.open": "Open in your email client"
+    }
+  };
+  var SKIP = 'script, style, svg, template, noscript, title, [translate="no"], [data-lang-switch], [data-split]';
+  var ATTRS = ['alt', 'aria-label', 'data-title', 'data-fallback', 'title'];
+  var LETTERS = /[A-Za-zÄÖÜäöüß]/;
+  var norm = function (s) { return s.replace(/\u00ad/g, '').replace(/\s+/g, ' ').trim(); };
+  var english = function (de) { var en = EN[norm(de)]; return en === undefined ? de : en; };
+
+  // German sources of everything that can change, recorded once.
+  var texts = [], attrs = [], splits = [];
+  var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode: function (n) {
+      return LETTERS.test(n.nodeValue) && !n.parentElement.closest(SKIP) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+  for (var n = walker.nextNode(); n; n = walker.nextNode()) texts.push({ node: n, de: n.nodeValue });
+  document.body.querySelectorAll('[' + ATTRS.join('],[') + ']').forEach(function (el) {
+    if (el.closest(SKIP)) return;
+    ATTRS.forEach(function (name) {
+      var v = el.getAttribute(name);
+      if (v && LETTERS.test(v)) attrs.push({ el: el, name: name, de: v });
+    });
+  });
+  document.querySelectorAll('[data-split]').forEach(function (el) { el.setAttribute('data-i18n-de', el.textContent); splits.push(el); });
+  // Mark what fades during a switch. Text sitting directly on a surface (a button, a card,
+  // a bordered row) gets its own span, so the surface stays while the words change.
+  var surface = function (el) {
+    var cs = getComputedStyle(el);
+    return cs.backgroundColor !== 'rgba(0, 0, 0, 0)' ||
+      parseFloat(cs.borderTopWidth) + parseFloat(cs.borderRightWidth) + parseFloat(cs.borderBottomWidth) + parseFloat(cs.borderLeftWidth) > 0;
+  };
+  texts.forEach(function (x) {
+    if (english(x.de) === norm(x.de)) return; // same in both languages (names, places): stays still
+    var el = x.node.parentElement;
+    if (el.matches('.btn, button') || (!el.closest('a') && surface(el))) {
+      var label = document.createElement('span');
+      el.insertBefore(label, x.node); label.appendChild(x.node); el = label;
+    }
+    el.setAttribute('data-i18n', '');
+  });
+  splits.forEach(function (el) { el.setAttribute('data-i18n', ''); });
+  var meta = document.querySelector('meta[name="description"]');
+  var source = { title: document.title, description: meta ? meta.content : '' };
+
+  var current = 'de';
+  function t(key, vars) {
+    var str = UI[current][key] || UI.de[key] || key;
+    return vars ? str.replace(/\{(\w+)\}/g, function (_, k) { return vars[k]; }) : str;
+  }
+  function tr(de) { return current === 'en' ? english(de) : de; }
+
+  function swap() {
+    var en = current === 'en';
+    texts.forEach(function (x) {
+      var v = en ? EN[norm(x.de)] : undefined;
+      if (v === undefined) { x.node.nodeValue = x.de; return; }
+      var edges = /^(\s*)[\s\S]*?(\s*)$/.exec(x.de);
+      x.node.nodeValue = edges[1] + v + edges[2];
+    });
+    attrs.forEach(function (x) { x.el.setAttribute(x.name, en ? english(x.de) : x.de); });
+    splits.forEach(function (el) { if (!el.classList.contains('is-split')) el.textContent = tr(el.getAttribute('data-i18n-de')); });
+    document.title = tr(source.title);
+    if (meta) meta.content = tr(source.description);
+    doc.lang = current;
+    doc.setAttribute('data-lang', current);
+  }
+
+  function syncSwitches() {
+    document.querySelectorAll('[data-lang-switch]').forEach(function (sw) {
+      sw.setAttribute('data-active', current);
+      sw.setAttribute('aria-label', t('lang.group'));
+      sw.querySelectorAll('[data-lang-option]').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-lang-option') === current));
+      });
+    });
+  }
+
+  // An explicit ?lang= in the address follows the language shown, so a reload or a shared link agrees with it.
+  function syncUrl() {
+    try {
+      var url = new URL(location.href);
+      if (url.searchParams.has('lang') && url.searchParams.get('lang') !== current) {
+        url.searchParams.set('lang', current);
+        history.replaceState(history.state, '', url);
+      }
+    } catch (e) {}
+  }
+  function persist() {
+    try { localStorage.setItem('gi-lang', current); } catch (e) {}
+    syncUrl();
+  }
+
+  var pending = null;
+  function set(lang, opts) {
+    if ((lang !== 'de' && lang !== 'en') || lang === current) return;
+    current = lang;
+    persist();
+    syncSwitches(); // the indicator starts moving immediately
+    var animate = opts && opts.animate && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var finish = function () {
+      doc.classList.add('lang-swap');
+      document.dispatchEvent(new CustomEvent('gi:langbeforechange', { detail: { lang: current } }));
+      swap();
+      document.dispatchEvent(new CustomEvent('gi:langchange', { detail: { lang: current } }));
+      doc.classList.remove('lang-swap');
+    };
+    clearTimeout(pending);
+    doc.classList.remove('lang-in');
+    if (!animate) {
+      doc.classList.remove('lang-out');
+      finish();
+      return;
+    }
+    doc.classList.add('lang-out');
+    pending = setTimeout(function () {
+      finish();
+      doc.classList.replace('lang-out', 'lang-in');
+      pending = setTimeout(function () { doc.classList.remove('lang-in'); }, 280);
+    }, 170);
+  }
+
+  if (doc.getAttribute('data-lang') === 'en') { current = 'en'; swap(); }
+  syncSwitches();
+  doc.classList.remove('i18n-pending');
+  // Transitions only after the initial indicator position has been painted
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      document.querySelectorAll('[data-lang-switch]').forEach(function (sw) { sw.classList.add('is-ready'); });
+    });
+  });
+
+  document.addEventListener('click', function (e) {
+    var option = e.target.closest && e.target.closest('[data-lang-option]');
+    if (option) set(option.getAttribute('data-lang-option'), { animate: true });
+  });
+  // Back/forward can land on an entry recorded before the last switch: keep the language, correct the address
+  window.addEventListener('popstate', syncUrl);
+  // Another tab switched language: follow it
+  window.addEventListener('storage', function (e) {
+    if (e.key === 'gi-lang' && (e.newValue === 'de' || e.newValue === 'en')) set(e.newValue, { animate: false });
+  });
+
+  window.giI18n = {
+    get lang() { return current; },
+    t: t,
+    tr: tr,
+    set: set,
+    source: source,
+    // German strings on the page without an English entry (used by the checks; should stay empty)
+    missing: function () {
+      return texts.map(function (x) { return x.de; }).concat(attrs.map(function (x) { return x.de; }))
+        .map(norm).filter(function (k, i, all) { return EN[k] === undefined && all.indexOf(k) === i; });
+    }
+  };
+})();
+</script>
+
 <script type="importmap">
 {
   "imports": {
@@ -2573,6 +3254,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const header = document.querySelector('[data-header]');
 const hero = document.querySelector('[data-hero]');
 let lenis = null;
+const i18n = window.giI18n;
 const hist = (method, ...args) => { try { history[method](...args); } catch (err) { /* sandboxed frame */ } };
 
 /* ---------------------------------------------------------------------------
@@ -2715,21 +3397,22 @@ document.addEventListener('keydown', (e) => {
   else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
 });
 // Close the overlay if the viewport grows into the desktop layout
-window.matchMedia('(min-width: 1180px)').addEventListener('change', (e) => { if (e.matches) closeMenu({ restoreFocus: false }); });
+window.matchMedia('(min-width: 1280px)').addEventListener('change', (e) => { if (e.matches) closeMenu({ restoreFocus: false }); });
 
 /* ---------------------------------------------------------------------------
    Contact form → prepared e-mail (no backend is connected)
    --------------------------------------------------------------------------- */
 // Opens the visitor's mail program on submit; the prepared text stays visible as a fallback.
 const AUTO_OPEN_MAIL = true;
-(() => {
+const contactForm = (() => {
   const form = document.querySelector('[data-form]');
   const status = form.querySelector('[data-form-status]');
   const rules = {
-    name: (v) => v.trim().length >= 2 || 'Bitte geben Sie Ihren Namen an.',
-    email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) || (v.trim() ? 'Bitte geben Sie eine gültige E-Mail-Adresse an.' : 'Bitte geben Sie Ihre E-Mail-Adresse an.'),
-    nachricht: (v) => v.trim().length >= 10 || 'Bitte beschreiben Sie Ihr Anliegen in einigen Worten.',
+    name: (v) => v.trim().length >= 2 || i18n.t('form.name'),
+    email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) || i18n.t(v.trim() ? 'form.email.invalid' : 'form.email.missing'),
+    nachricht: (v) => v.trim().length >= 10 || i18n.t('form.message'),
   };
+  let shown = null; // what the status area shows, so a language change can re-render it
   const validate = (input) => {
     const rule = rules[input.name];
     if (!rule) return true;
@@ -2740,54 +3423,74 @@ const AUTO_OPEN_MAIL = true;
     error.textContent = ok ? '' : result;
     return ok;
   };
-  form.querySelectorAll('[required]').forEach((input) => {
-    input.addEventListener('blur', () => { if (input.value) validate(input); });
-    input.addEventListener('input', () => { if (input.getAttribute('aria-invalid') === 'true') validate(input); });
-  });
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
+  const renderInvalid = (count) => {
+    status.classList.add('is-error');
+    status.textContent = count === 1 ? i18n.t('form.check.one') : i18n.t('form.check.many', { n: count });
+  };
+  const renderPrepared = (d, { open = false } = {}) => {
     status.classList.remove('is-error');
-    const inputs = [...form.querySelectorAll('[required]')];
-    const invalid = inputs.filter((input) => !validate(input));
-    if (invalid.length) {
-      status.classList.add('is-error');
-      status.textContent = invalid.length === 1 ? 'Bitte prüfen Sie das markierte Feld.' : `Bitte prüfen Sie die ${invalid.length} markierten Felder.`;
-      invalid[0].focus();
-      return;
-    }
-    const d = Object.fromEntries(new FormData(form));
-    const subject = `Anfrage über die Website – ${d.thema}`;
-    const lines = [d.nachricht.trim(), '', '—', `Name: ${d.name.trim()}`];
-    if (d.firma.trim()) lines.push(`Unternehmen / Institut: ${d.firma.trim()}`);
-    lines.push(`E-Mail: ${d.email.trim()}`);
-    if (d.telefon.trim()) lines.push(`Telefon: ${d.telefon.trim()}`);
+    const topic = form.elements.thema.options[d.topicIndex].text;
+    const subject = i18n.t('mail.subject', { topic });
+    const lines = [d.nachricht.trim(), '', '—', `${i18n.t('mail.name')}: ${d.name.trim()}`];
+    if (d.firma.trim()) lines.push(`${i18n.t('mail.company')}: ${d.firma.trim()}`);
+    lines.push(`${i18n.t('mail.email')}: ${d.email.trim()}`);
+    if (d.telefon.trim()) lines.push(`${i18n.t('mail.phone')}: ${d.telefon.trim()}`);
     const body = lines.join('\r\n');
     const mailto = `mailto:info@gi-immo.de?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    const text = `An: info@gi-immo.de\nBetreff: ${subject}\n\n${lines.join('\n')}`;
+    const text = `${i18n.t('mail.to')}: info@gi-immo.de\n${i18n.t('mail.subjectLabel')}: ${subject}\n\n${lines.join('\n')}`;
     // Built with textContent, so visitor input never becomes markup.
     const wrap = document.createElement('div'); wrap.className = 'prepared';
     const intro = document.createElement('p');
-    intro.textContent = AUTO_OPEN_MAIL
-      ? 'Ihr E-Mail-Programm sollte sich jetzt mit dieser Nachricht öffnen. Falls nicht, kopieren Sie den Text und senden Sie ihn an info@gi-immo.de oder rufen Sie an: +49 (0) 89 7908648-0.'
-      : 'Ihre Nachricht ist vorbereitet. Bitte senden Sie sie selbst an info@gi-immo.de – über diese Seite wird nichts verschickt.';
+    intro.textContent = i18n.t(AUTO_OPEN_MAIL ? 'mail.opened' : 'mail.prepared');
     const pre = document.createElement('pre'); pre.className = 'prepared__text'; pre.textContent = text; pre.tabIndex = 0;
     const actions = document.createElement('div'); actions.className = 'prepared__actions';
-    const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'btn btn--ghost'; copy.textContent = 'Text kopieren';
+    const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'btn btn--ghost'; copy.textContent = i18n.t('mail.copy');
     copy.addEventListener('click', () => {
       const selectText = () => {
         const range = document.createRange(); range.selectNodeContents(pre);
         const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
-        copy.textContent = 'Text markiert – mit Strg/⌘+C kopieren';
+        copy.textContent = i18n.t('mail.selected');
       };
-      try { navigator.clipboard.writeText(text).then(() => { copy.textContent = 'Kopiert'; }, selectText); }
+      try { navigator.clipboard.writeText(text).then(() => { copy.textContent = i18n.t('mail.copied'); }, selectText); }
       catch (err) { selectText(); }
     });
-    const open = document.createElement('a'); open.className = 'link-arrow'; open.href = mailto; open.textContent = 'Im E-Mail-Programm öffnen';
-    actions.append(copy, open);
+    const openLink = document.createElement('a'); openLink.className = 'link-arrow'; openLink.href = mailto; openLink.textContent = i18n.t('mail.open');
+    actions.append(copy, openLink);
     wrap.append(intro, pre, actions);
     status.replaceChildren(wrap);
-    if (AUTO_OPEN_MAIL) window.location.href = mailto;
+    if (open && AUTO_OPEN_MAIL) window.location.href = mailto;
+  };
+  // Pressing the submit button blurs the field first. Validating then would insert an error line, push the
+  // button away from under the pointer and swallow the click; the submit handler validates anyway.
+  let pressingSubmit = false;
+  form.querySelector('[type="submit"]').addEventListener('pointerdown', () => { pressingSubmit = true; });
+  document.addEventListener('pointerup', () => { pressingSubmit = false; }, true);
+  document.addEventListener('pointercancel', () => { pressingSubmit = false; }, true);
+  form.querySelectorAll('[required]').forEach((input) => {
+    input.addEventListener('blur', () => { if (input.value && !pressingSubmit) validate(input); });
+    input.addEventListener('input', () => { if (input.getAttribute('aria-invalid') === 'true') validate(input); });
   });
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const inputs = [...form.querySelectorAll('[required]')];
+    const invalid = inputs.filter((input) => !validate(input));
+    if (invalid.length) {
+      shown = { kind: 'invalid', count: invalid.length };
+      renderInvalid(invalid.length);
+      invalid[0].focus();
+      return;
+    }
+    const data = { ...Object.fromEntries(new FormData(form)), topicIndex: form.elements.thema.selectedIndex };
+    shown = { kind: 'prepared', data };
+    renderPrepared(data, { open: true });
+  });
+  return {
+    relocalise() {
+      form.querySelectorAll('[aria-invalid="true"]').forEach(validate);
+      if (shown?.kind === 'invalid') renderInvalid(shown.count);
+      if (shown?.kind === 'prepared') renderPrepared(shown.data);
+    },
+  };
 })();
 
 document.querySelectorAll('[data-year]').forEach((el) => { el.textContent = new Date().getFullYear(); });
@@ -2798,12 +3501,22 @@ document.querySelectorAll('[data-year]').forEach((el) => { el.textContent = new 
 let observeReveal = () => {};
 let applyParallax = () => {};
 
+// Splits a heading into masked words; the readable text stays on aria-label.
+function splitWords(el, text) {
+  el.setAttribute('aria-label', text.replace(/\u00ad/g, '').trim());
+  el.replaceChildren();
+  text.trim().split(/\s+/).forEach((word, i) => {
+    if (i) el.append(' ');
+    const outer = document.createElement('span'); outer.className = 'w'; outer.setAttribute('aria-hidden', 'true');
+    const inner = document.createElement('span'); inner.className = 'w__i'; inner.style.setProperty('--i', i); inner.textContent = word;
+    outer.append(inner); el.append(outer);
+  });
+}
+
 if (!reduceMotion.matches && 'IntersectionObserver' in window) {
   // Split the hero title into words (text stays readable to assistive tech)
   document.querySelectorAll('[data-split]').forEach((el) => {
-    const words = el.textContent.trim().split(/\s+/);
-    el.setAttribute('aria-label', el.textContent.replace(/­/g, '').trim());
-    el.innerHTML = words.map((w, i) => `<span class="w" aria-hidden="true"><span class="w__i" style="--i:${i}">${w}</span></span>`).join(' ');
+    splitWords(el, el.textContent);
     el.classList.add('is-split');
   });
 
@@ -2860,10 +3573,11 @@ const orbit = (() => {
     label: el.querySelector('.node__label'),
     land: el.dataset.l.split(',').map(Number),
     port: el.dataset.p.split(',').map(Number),
-    chars: Number(el.dataset.chars) || el.textContent.trim().length,
   }));
   const GAP = 14, EDGE = 10, MIN_STAGE_H = 420, STAGGER = 0.07, SPAN = 0.5;
   const smooth = (t) => t * t * (3 - 2 * t);
+  // a soft hyphen allows a break, and the hyphen it shows needs one more character of room
+  const longestWord = (text) => Math.max(...text.split(/[\s\u00ad]+/).map((w) => w.length)) + (text.includes('\u00ad') ? 1 : 0);
   let ready = false, pinned = false;
 
   function layout() {
@@ -2897,7 +3611,7 @@ const orbit = (() => {
 
     nodes.forEach((n, i) => {
       const d = cs[i].r * 2;
-      const fs = Math.max(13, Math.min(0.13 * d, (1.25 * d) / n.chars, 30));
+      const fs = Math.max(13, Math.min(0.13 * d, (1.25 * d) / longestWord(n.label.textContent), 30));
       n.cx = cs[i].x; n.cy = cs[i].y; n.d = d;
       n.el.style.fontSize = `${fs}px`;
       n.label.style.maxWidth = `${0.76 * d}px`;
@@ -2958,7 +3672,7 @@ window.addEventListener('resize', () => {
    the hash. Each history entry remembers the homepage scroll position.
    --------------------------------------------------------------------------- */
 const pages = new Map([...document.querySelectorAll('[data-page]')].map((el) => [el.dataset.page, el]));
-const homeTitle = document.title;
+const viewTitle = (view) => (view === 'home' ? i18n.tr(i18n.source.title) : `${pages.get(view).dataset.title} – GEWERBE-IMMO`);
 let currentView = 'home';
 const currentScroll = () => (lenis ? lenis.scroll : window.scrollY);
 const viewOf = (el) => el.closest('[data-page]')?.dataset.page || 'home';
@@ -2970,7 +3684,7 @@ function showView(view) {
   if (view === currentView) return false;
   currentView = view;
   if (view === 'home') doc.removeAttribute('data-view'); else doc.setAttribute('data-view', view);
-  document.title = view === 'home' ? homeTitle : `${pages.get(view).dataset.title} – GEWERBE-IMMO`;
+  document.title = viewTitle(view);
   navLinks.forEach((a) => a.removeAttribute('aria-current'));
   updateHeader(currentScroll());
   if (view === 'home') orbit.layout(); // the stage can only be measured while visible
@@ -2991,6 +3705,44 @@ window.addEventListener('popstate', (e) => {
     else if (target && viewOf(target) === 'home') scrollToTarget(target, { immediate: switched });
     else if (switched) scrollToTarget(0, { immediate: true });
   });
+});
+
+/* ---------------------------------------------------------------------------
+   Language change. Text nodes and attributes are swapped by the language
+   script; here: keep the reader's place and re-render generated content.
+   --------------------------------------------------------------------------- */
+// The block under the reading line just below the header. While the menu covers the page
+// (which is inert then), hit testing cannot reach it, so the page's blocks are measured instead.
+const READING_BLOCKS = 'p, li, h1, h2, h3, h4, figure, dt, dd, .bottom-line, section, article';
+const isAnchorable = (el) => el.closest('main, footer') && !el.closest('[data-orbit-stage]');
+function readingElement() {
+  const line = headerOffset() + 48;
+  const hit = document.elementFromPoint(window.innerWidth / 2, line)?.closest(READING_BLOCKS);
+  if (hit && isAnchorable(hit)) return hit;
+  let deepest = null;
+  document.querySelectorAll(`main :is(${READING_BLOCKS}), footer :is(${READING_BLOCKS})`).forEach((el) => {
+    if (!el.offsetParent || !isAnchorable(el)) return;
+    const r = el.getBoundingClientRect();
+    if (r.top <= line && r.bottom > line) deepest = el;
+  });
+  return deepest;
+}
+let readingAnchor = null;
+document.addEventListener('gi:langbeforechange', () => {
+  const el = readingElement();
+  readingAnchor = el ? { el, top: el.getBoundingClientRect().top } : null;
+});
+document.addEventListener('gi:langchange', () => {
+  document.querySelectorAll('[data-split].is-split').forEach((el) => splitWords(el, i18n.tr(el.dataset.i18nDe)));
+  document.title = viewTitle(currentView);
+  contactForm.relocalise();
+  orbit.layout();
+  lenis?.resize();
+  if (readingAnchor) {
+    const shift = readingAnchor.el.getBoundingClientRect().top - readingAnchor.top;
+    if (Math.abs(shift) > 1) scrollToTarget(null, { immediate: true, top: currentScroll() + shift });
+    readingAnchor = null;
+  }
 });
 
 /* ---------------------------------------------------------------------------
