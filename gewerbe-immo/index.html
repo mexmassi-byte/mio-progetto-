@@ -20,8 +20,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600&display=swap">
 <link rel="preload" as="image"
-  href="https://images.squarespace-cdn.com/content/v1/56dfe72540261de4b233e53f/1461075956204-KQLCKDPN00AFXD79GLY6/Fotolia_79830019_XL_overlay_pfeil.jpg?format=1500w"
-  imagesrcset="https://images.squarespace-cdn.com/content/v1/56dfe72540261de4b233e53f/1461075956204-KQLCKDPN00AFXD79GLY6/Fotolia_79830019_XL_overlay_pfeil.jpg?format=750w 750w, https://images.squarespace-cdn.com/content/v1/56dfe72540261de4b233e53f/1461075956204-KQLCKDPN00AFXD79GLY6/Fotolia_79830019_XL_overlay_pfeil.jpg?format=1500w 1500w, https://images.squarespace-cdn.com/content/v1/56dfe72540261de4b233e53f/1461075956204-KQLCKDPN00AFXD79GLY6/Fotolia_79830019_XL_overlay_pfeil.jpg?format=2500w 2500w"
+  href="img/hero-1672.webp"
+  imagesrcset="img/hero-750.webp 750w, img/hero-1200.webp 1200w, img/hero-1672.webp 1672w"
   imagesizes="100vw" fetchpriority="high">
 
 <script>
@@ -521,7 +521,7 @@ html.i18n-pending :is(.site-header, main, .site-footer, .loader__inner, .skip-li
 .hero__media { position: absolute; inset: 0; z-index: -2; overflow: hidden; background: var(--ink-2); }
 .hero__media img {
   position: absolute; left: 0; top: 0; width: 100%;
-  /* The original photo carries a baked-in scroll arrow at the bottom edge – the extra height crops it away. */
+  /* The extra height gives the parallax room to travel without showing an edge. */
   height: 114%; object-fit: cover; object-position: 50% 0%;
   will-change: transform;
 }
@@ -1045,11 +1045,9 @@ html.motion-ready [data-reveal="image"].is-visible img { scale: 1; }
 <section class="hero" id="start" aria-labelledby="hero-title" data-hero>
   <div class="hero__media">
     <img
-      src="https://images.squarespace-cdn.com/content/v1/56dfe72540261de4b233e53f/1461075956204-KQLCKDPN00AFXD79GLY6/Fotolia_79830019_XL_overlay_pfeil.jpg?format=1500w"
-      srcset="https://images.squarespace-cdn.com/content/v1/56dfe72540261de4b233e53f/1461075956204-KQLCKDPN00AFXD79GLY6/Fotolia_79830019_XL_overlay_pfeil.jpg?format=750w 750w,
-              https://images.squarespace-cdn.com/content/v1/56dfe72540261de4b233e53f/1461075956204-KQLCKDPN00AFXD79GLY6/Fotolia_79830019_XL_overlay_pfeil.jpg?format=1500w 1500w,
-              https://images.squarespace-cdn.com/content/v1/56dfe72540261de4b233e53f/1461075956204-KQLCKDPN00AFXD79GLY6/Fotolia_79830019_XL_overlay_pfeil.jpg?format=2500w 2500w"
-      sizes="100vw" width="1500" height="1000" alt="" fetchpriority="high" decoding="async" data-hero-img>
+      src="img/hero-1672.webp"
+      srcset="img/hero-750.webp 750w, img/hero-1200.webp 1200w, img/hero-1672.webp 1672w"
+      sizes="100vw" width="1672" height="941" alt="" fetchpriority="high" decoding="async" data-hero-img>
   </div>
   <div class="hero__shade" aria-hidden="true"></div>
 
