@@ -19,9 +19,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600&display=swap">
-<link rel="preload" as="image"
+<link rel="preload" as="image" media="not all and (max-width: 767px) and (orientation: portrait)"
   href="img/hero-1672.webp"
   imagesrcset="img/hero-750.webp 750w, img/hero-1200.webp 1200w, img/hero-1672.webp 1672w"
+  imagesizes="100vw" fetchpriority="high">
+<link rel="preload" as="image" media="(max-width: 767px) and (orientation: portrait)"
+  href="img/hero-mobile-941.webp"
+  imagesrcset="img/hero-mobile-540.webp 540w, img/hero-mobile-941.webp 941w"
   imagesizes="100vw" fetchpriority="high">
 
 <script>
@@ -1044,10 +1048,14 @@ html.motion-ready [data-reveal="image"].is-visible img { scale: 1; }
      ====================================================================== -->
 <section class="hero" id="start" aria-labelledby="hero-title" data-hero>
   <div class="hero__media">
+    <picture>
+    <!-- Phones in portrait get the upright photograph of the same skyline -->
+    <source media="(max-width: 767px) and (orientation: portrait)" srcset="img/hero-mobile-540.webp 540w, img/hero-mobile-941.webp 941w" sizes="100vw" width="941" height="1672">
     <img
       src="img/hero-1672.webp"
       srcset="img/hero-750.webp 750w, img/hero-1200.webp 1200w, img/hero-1672.webp 1672w"
       sizes="100vw" width="1672" height="941" alt="" fetchpriority="high" decoding="async" data-hero-img>
+    </picture>
   </div>
   <div class="hero__shade" aria-hidden="true"></div>
 
