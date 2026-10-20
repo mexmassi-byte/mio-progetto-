@@ -836,6 +836,18 @@ html.motion-ready .hero:not(.is-in) .hero__media img { scale: 1.07; }
 .footer__bar ul { list-style: none; display: flex; flex-wrap: wrap; gap: .5rem 1.6rem; }
 .footer__bar a { color: var(--muted-on-dark); text-decoration: none; }
 .footer__bar a:hover { color: var(--white); text-decoration: underline; }
+/* Wordmark at the foot of the page, spanning the container (6.72em wide at this tracking).
+   Cream at rest; under a mouse the letters fill with the site navy in a wave from the point
+   of entry and those near the cursor rise slightly. The cream contour keeps the navy letters
+   legible on the deep-navy footer. Touch screens keep the static cream wordmark. */
+.footer__mark { container-type: inline-size; padding-bottom: clamp(1.25rem, 3vw, 2.5rem); user-select: none; -webkit-user-select: none; }
+.footer__mark-word {
+  width: fit-content; white-space: nowrap;
+  font-size: 13vw; font-size: 14.85cqi; font-weight: 300; line-height: .9; letter-spacing: -.04em;
+  color: var(--paper); -webkit-text-stroke: 1px var(--paper);
+}
+.footer__mark-word span { display: inline-block; transition: color .6s var(--ease) var(--d, 0ms); }
+.footer__mark-word.is-active span { color: var(--ink); }
 @media (min-width: 720px) { .footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1100px) { .footer__grid { grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)); } }
 
@@ -2626,6 +2638,10 @@ html.motion-ready [data-reveal="image"].is-visible img { scale: 1; }
         <li><a href="https://www.gi-immo.de/datenschutz" rel="noopener">Datenschutz</a></li>
       </ul>
     </div>
+    <!-- Decorative wordmark (the company name is already given above) -->
+    <div class="footer__mark" aria-hidden="true" translate="no">
+      <p class="footer__mark-word" data-footer-mark><span>G</span><span>e</span><span>w</span><span>e</span><span>r</span><span>b</span><span>e</span><span>-</span><span>I</span><span>m</span><span>m</span><span>o</span></p>
+    </div>
   </div>
 </footer>
 
@@ -3471,6 +3487,53 @@ const contactForm = (() => {
 })();
 
 document.querySelectorAll('[data-year]').forEach((el) => { el.textContent = new Date().getFullYear(); });
+
+/* ---------------------------------------------------------------------------
+   Footer wordmark: under a mouse the letters fill with navy in a wave from the
+   point of entry, and the letters around the cursor rise gently (eased per frame,
+   transform only). Touch input is ignored; reduced motion keeps the colour change
+   without movement.
+   --------------------------------------------------------------------------- */
+(() => {
+  const word = document.querySelector('[data-footer-mark]');
+  if (!word) return;
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const letters = [...word.children];
+  const LIFT = 0.055; // em, for the letter right under the cursor
+  const lift = letters.map(() => 0);
+  let centres = [], pitch = 1, cursorX = null, frame = 0;
+  const nearest = (x) => centres.reduce((best, c, i) => (Math.abs(c - x) < Math.abs(centres[best] - x) ? i : best), 0);
+  const wave = (from) => letters.forEach((l, i) => l.style.setProperty('--d', `${Math.abs(i - from) * 32}ms`));
+  const tick = () => {
+    let moving = false;
+    letters.forEach((l, i) => {
+      const goal = cursorX === null ? 0 : LIFT * Math.exp(-(((centres[i] - cursorX) / pitch) ** 2) / 2);
+      lift[i] += (goal - lift[i]) * 0.14;
+      if (Math.abs(goal - lift[i]) < 0.0004) lift[i] = goal; else moving = true;
+      l.style.transform = lift[i] ? `translateY(${(-lift[i]).toFixed(4)}em)` : '';
+    });
+    frame = moving ? requestAnimationFrame(tick) : 0;
+  };
+  const run = () => { if (!frame) frame = requestAnimationFrame(tick); };
+  word.addEventListener('pointerenter', (e) => {
+    if (e.pointerType !== 'mouse' || !finePointer.matches) return;
+    centres = letters.map((l) => { const r = l.getBoundingClientRect(); return r.left + r.width / 2; });
+    pitch = (centres[centres.length - 1] - centres[0]) / (centres.length - 1);
+    wave(nearest(e.clientX));
+    word.classList.add('is-active');
+    if (!reduceMotion.matches) { cursorX = e.clientX; run(); }
+  });
+  word.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse' || !word.classList.contains('is-active') || reduceMotion.matches) return;
+    cursorX = e.clientX; run();
+  });
+  word.addEventListener('pointerleave', (e) => {
+    if (!word.classList.contains('is-active')) return;
+    wave(nearest(e.clientX));
+    word.classList.remove('is-active');
+    cursorX = null; run();
+  });
+})();
 
 /* ---------------------------------------------------------------------------
    Motion: hero word reveal, scroll reveals, parallax
