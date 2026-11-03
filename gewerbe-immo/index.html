@@ -836,6 +836,8 @@ html.motion-ready .hero:not(.is-in) .hero__media img { scale: 1.07; }
 .footer__bar ul { list-style: none; display: flex; flex-wrap: wrap; gap: .5rem 1.6rem; }
 .footer__bar a { color: var(--muted-on-dark); text-decoration: none; }
 .footer__bar a:hover { color: var(--white); text-decoration: underline; }
+/* the designer credit stands out from the muted legal links */
+.footer__bar a.footer__credit { color: var(--white); font-weight: 500; }
 /* Wordmark at the foot of the page, spanning the container (6.72em wide at this tracking).
    Cream at rest; under a mouse the letters fill with the site navy in a wave from the point
    of entry and those near the cursor rise slightly. The cream contour keeps the navy letters
@@ -2637,7 +2639,7 @@ html.motion-ready [data-reveal="image"].is-visible img { scale: 1; }
       <ul>
         <li><a href="https://www.gi-immo.de/impressum" rel="noopener">Impressum</a></li>
         <li><a href="https://www.gi-immo.de/datenschutz" rel="noopener">Datenschutz</a></li>
-        <li>Gestaltet von <a href="https://veyroweb.tech" target="_blank" rel="noopener">Veyro Web</a></li>
+        <li>Gestaltet von <a class="footer__credit" href="https://veyroweb.tech" target="_blank" rel="noopener">Veyro Web</a></li>
       </ul>
     </div>
     <!-- Decorative wordmark (the company name is already given above) -->
