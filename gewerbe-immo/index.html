@@ -846,7 +846,8 @@ html.motion-ready .hero:not(.is-in) .hero__media img { scale: 1.07; }
   font-size: 13vw; font-size: 14.85cqi; font-weight: 300; line-height: .9; letter-spacing: -.04em;
   color: var(--paper); -webkit-text-stroke: 1px var(--paper);
 }
-.footer__mark-word span { display: inline-block; transition: color .6s var(--ease) var(--d, 0ms); }
+/* the letters' boxes reach above the line into the bar; only the line itself takes the pointer */
+.footer__mark-word span { display: inline-block; pointer-events: none; transition: color .6s var(--ease) var(--d, 0ms); }
 .footer__mark-word.is-active span { color: var(--ink); }
 @media (min-width: 720px) { .footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1100px) { .footer__grid { grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)); } }
@@ -2636,6 +2637,7 @@ html.motion-ready [data-reveal="image"].is-visible img { scale: 1; }
       <ul>
         <li><a href="https://www.gi-immo.de/impressum" rel="noopener">Impressum</a></li>
         <li><a href="https://www.gi-immo.de/datenschutz" rel="noopener">Datenschutz</a></li>
+        <li>Gestaltet von <a href="https://veyroweb.tech" target="_blank" rel="noopener">Veyro Web</a></li>
       </ul>
     </div>
     <!-- Decorative wordmark (the company name is already given above) -->
@@ -3016,7 +3018,9 @@ html.motion-ready [data-reveal="image"].is-visible img { scale: 1; }
 "Besprechung mit Finanzanalysen, Unterlagen und Objektdaten auf einem Bildschirm": "A meeting reviewing financial analyses, documents and property data on a screen",
 "Coach erarbeitet mit einem kleinen Team Ziele am Flipchart": "A coach works through goals with a small team at a flipchart",
 "Berater erläutert Führungskräften Strukturen an einem Stadtmodell": "An adviser walks executives through structures on a city model",
-"Berater bespricht mit zwei Gesprächspartnern Unterlagen, im Hintergrund die Münchner Frauenkirche": "An adviser discusses documents with two colleagues, with Munich’s Frauenkirche in the background"
+"Berater bespricht mit zwei Gesprächspartnern Unterlagen, im Hintergrund die Münchner Frauenkirche": "An adviser discusses documents with two colleagues, with Munich’s Frauenkirche in the background",
+"Gestaltet von": "Designed by",
+"Veyro Web": "Veyro Web"
 }
 </script>
 
