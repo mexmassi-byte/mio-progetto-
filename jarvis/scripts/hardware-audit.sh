@@ -1,100 +1,95 @@
 #!/usr/bin/env bash
 # JARVIS — Phase 0 hardware audit (macOS / Linux)
 #
-# READ-ONLY: this script installs nothing, downloads nothing and changes
-# no system settings. It only reads system information and writes a
-# report to ./jarvis-hardware-report.txt in the current directory.
+# READ-ONLY: installs nothing, downloads nothing, changes no setting.
+# It only reads system information and writes the report to
+# ~/jarvis-audit.txt (also printed on screen).
+#
+# On macOS without Apple's Command Line Tools, typing `python3` or `git`
+# opens an installation dialog: this script checks first and never calls
+# those placeholders.
 #
 # Usage:   bash hardware-audit.sh
 
 set -u
-OUT="jarvis-hardware-report.txt"
+OUT="$HOME/jarvis-audit.txt"
 : > "$OUT"
 
 log()     { printf '%s\n' "$*" | tee -a "$OUT"; }
 section() { log ""; log "=== $* ==="; }
-have()    { command -v "$1" >/dev/null 2>&1; }
-ver()     { # name, command...
-  local name="$1"; shift
-  if have "$1"; then
-    log "$name: $("$@" 2>&1 | head -n 1)"
-  else
-    log "$name: NOT INSTALLED"
+OS="$(uname -s)"
+
+clt_ok() { [ "$OS" != "Darwin" ] || xcode-select -p >/dev/null 2>&1; }
+
+tool() { # name -> version line, without triggering macOS install dialogs
+  local name="$1" path
+  path="$(command -v "$name" 2>/dev/null || true)"
+  if [ -z "$path" ]; then log "$name: non trovato"; return; fi
+  if [ "$OS" = "Darwin" ] && { [ "$path" = "/usr/bin/python3" ] || [ "$path" = "/usr/bin/git" ]; } && ! clt_ok; then
+    log "$name: non installato (solo segnaposto Apple)"; return
   fi
+  log "$name: $("$name" --version 2>&1 | head -n 1) ($path)"
 }
 
-OS="$(uname -s)"
 log "JARVIS hardware audit — $(date '+%Y-%m-%d %H:%M:%S')"
 
-section "OPERATING SYSTEM"
+section "SISTEMA OPERATIVO"
 if [ "$OS" = "Darwin" ]; then
   log "macOS $(sw_vers -productVersion) (build $(sw_vers -buildVersion))"
 else
-  if [ -r /etc/os-release ]; then . /etc/os-release; log "${PRETTY_NAME:-Linux}"; fi
+  [ -r /etc/os-release ] && . /etc/os-release && log "${PRETTY_NAME:-Linux}"
 fi
-log "Kernel: $(uname -r)  Arch: $(uname -m)"
+log "Kernel: $(uname -r)  Architettura: $(uname -m)"
 
-section "CPU"
+section "CPU / CHIP"
 if [ "$OS" = "Darwin" ]; then
-  log "Model: $(sysctl -n machdep.cpu.brand_string 2>/dev/null)"
-  log "Cores (physical/logical): $(sysctl -n hw.physicalcpu)/$(sysctl -n hw.logicalcpu)"
-  P=$(sysctl -n hw.perflevel0.physicalcpu 2>/dev/null) && log "Performance cores: $P"
-  E=$(sysctl -n hw.perflevel1.physicalcpu 2>/dev/null) && log "Efficiency cores: $E"
+  system_profiler SPHardwareDataType 2>/dev/null \
+    | grep -E "Model Name|Model Identifier|Chip|Total Number of Cores|Memory" | sed 's/^ *//' | tee -a "$OUT"
+  log "Core performance/efficienza: $(sysctl -n hw.perflevel0.physicalcpu 2>/dev/null)/$(sysctl -n hw.perflevel1.physicalcpu 2>/dev/null)"
 else
-  log "Model: $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2- | sed 's/^ //')"
-  log "Logical cores: $(nproc)"
-  have lscpu && log "$(lscpu | grep -E '^(Core\(s\) per socket|Socket\(s\))')"
-  grep -qw avx2 /proc/cpuinfo && log "AVX2: yes" || log "AVX2: no"
-  grep -qw avx512f /proc/cpuinfo && log "AVX-512: yes" || log "AVX-512: no"
+  log "Modello: $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2- | sed 's/^ //')"
+  log "Core logici: $(nproc)"
 fi
 
-section "MEMORY (RAM)"
-if [ "$OS" = "Darwin" ]; then
-  BYTES=$(sysctl -n hw.memsize)
-  log "Total RAM: $((BYTES / 1024 / 1024 / 1024)) GB"
-  [ "$(uname -m)" = "arm64" ] && log "Apple Silicon: unified memory (shared by CPU and GPU)"
-  log "Memory pressure: $(memory_pressure 2>/dev/null | grep -i 'free percentage' | head -n1)"
-else
-  have free && log "$(free -h | sed -n '1,2p')"
-fi
-
-section "GPU / VRAM"
+section "GPU"
 if [ "$OS" = "Darwin" ]; then
   system_profiler SPDisplaysDataType 2>/dev/null \
-    | grep -E 'Chipset Model|Total Number of Cores|VRAM|Metal' | sed 's/^ *//' | tee -a "$OUT"
+    | grep -E "Chipset Model|Total Number of Cores|Metal" | sed 's/^ *//' | tee -a "$OUT"
 else
-  have lspci && lspci 2>/dev/null | grep -Ei 'vga|3d|display' | tee -a "$OUT"
+  command -v lspci >/dev/null && lspci 2>/dev/null | grep -Ei 'vga|3d|display' | tee -a "$OUT"
+  command -v nvidia-smi >/dev/null && nvidia-smi --query-gpu=name,memory.total --format=csv,noheader | tee -a "$OUT"
 fi
-if have nvidia-smi; then
-  log "NVIDIA:"
-  nvidia-smi --query-gpu=name,memory.total,memory.free,driver_version --format=csv,noheader 2>&1 | tee -a "$OUT"
-fi
-have rocm-smi && { log "AMD ROCm:"; rocm-smi --showproductname --showmeminfo vram 2>&1 | tee -a "$OUT"; }
 
-section "DISK (home directory volume)"
-df -h "$HOME" | tee -a "$OUT"
-
-section "DEVELOPMENT TOOLS"
-ver "Python3"  python3 --version
-ver "pip"      python3 -m pip --version
-ver "Node.js"  node --version
-ver "npm"      npm --version
-ver "Git"      git --version
-ver "Ollama"   ollama --version
-ver "Docker"   docker --version
-ver "ffmpeg"   ffmpeg -version
-ver "Homebrew" brew --version
-
-section "OLLAMA MODELS ALREADY INSTALLED"
-if have ollama; then ollama list 2>&1 | tee -a "$OUT"; else log "Ollama not installed"; fi
-
-section "AUDIO"
+section "MEMORIA"
 if [ "$OS" = "Darwin" ]; then
-  system_profiler SPAudioDataType 2>/dev/null | grep -E '^ {8}[^ ].*:$' | sed 's/^ *//' | tee -a "$OUT"
+  log "RAM totale: $(( $(sysctl -n hw.memsize) / 1073741824 )) GB (unificata CPU+GPU)"
+  log "$(memory_pressure 2>/dev/null | tail -n 1)"
+  log "Swap: $(sysctl -n vm.swapusage 2>/dev/null)"
+  vm_stat 2>/dev/null | grep -E "Pages free|Pages active|Pages inactive|Pages wired|Pages occupied by compressor" | tee -a "$OUT"
 else
-  have arecord && arecord -l 2>&1 | grep -E '^card' | tee -a "$OUT"
+  free -h | tee -a "$OUT"
 fi
+
+section "DISCO"
+df -h / | tee -a "$OUT"
+[ "$OS" = "Darwin" ] && df -h "$HOME" | tail -n 1 | tee -a "$OUT"
+
+section "STRUMENTI DI SVILUPPO"
+if [ "$OS" = "Darwin" ]; then
+  if clt_ok; then log "Command Line Tools Apple: $(xcode-select -p)"; else log "Command Line Tools Apple: NON installati"; fi
+fi
+for t in python3 python3.10 python3.11 python3.12 python3.13 pip3 node npm git brew docker ffmpeg; do tool "$t"; done
+
+section "OLLAMA"
+if command -v ollama >/dev/null 2>&1; then
+  tool ollama
+  log "-- modelli installati:"; ollama list 2>&1 | tee -a "$OUT"
+  log "-- modelli caricati ora:"; ollama ps 2>&1 | tee -a "$OUT"
+else
+  log "Ollama: non installato"
+fi
+[ -d /Applications/Ollama.app ] && log "App Ollama presente in /Applications"
 
 log ""
-log "Report saved to: $(pwd)/$OUT"
-log "Paste the contents of this file into the chat with Claude."
+log "Report salvato in: $OUT"
+log "Incolla il contenuto di questo file nella chat con Claude."
