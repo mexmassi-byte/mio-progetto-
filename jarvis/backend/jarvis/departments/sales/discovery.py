@@ -25,8 +25,16 @@ SECTOR_TAGS: dict[str, list[tuple[str, str]]] = {
 }
 
 
-def build_query(sector: str, city: str, limit: int) -> str:
+def build_query(sector: str, city: str, limit: int, coords: tuple[float, float] | None = None,
+                radius_m: int = 9000) -> str:
+    """Overpass query. With known city coordinates a radius search is used: much
+    lighter for the server than resolving the administrative area, and it cannot
+    confuse two cities with the same name."""
     tags = SECTOR_TAGS.get(sector, SECTOR_TAGS["other"])
+    if coords:
+        lat, lon = coords
+        selectors = "\n".join(f'  nwr["{k}"="{v}"](around:{int(radius_m)},{lat:.5f},{lon:.5f});' for k, v in tags)
+        return f"[out:json][timeout:90];\n(\n{selectors}\n);\nout center tags {int(limit)};"
     safe_city = city.replace('"', "").replace("\\", "")
     selectors = "\n".join(f'  nwr["{k}"="{v}"](area.a);' for k, v in tags)
     return (
@@ -67,12 +75,29 @@ def parse_elements(data: dict[str, Any], sector: str, city: str, country: str) -
     return out
 
 
-async def overpass_search(overpass_url: str, user_agent: str, sector: str, city: str,
+async def overpass_search(overpass_url: str | list[str], user_agent: str, sector: str, city: str,
                           country: str, limit: int, timeout_s: float = 120.0) -> list[dict[str, Any]]:
-    query = build_query(sector, city, limit)
+    """Query Overpass, trying each server in turn until one answers."""
+    from .geo import city_coords
+
+    urls = [overpass_url] if isinstance(overpass_url, str) else list(overpass_url)
+    query = build_query(sector, city, limit, city_coords(city))
+    errors: list[str] = []
     async with httpx.AsyncClient(timeout=timeout_s, headers={"User-Agent": user_agent}) as client:
-        resp = await client.post(overpass_url, data={"data": query})
-    if resp.status_code == 429:
-        raise RuntimeError("Overpass rate limit reached (429): retry later")
-    resp.raise_for_status()
-    return parse_elements(resp.json(), sector, city, country)
+        for url in urls:
+            try:
+                resp = await client.post(url, data={"data": query})
+            except httpx.HTTPError as exc:
+                errors.append(f"{url}: {exc.__class__.__name__}")
+                continue
+            if resp.status_code in (429, 502, 503, 504):
+                errors.append(f"{url}: HTTP {resp.status_code}")
+                continue
+            if resp.status_code >= 400:
+                errors.append(f"{url}: HTTP {resp.status_code}")
+                continue
+            try:
+                return parse_elements(resp.json(), sector, city, country)
+            except ValueError:
+                errors.append(f"{url}: invalid JSON")
+    raise RuntimeError("No Overpass server answered: " + "; ".join(errors))

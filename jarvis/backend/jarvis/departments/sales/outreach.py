@@ -31,16 +31,42 @@ DRAFT_SCHEMA = {"type": "object", "properties": {"subject": {"type": "string"}, 
                 "required": ["body"]}
 
 
+# Language-neutral (English) descriptions of audit findings for the model.
+# The UI shows Italian labels; mixing them into a German email confuses models.
+FINDING_EN = {
+    "status": "the page returned an HTTP error",
+    "https": "the website does not use HTTPS (browsers mark it as not secure)",
+    "speed": "the first page loads slowly",
+    "weight": "the page is heavy",
+    "viewport": "the site is not optimized for mobile phones (no responsive viewport)",
+    "title": "the page title is missing or poorly sized for Google",
+    "meta_description": "there is no description for Google search results",
+    "h1": "the main heading structure is unclear",
+    "lang": "the page language is not declared",
+    "img_alt": "many images have no alternative text (accessibility, SEO)",
+    "schema": "no structured data for Google (business details, opening hours)",
+    "og": "no preview image/text when the link is shared on social media or WhatsApp",
+    "cta": "few clear ways to contact or book (phone link, email, form, online booking)",
+    "legal": "privacy / legal pages are hard to find",
+    "copyright": "the footer shows an old year, the site looks outdated",
+    "jquery": "outdated JavaScript libraries",
+    "legacy": "very old HTML code",
+    "mixed": "insecure http:// resources on an https page",
+    "overflow": "on a phone the page is wider than the screen",
+}
+
+
 def facts_for(lead: dict[str, Any]) -> str:
     audit = lead.get("audit") or {}
     lines = [
-        f"Business: {lead.get('name')}", f"Sector: {lead.get('sector')}", f"City: {lead.get('city')}",
-        f"Website: {lead.get('website') or 'none'}",
+        f"Business name: {lead.get('name')}", f"Sector: {lead.get('sector')}", f"City: {lead.get('city')}",
+        f"Their website: {lead.get('website') or 'none'}",
     ]
     if audit and not audit.get("error"):
-        lines.append("Observed website problems (verified by automatic audit):")
-        lines += [f"- {p}" for p in audit.get("problems", [])[:8]] or ["- none significant"]
-        lines.append(f"Platform: {audit.get('platform') or 'unknown'}")
+        lines.append("Observed problems on THEIR website (verified by an automatic audit):")
+        found = [c for c in audit.get("checks", []) if c.get("status") in ("fail", "warn") and c.get("id") in FINDING_EN]
+        found.sort(key=lambda c: c.get("weight", 0), reverse=True)
+        lines += [f"- {FINDING_EN[c['id']]}" for c in found[:6]] or ["- none significant"]
     elif audit.get("error"):
         lines.append(f"Website could not be loaded: {audit['error']}")
     return "\n".join(lines)
@@ -53,7 +79,8 @@ async def generate_draft(llm: LLMProvider | None, lead: dict[str, Any], kind: st
         msgs = [
             Message("system",
                     f"You write sales outreach for {company}, a web design and development agency. "
-                    f"Sender: {sender}. Write in {LANG_NAMES.get(language, language)}. "
+                    f"Sender: {sender} from {company}. The recipient is the business described in FACTS: "
+                    f"you write TO them about THEIR website. Write ONLY in {LANG_NAMES.get(language, language)}. "
                     "Use ONLY the facts given; never invent numbers, results or customer names. "
                     "Return JSON with 'subject' (may be empty) and 'body'.\n" + POLICY),
             Message("user", f"Draft type: {kind}\nInstructions: {KIND_INSTRUCTIONS[kind]}\n\n"
@@ -62,7 +89,10 @@ async def generate_draft(llm: LLMProvider | None, lead: dict[str, Any], kind: st
         try:
             data = await llm.chat_json(msgs, DRAFT_SCHEMA)
             if isinstance(data, dict) and str(data.get("body", "")).strip():
-                return (str(data.get("subject") or "") or None), str(data["body"]).strip(), f"llm:{llm.model}"
+                subject = str(data.get("subject") or "").strip() or None
+                if subject is None and kind in ("email", "followup", "proposal", "audit_report"):
+                    subject = template_draft(lead, kind, language, sender, company)[0]
+                return subject, str(data["body"]).strip(), f"llm:{llm.model}"
         except LLMError:
             pass
     subject, body = template_draft(lead, kind, language, sender, company)

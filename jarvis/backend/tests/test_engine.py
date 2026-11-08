@@ -34,6 +34,7 @@ def fake_sales(monkeypatch):
 
     async def fake_overpass(url, ua, sector, city, country, limit, timeout_s=120.0):
         return [dict(b, city=city) for b in businesses if city == "Berlin"]
+    # (any other city returns nothing)
 
     async def fake_audit(url, ctx):
         n = int(url.rstrip("/").split("kanzlei")[-1].split(".")[0])
@@ -177,3 +178,12 @@ async def test_cancel(services):
     assert services.missions.cancel(m["id"])
     assert services.missions.get(m["id"])["status"] == "cancelled"
     assert services.missions.tasks(m["id"])[0]["status"] == "cancelled"
+
+
+async def test_mission_stops_when_no_business_is_found(services, llm, fake_sales):
+    m = services.missions.create("Trova clienti", kind="lead_acquisition",
+                                 params={"sector": "lawyer", "country": "DE", "city": "Munich", "count": 3})
+    done = await services.engine.run_until_idle(m["id"])
+    assert done["params"]["cities"] == ["München"]
+    assert done["status"] == "failed" and "No 'lawyer' businesses found" in done["error"]
+    assert [t["status"] for t in done["tasks"]][:2] == ["failed", "skipped"]

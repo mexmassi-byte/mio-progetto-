@@ -103,3 +103,24 @@ async def test_workspace_isolation_and_git(services):
         r = await ws.run(p["id"], ["git", "status"])
         assert r["exit_code"] == 0 and "src/" in r["output"]
     assert {f["path"] for f in ws.files(p["id"])} >= {"README.md", "src/index.html"}
+
+
+def test_overpass_radius_query_when_city_known():
+    q = build_query("lawyer", "München", 30, (48.137, 11.575))
+    assert "around:9000,48.13700,11.57500" in q and "area" not in q
+
+
+def test_city_names_are_normalized():
+    from jarvis.departments.sales.geo import canonical_city, city_coords
+    assert canonical_city("Munich") == "München" and canonical_city("monaco di baviera") == "München"
+    assert canonical_city("Milan") == "Milano" and canonical_city("Kleinstadt") == "Kleinstadt"
+    assert city_coords("Cologne") == city_coords("Köln") is not None
+
+
+def test_outreach_facts_are_language_neutral():
+    from jarvis.departments.sales.outreach import facts_for
+    lead = {"name": "Praxis X", "sector": "dentist", "city": "München", "website": "http://x.de",
+            "audit": analyze_html(BAD_SITE, "http://x.de", elapsed_ms=4000, now_year=2026)}
+    facts = facts_for(lead)
+    assert "not optimized for mobile" in facts and "HTTPS" in facts
+    assert "Ottimizzato" not in facts

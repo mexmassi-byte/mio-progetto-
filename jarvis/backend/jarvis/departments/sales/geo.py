@@ -20,9 +20,36 @@ CITIES: dict[str, tuple[float, float]] = {
 }
 
 
+# Names a model (or the user) may use -> the local name used by OpenStreetMap.
+ALIASES: dict[str, str] = {
+    "munich": "München", "munchen": "München", "muenchen": "München", "monaco di baviera": "München",
+    "monaco": "München", "cologne": "Köln", "koln": "Köln", "koeln": "Köln", "colonia": "Köln",
+    "frankfurt": "Frankfurt am Main", "francoforte": "Frankfurt am Main", "hamburg": "Hamburg",
+    "amburgo": "Hamburg", "berlino": "Berlin", "stoccarda": "Stuttgart", "dusseldorf": "Düsseldorf",
+    "duesseldorf": "Düsseldorf", "dresda": "Dresden", "lipsia": "Leipzig", "norimberga": "Nürnberg",
+    "nuremberg": "Nürnberg", "nurnberg": "Nürnberg", "hanover": "Hannover", "brema": "Bremen",
+    "milan": "Milano", "rome": "Roma", "turin": "Torino", "genoa": "Genova", "florence": "Firenze",
+    "naples": "Napoli", "venice": "Venezia", "padua": "Padova",
+    "vienna": "Wien", "zurich": "Zürich", "zurigo": "Zürich", "geneva": "Genève", "ginevra": "Genève",
+    "geneve": "Genève", "basilea": "Basel", "berna": "Bern", "salisburgo": "Salzburg",
+}
+
+
+def canonical_city(name: str | None) -> str | None:
+    """Map English/Italian/ASCII spellings to the local OpenStreetMap name."""
+    if not name:
+        return name
+    clean = " ".join(name.strip().split())
+    for k in CITIES:
+        if k.lower() == clean.lower():
+            return k
+    return ALIASES.get(clean.lower(), clean)
+
+
 def city_coords(name: str | None) -> tuple[float, float] | None:
     if not name:
         return None
+    name = canonical_city(name) or name
     if name in CITIES:
         return CITIES[name]
     low = name.lower()

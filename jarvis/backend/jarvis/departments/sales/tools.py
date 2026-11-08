@@ -13,7 +13,7 @@ from ...tools.registry import ToolContext, ToolError, ToolRegistry
 from .audit import audit_url
 from .crm import DRAFT_KINDS, LEAD_STATUSES
 from .discovery import SECTOR_TAGS, overpass_search
-from .geo import city_coords
+from .geo import canonical_city, city_coords
 from .outreach import generate_draft
 from .scoring import score_lead
 
@@ -40,6 +40,7 @@ def register(reg: ToolRegistry) -> None:
         found_total = int(ctx.checkpoint.get("found", 0))
         errors: list[str] = []
         per_city = max(10, limit)
+        cities = [canonical_city(c) or c for c in cities]
         for city in cities[:10]:
             if city in done_cities:
                 continue
@@ -50,8 +51,8 @@ def register(reg: ToolRegistry) -> None:
                      lat=coords[0] if coords else None, lon=coords[1] if coords else None, stage="search")
             ctx.emit("research.search", query=f"{sector} @ {city}", source="openstreetmap")
             try:
-                items = await overpass_search(s.overpass_url, s.http_user_agent, sector, city, country,
-                                              per_city * 3)
+                items = await overpass_search([s.overpass_url, *s.overpass_fallback_urls], s.http_user_agent,
+                                              sector, city, country, per_city * 3)
             except Exception as exc:  # network/rate limit: keep progress, report
                 errors.append(f"{city}: {exc}")
                 continue
@@ -72,6 +73,10 @@ def register(reg: ToolRegistry) -> None:
             await asyncio.sleep(1.0)  # be gentle with the public Overpass server
         if created == 0 and errors:
             raise ToolError("Business search failed: " + "; ".join(errors)[:500])
+        if found_total == 0:
+            # Stop the mission here instead of auditing and drafting for nobody.
+            raise ToolError(f"No '{sector}' businesses found in OpenStreetMap for: {', '.join(cities)}. "
+                            "Check the city name or choose another city.", retryable=False)
         return {"created": created, "found": found_total, "cities": done_cities, "errors": errors,
                 "source": "OpenStreetMap contributors (ODbL)"}
 

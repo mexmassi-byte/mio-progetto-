@@ -64,6 +64,11 @@ class Settings(BaseSettings):
     # Research.
     searxng_url: str = "http://127.0.0.1:8888"
     overpass_url: str = "https://overpass-api.de/api/interpreter"
+    # Tried in order when the main server is down or rate-limited.
+    overpass_fallback_urls: list[str] = [
+        "https://overpass.kumi.systems/api/interpreter",
+        "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    ]
     http_user_agent: str = "JARVIS-VeyroWeb/0.1 (local business research assistant)"
     http_timeout_s: float = 20.0
 

@@ -154,13 +154,12 @@ class Engine:
                     ms.set_status(mission_id, "awaiting_approval")
                 return False
             if pending:
-                # Pending but not runnable: dependency failed or waiting for backoff.
+                # Pending but not runnable: a dependency failed (skip it, which
+                # cascades down the chain on the next steps) or waiting for backoff.
                 dep_blocked = [t for t in pending if _deps_failed(t, tasks)]
-                if dep_blocked and len(dep_blocked) == len(pending):
-                    for t in dep_blocked:
-                        ms.update_task(t["id"], status="skipped", error="a required earlier step failed")
-                    return True
-                return False
+                for t in dep_blocked:
+                    ms.update_task(t["id"], status="skipped", error="a required earlier step failed")
+                return bool(dep_blocked)
             ms.set_status(mission_id, "verifying")
             return True
 
