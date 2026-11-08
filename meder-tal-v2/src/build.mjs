@@ -39,7 +39,7 @@ function head({ title, description, moments = [], preload = "" }) {
   const mo = moments.length
     ? `<script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
 <link rel="modulepreload" href="assets/moments/moments.js"><link rel="modulepreload" href="assets/moments/lib.js">
-${moments.map((m) => `<link rel="modulepreload" href="assets/moments/${m}/moment.js">`).join("")}`
+${moments.map((m) => `<link rel="modulepreload" href="assets/moments/${m}/moment.js"><link rel="stylesheet" href="assets/moments/${m}/moment.css">`).join("")}`
     : "";
   return `<head>
 <meta charset="utf-8">
@@ -56,7 +56,6 @@ ${moments.map((m) => `<link rel="modulepreload" href="assets/moments/${m}/moment
 <!-- <link rel="canonical" href="https://www.medertal.com/"> once the new site is live on the domain -->
 <meta name="site-kind" content="other">
 <meta name="page-type" content="service">
-<link rel="preload" href="assets/fonts/hanken-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 ${preload}
 <link rel="stylesheet" href="assets/fonts/fonts.css">
 <link rel="stylesheet" href="assets/system.css">
