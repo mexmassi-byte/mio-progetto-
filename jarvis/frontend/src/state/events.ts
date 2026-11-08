@@ -25,7 +25,9 @@ class EventStore {
       this.connected = true;
       this.notify();
       // Catch up on anything missed while disconnected.
-      api.get<JEvent[]>(`/events?after_id=${this.lastId}&limit=300`).then((evs) => evs.forEach((e) => this.push(e)))
+      // Replayed history updates the lists but does not fire live listeners
+      // (no old notifications popping up, no globe arcs for past searches).
+      api.get<JEvent[]>(`/events?after_id=${this.lastId}&limit=300`).then((evs) => evs.forEach((e) => this.push(e, true)))
         .catch(() => undefined);
     };
     ws.onmessage = (msg) => {
@@ -52,11 +54,11 @@ class EventStore {
     this.ws = null;
   }
 
-  push(e: JEvent) {
+  push(e: JEvent, replay = false) {
     if (e.id && e.id <= this.lastId) return;
     if (e.id) this.lastId = e.id;
     this.events = [...this.events.slice(-499), e];
-    this.listeners.forEach((l) => l(e));
+    if (!replay) this.listeners.forEach((l) => l(e));
     this.notify();
   }
 

@@ -279,9 +279,9 @@ class Engine:
             verdict = verifier(self.s, m)
             status = "completed" if verdict["passed"] else "incomplete"
         else:
-            verdict = {"passed": None, "check": "no automatic check exists for free-form missions; "
-                                                "all required steps succeeded" if not failed_required
-                       else f"{len(failed_required)} required steps did not succeed"}
+            verdict = {"passed": None, "check": "nessun controllo automatico per le missioni libere; "
+                                                "tutti i passi richiesti sono riusciti" if not failed_required
+                       else f"{len(failed_required)} passi richiesti non sono riusciti"}
             status = "completed_unverified" if not failed_required else "incomplete"
         summary = {
             "steps": {s: sum(1 for t in tasks if t["status"] == s) for s in TASK_FINAL},

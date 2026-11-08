@@ -54,8 +54,8 @@ def lead_acquisition(params: dict[str, Any]) -> tuple[list[dict], str]:
          "args": {"title": "Missione lead completata: bozze pronte da approvare", "level": "decision"},
          "depends_on": [5]},
     ]
-    cond = (f"At least {count} leads of this mission are qualified, have a website audit "
-            f"and at least one outreach draft.")
+    cond = (f"Almeno {count} lead di questa missione qualificati, con audit del sito "
+            f"e almeno una bozza di contatto.")
     return steps, cond
 
 
@@ -74,7 +74,7 @@ def website_audit(params: dict[str, Any]) -> tuple[list[dict], str]:
                                            "improvements VEYRO Web could offer. Use only the audit data.",
                            "language": "it"},
                   "depends_on": list(range(1, len(urls) + 1))})
-    return steps, f"An audit exists for each of the {len(urls)} websites."
+    return steps, f"Esiste un audit per ciascuno dei {len(urls)} siti."
 
 
 # ---------------------------------------------------------------- verifiers
@@ -86,7 +86,7 @@ def verify_lead_acquisition(services: Any, mission: dict[str, Any]) -> dict[str,
         (mission["id"],))
     ready = [r for r in rows if r["drafts"] > 0]
     return {"passed": len(ready) >= target,
-            "check": f"qualified leads with audit and draft: {len(ready)} / {target}",
+            "check": f"lead qualificati con audit e bozza: {len(ready)} / {target}",
             "lead_ids": [r["id"] for r in ready]}
 
 
@@ -95,7 +95,7 @@ def verify_website_audit(services: Any, mission: dict[str, Any]) -> dict[str, An
     tasks = services.missions.tasks(mission["id"])
     ok = [t for t in tasks if t["tool"] == "sales_audit_url" and t["status"] == "succeeded"]
     return {"passed": len(ok) == len(urls) and len(urls) > 0,
-            "check": f"audits completed: {len(ok)} / {len(urls)}"}
+            "check": f"audit completati: {len(ok)} / {len(urls)}"}
 
 
 VERIFIERS: dict[str, Callable[[Any, dict[str, Any]], dict[str, Any]]] = {

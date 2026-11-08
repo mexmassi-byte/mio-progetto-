@@ -10,14 +10,14 @@ Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
 | 1 | Core: backend, DB, Ollama, chat, memoria | fatto e testato |
 | 2 | Identità visiva: 3 modalità a particelle | fatto, da rifinire con il tuo feedback |
 | 3 | Motore autonomo | fatto e testato |
-| 4 | Reparto vendite | fatto e testato (dati di prova + 1 sito reale) |
+| 4 | Reparto vendite | fatto e provato su dati reali (OpenStreetMap + siti veri) |
 | 5 | Reparto sviluppo | fatto e testato (base) |
 | 6 | Voce e notifiche | fatto e provato nel browser con microfono simulato |
-| 7 | Test e ottimizzazione | in parte: 46 test automatici, eval sul modello reale |
+| 7 | Test e ottimizzazione | in parte: 50 test automatici, eval e missioni con modello reale |
 
 ## Cosa è stato verificato davvero
 
-- **46 test automatici** passano (`pytest`): database e migrazioni, backup,
+- **50 test automatici** passano (`pytest`): database e migrazioni, backup,
   memoria con revisioni, permessi, timeout, URL privati rifiutati, prompt
   injection (blocco in codice), pianificazione, missioni end-to-end, retry,
   budget, ripresa dopo riavvio, annullamento, audit siti, punteggio, CRM,
@@ -33,6 +33,12 @@ Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
   faster-whisper `small` l'ha ritrascritta in 4 s su CPU, con piccoli errori
   ("Massimilano", "identistici"). Trovata e corretta un'incompatibilità di
   versioni (PyAV ≥ 17 rompe faster-whisper 1.2).
+- **Prima missione reale di acquisizione clienti** ("trova 3 studi dentistici a
+  München…", modello reale, mirror OpenStreetMap, siti veri): 52 studi trovati,
+  12 siti analizzati, 18 lead valutati, 3 qualificati con audit e bozze in
+  tedesco, **verificata 3/3** in 6 min 45 s. Il primo tentativo di ricerca è
+  fallito (server sovraccarico) ed è stato ripetuto da solo. Nessun messaggio
+  inviato.
 - **Conversazione vocale completa nel browser** (Chromium con microfono
   simulato da file audio): ascolto → rilevamento della pausa → trascrizione →
   risposta del modello → voce Piper → di nuovo in attesa, in 10 s totali; la
@@ -63,13 +69,21 @@ Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
    modello (53 token in 162 s). Ora JARVIS riconosce il rendering software e
    passa a qualità bassa a 20 fotogrammi al secondo.
 
+7. Il modello ha tradotto "München" in "Munich" e OpenStreetMap non trovava
+   nulla. Ora i nomi delle città vengono normalizzati, la ricerca usa un
+   raggio attorno al centro città e prova più server Overpass.
+8. Con zero risultati la missione proseguiva a vuoto; un passo fallito poteva
+   lasciare la missione "in esecuzione" per sempre. Entrambi corretti e
+   coperti da test.
+9. Le bozze ricevevano i problemi del sito in italiano mentre dovevano essere
+   in tedesco: ora il modello riceve fatti neutri in inglese e ruoli espliciti.
+
 ## Cosa NON è ancora verificato
 
 - **Il tuo PC:** nessun test sul tuo hardware. Serve l'output di
   `scripts/hardware-audit.*`.
-- **Ricerca aziende su OpenStreetMap:** il server Overpass non era
-  raggiungibile dall'ambiente cloud; il codice è testato con dati simulati.
-  Sarà la prima cosa da provare sul tuo PC.
+- **Qualità delle bozze con un modello adeguato:** con `qwen3:0.6b` le bozze
+  sono corrette nei fatti ma goffe. Vanno giudicate con il modello 8B/14B.
 - **Microfono fisico:** il flusso è stato provato con un microfono simulato;
   con un microfono vero contano rumore di fondo e soglia della pausa
   (`SPEECH_RMS` in `Voice.tsx`).
