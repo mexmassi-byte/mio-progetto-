@@ -288,3 +288,10 @@ html.mt-pre .hero-cine__content, html.mt-pre .hero-cine__foot, html.mt-pre .page
 html.mt-pre main > .hero:first-child .hero-text { visibility: hidden; }
 html.mt-pre .hero-cine__plate { clip-path: inset(13% 0% 13% 0%); }
 .footer.closing.g2 .footer__giant { margin-top: var(--s-7); }
+
+/* portraits shown whole: every frame takes the photograph's own ratio (1400 x 1158), so nothing is cut */
+.partner-tile__photo, .member__photo { aspect-ratio: 1400 / 1158; height: auto; }
+.partner-tile__photo .frame__img, .member__photo .frame__img { object-fit: cover; object-position: 50% 50%; }
+.hero__media--pair { height: auto; min-height: 0; align-self: center; background: none; gap: var(--s-3); overflow: visible; border-radius: 0; }
+.hero__media--pair > img { position: static; inset: auto; width: 100%; height: auto; aspect-ratio: 1400 / 1158; object-fit: cover; object-position: 50% 50%;
+  border-radius: var(--r-lg); background: #aeaeae; }
