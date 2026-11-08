@@ -80,6 +80,16 @@ class Settings(BaseSettings):
     smtp_from: str | None = None
 
     # Voice.
+    # Speech synthesis: "elevenlabs" (cloud, best quality, needs an API key)
+    # with automatic fallback to "piper" (local). "piper" = local only.
+    tts_provider: str = "piper"
+    elevenlabs_api_key: str | None = None
+    elevenlabs_voice_id: str = "nPczCjzI2devNBz1zQrb"  # "Brian": deep, resonant, male
+    elevenlabs_model: str = "eleven_multilingual_v2"   # same voice in IT / DE / EN
+    elevenlabs_base_url: str = "https://api.elevenlabs.io"
+    # Characters JARVIS may send per calendar month (free plan: 10,000).
+    # Beyond this it switches to the local voice instead of failing.
+    elevenlabs_monthly_chars: int = 10000
     whisper_model: str = "small"
     piper_binary: str = "piper"
     piper_voice: str | None = None  # path to a .onnx voice model

@@ -13,11 +13,11 @@ Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
 | 4 | Reparto vendite | fatto e provato su dati reali (OpenStreetMap + siti veri) |
 | 5 | Reparto sviluppo | fatto e provato con il modello reale |
 | 6 | Voce e notifiche | fatto e provato nel browser con microfono simulato |
-| 7 | Test e ottimizzazione | in parte: 52 test automatici, eval e missioni con modello reale |
+| 7 | Test e ottimizzazione | in parte: 57 test automatici, eval e missioni con modello reale |
 
 ## Cosa è stato verificato davvero
 
-- **52 test automatici** passano (`pytest`): database e migrazioni, backup,
+- **57 test automatici** passano (`pytest`): database e migrazioni, backup,
   memoria con revisioni, permessi, timeout, URL privati rifiutati, prompt
   injection (blocco in codice), pianificazione, missioni end-to-end, retry,
   budget, ripresa dopo riavvio, annullamento, audit siti, punteggio, CRM,
@@ -86,6 +86,14 @@ Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
     fisso "progetto di sviluppo": il modello estrae solo nome e file.
 11. Sicurezza: il token passava nell'URL del WebSocket e finiva nei log. Ora
     viene inviato come primo messaggio.
+
+## Voce: Brian (ElevenLabs) con riserva locale
+
+Voce scelta dall'utente: Brian (ElevenLabs, eleven_multilingual_v2), stessa
+voce in italiano, tedesco e inglese. Riserva automatica su Piper se ElevenLabs
+non risponde, rifiuta (credito, piano) o si supera il budget mensile di
+caratteri. Provato nel browser: microfono simulato → Whisper → modello locale →
+Brian → riproduzione. 57 test automatici.
 
 ## Cambio automatico delle modalità
 

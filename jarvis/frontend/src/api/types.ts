@@ -154,7 +154,11 @@ export interface SystemStatus {
   version: string;
   llm: { ok: boolean; provider: string; model: string; model_installed?: boolean; error?: string | null; version?: string; note?: string };
   engine: { running: boolean; last_tick: string | null };
-  voice: { stt: { available: boolean; hint: string | null }; tts: { available: boolean; hint: string | null } };
+  voice: {
+    stt: { available: boolean; hint: string | null };
+    tts: { available: boolean; hint: string | null; engine?: string; fallback?: string | null;
+      chars_used_month?: number | null; chars_budget_month?: number | null };
+  };
   counts: Record<string, number>;
   settings: Record<string, any>;
 }

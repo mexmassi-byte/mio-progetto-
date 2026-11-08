@@ -259,7 +259,8 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
         </div>
 
         {note && <div className="error" style={{ marginTop: 8 }}>{note}</div>}
-        {!ttsOk && status && <div className="label" style={{ marginTop: 8 }}>voce locale (Piper) non installata: uso la voce del sistema</div>}
+        {!ttsOk && status && <div className="label" style={{ marginTop: 8 }}>voce di JARVIS non configurata: uso la voce del sistema</div>}
+        {ttsOk && status?.voice.tts.engine === "elevenlabs" && <div className="label" style={{ marginTop: 8 }}>voce: Brian · ElevenLabs</div>}
       </div>
     </>
   );

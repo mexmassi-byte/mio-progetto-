@@ -635,7 +635,8 @@ async def voice_stt(request: Request, language: str | None = None) -> dict:
 @api.post("/voice/tts")
 async def voice_tts(request: Request, text: str = Body(..., embed=True)) -> Response:
     try:
-        wav = await request.app.state.voice.synthesize(text)
+        audio, media_type = await request.app.state.voice.speak(text)
     except VoiceUnavailable as exc:
         raise HTTPException(501, str(exc)) from exc
-    return Response(wav, media_type="audio/wav")
+    return Response(audio, media_type=media_type,
+                    headers={"X-Jarvis-Voice": request.app.state.voice.last_engine or ""})

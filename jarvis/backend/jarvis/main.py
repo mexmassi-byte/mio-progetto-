@@ -87,7 +87,7 @@ def create_app(settings: Settings | None = None, llm: LLMProvider | None = None,
     app = FastAPI(title="JARVIS", version=__version__, lifespan=lifespan,
                   docs_url="/api/docs", openapi_url="/api/openapi.json")
     app.state.services = services
-    app.state.voice = VoiceEngine(settings)
+    app.state.voice = VoiceEngine(settings, services.db, services.audit)
     app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins, allow_credentials=False,
                        allow_methods=["*"], allow_headers=["*"])
 

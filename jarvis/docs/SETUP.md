@@ -103,7 +103,28 @@ jarvis/backend/.venv/bin/pip install playwright
 jarvis/backend/.venv/bin/playwright install chromium
 ```
 
-### Voce (locale)
+### Voce di JARVIS: Brian (ElevenLabs) — consigliata
+
+La voce principale è **Brian** di ElevenLabs: maschile, profonda, la stessa in
+italiano, tedesco e inglese. In `jarvis/backend/.env`:
+
+```
+JARVIS_TTS_PROVIDER=elevenlabs
+JARVIS_ELEVENLABS_API_KEY=la-tua-chiave
+JARVIS_ELEVENLABS_MONTHLY_CHARS=10000
+```
+
+- La chiave si crea su elevenlabs.io → profilo → API Keys, con il permesso
+  "Text to Speech" su Access. Il file `.env` è escluso da git.
+- Viene inviato a ElevenLabs solo il testo da leggere; modello e memoria restano
+  sul Mac. Il registro audit annota solo il numero di caratteri, mai il testo.
+- Il piano gratuito dà 10.000 caratteri al mese e **non include l'uso
+  commerciale**: per parlare con i clienti di VEYRO Web serve il piano Starter.
+  Le voci aggiunte dalla libreria richiedono comunque un piano a pagamento.
+- Se ElevenLabs non risponde, finisce il credito o si supera il budget mensile,
+  JARVIS usa la voce locale (Piper, sotto) senza interrompersi.
+
+### Voce locale (riserva)
 
 ```bash
 jarvis/backend/.venv/bin/pip install -e "jarvis/backend[voice]"

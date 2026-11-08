@@ -60,7 +60,10 @@ export function SettingsPage({ status }: { status: SystemStatus | null }) {
           <div className="kv">
             <span>Motore missioni</span><span>{status?.engine.running ? "attivo" : "fermo"}</span>
             <span>Voce → testo</span><span>{status?.voice.stt.available ? "faster-whisper" : <span className="dim">{status?.voice.stt.hint}</span>}</span>
-            <span>Testo → voce</span><span>{status?.voice.tts.available ? "Piper" : <span className="dim">{status?.voice.tts.hint}</span>}</span>
+            <span>Testo → voce</span><span>{!status?.voice.tts.available ? <span className="dim">{status?.voice.tts.hint}</span>
+              : status.voice.tts.engine === "elevenlabs"
+                ? <>ElevenLabs · Brian <span className="dim num">· {status.voice.tts.chars_used_month ?? 0}/{status.voice.tts.chars_budget_month} caratteri questo mese{status.voice.tts.fallback ? " · riserva locale: Piper" : " · nessuna voce locale di riserva"}</span></>
+                : "Piper (locale)"}</span>
             <span>Ricerca web</span><span className="mono">{status?.settings.searxng_url}</span>
             <span>Email (SMTP)</span><span>{status?.settings.smtp_configured ? "configurata (invio solo con approvazione)" : "non configurata"}</span>
             <span>Dati</span><span className="mono" style={{ fontSize: 11 }}>{status?.settings.data_dir}</span>

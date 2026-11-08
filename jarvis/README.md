@@ -54,7 +54,7 @@ jarvis/
 │   ├── jarvis/         api, core (missioni, planner, engine), llm, memory,
 │   │                   tools, departments/{sales,dev}, voice, security, db
 │   ├── evals/          jarvis eval: misura il modello sul tuo PC
-│   └── tests/          52 test automatici
+│   └── tests/          57 test automatici
 ├── frontend/           React · TypeScript · three.js (shader GLSL)
 │   └── src/visuals/    dataLandscape, particleGlobe, voiceSphere
 ├── assets/references/  i 3 riferimenti visivi

@@ -42,6 +42,8 @@ JARVIS_LLM_THINK=false
 JARVIS_LLM_MAX_TOKENS=1200
 JARVIS_ENGINE_MAX_PARALLEL_MISSIONS=1
 JARVIS_WHISPER_MODEL=small
+JARVIS_TTS_PROVIDER=elevenlabs
+JARVIS_ELEVENLABS_API_KEY=...   # voce Brian; riserva locale: Piper
 ```
 
 ## Da installare (in attesa di conferma)

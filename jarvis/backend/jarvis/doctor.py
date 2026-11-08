@@ -37,8 +37,12 @@ async def doctor(settings: Settings) -> None:
     except ImportError:
         _line(None, "Browser audits (Playwright)", "optional: pip install playwright && playwright install chromium")
     v = VoiceEngine(settings).status()
+    if v["tts"]["engine"] == "elevenlabs":
+        _line(True, f"Speech synthesis (ElevenLabs, voice {settings.elevenlabs_voice_id})",
+              "local fallback: Piper" if v["tts"].get("fallback") else "no local fallback (Piper not set)")
     _line(v["stt"]["available"], "Speech recognition (faster-whisper)", v["stt"]["hint"] or "")
-    _line(v["tts"]["available"], "Speech synthesis (Piper)", v["tts"]["hint"] or "")
+    if v["tts"]["engine"] != "elevenlabs":
+        _line(v["tts"]["available"], "Speech synthesis (Piper)", v["tts"]["hint"] or "")
     for exe in ("git", "node", "npm"):
         _line(shutil.which(exe) is not None, f"{exe}")
     _line(bool(settings.smtp_host), "Email sending (SMTP)", "" if settings.smtp_host else "not configured (optional)")
