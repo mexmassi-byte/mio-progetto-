@@ -20,6 +20,11 @@ CHAT_TOOLS = [
     "dev_list_files", "dev_read_file",
 ]
 MAX_TOOL_ROUNDS = 4
+# Tools whose output is internet content (untrusted).
+UNTRUSTED_TOOLS = {"web_search", "fetch_page", "sales_audit_url"}
+# Tools a web page must never be able to trigger: after untrusted content was
+# read in the same turn they are refused, whatever the model decides.
+TAINT_BLOCKED = {"request_action", "create_mission"}
 HISTORY_CHARS = 12000
 
 
@@ -74,6 +79,7 @@ class ChatService:
         system = chat_system_prompt(self.s.settings, mem_text, self.s.knowledge.all_text(2500))
         msgs = [Message("system", system)] + self._history(conversation_id)
         tools = self.s.tools.specs(max_permission=Permission.AUTONOMOUS, names=CHAT_TOOLS)
+        tainted = "UNTRUSTED_WEB_CONTENT" in text
         used_tools: list[dict[str, Any]] = []
         answer = ""
         stats: dict[str, Any] = {}
@@ -97,7 +103,9 @@ class ChatService:
                 msgs.append(Message("assistant", answer, tool_calls=calls))
                 for call in calls:
                     yield {"type": "tool", "name": call.name, "args": call.arguments, "status": "running"}
-                    result = await self._run_tool(call)
+                    result = await self._run_tool(call, tainted)
+                    if call.name in UNTRUSTED_TOOLS:
+                        tainted = True
                     used_tools.append({"name": call.name, "args": call.arguments,
                                        "ok": "error" not in result})
                     yield {"type": "tool", "name": call.name, "status": "done", "ok": "error" not in result,
@@ -138,9 +146,17 @@ class ChatService:
         out["text"] = strip_thinking(out["text"])
         return out
 
-    async def _run_tool(self, call: ToolCall) -> dict[str, Any]:
+    async def _run_tool(self, call: ToolCall, tainted: bool = False) -> dict[str, Any]:
         if call.name not in CHAT_TOOLS or not self.s.tools.has(call.name):
             return {"error": f"tool '{call.name}' is not available in chat"}
+        if tainted and call.name in TAINT_BLOCKED:
+            self.s.audit.record("jarvis-chat", f"tool:{call.name}", "blocked_after_untrusted_content",
+                                args=call.arguments)
+            return {"error": "Blocked: web content was read in this turn, so actions cannot start now. "
+                             "Ask the user to request it explicitly in a new message."}
+        if tainted and call.name == "memory_save":
+            call.arguments["reliability"] = "assumption"
+            call.arguments["source"] = (call.arguments.get("source") or "") + " [from web content, unverified]"
         ctx = ToolContext(services=self.s, actor="jarvis-chat")
         try:
             result = await self.s.tools.execute(call.name, call.arguments, ctx)

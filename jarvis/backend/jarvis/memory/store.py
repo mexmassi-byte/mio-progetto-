@@ -59,12 +59,23 @@ class MemoryStore:
                      actor: str = "user") -> dict[str, Any]:
         cat = Category(category)
         rel = Reliability(reliability)
+        title, content = title.strip(), content.strip()
+        if actor != "user":
+            # Only the user can certify a fact as verified. JARVIS may record
+            # what the user said, or its own estimate, never a "verified" fact.
+            if rel is Reliability.VERIFIED:
+                rel = Reliability.USER_PROVIDED if actor == "jarvis-chat" else Reliability.ESTIMATE
+            dup = self.db.one(
+                "SELECT id FROM memories WHERE deleted_at IS NULL AND category = ? AND title = ? AND content = ?",
+                (cat.value, title, content))
+            if dup:
+                return self.get(dup["id"])  # type: ignore[return-value]
         mid = new_id("mem")
         ts = now_iso()
         embedding = await self._embed(f"{title}\n{content}")
         with self.db.tx():
             self.db.insert("memories", {
-                "id": mid, "category": cat.value, "title": title.strip(), "content": content.strip(),
+                "id": mid, "category": cat.value, "title": title, "content": content,
                 "reliability": rel.value, "source": source, "tags": dumps(tags or []), "version": 1,
                 "embedding": dumps(embedding) if embedding else None,
                 "created_at": ts, "updated_at": ts, "deleted_at": None,

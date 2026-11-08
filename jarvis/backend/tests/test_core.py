@@ -117,3 +117,14 @@ def test_extract_json_variants():
     assert extract_json('{"a": 1}') == {"a": 1}
     assert extract_json('<think>hmm</think>\n```json\n{"a": 2}\n```') == {"a": 2}
     assert extract_json('Ecco il piano: {"a": 3} spero vada bene') == {"a": 3}
+
+
+async def test_jarvis_cannot_mark_verified_and_dedups(services):
+    mem = services.memory
+    a = await mem.create("company", "Pacchetto base", "1500 EUR", "verified", actor="jarvis-chat")
+    b = await mem.create("company", "Pacchetto base", "1500 EUR", "verified", actor="jarvis-chat")
+    assert a["id"] == b["id"] and a["reliability"] == "user_provided"
+    c = await mem.create("lesson", "x", "y", "verified", actor="jarvis")
+    assert c["reliability"] == "estimate"
+    d = await mem.create("company", "Sede", "Genova", "verified", actor="user")
+    assert d["reliability"] == "verified"

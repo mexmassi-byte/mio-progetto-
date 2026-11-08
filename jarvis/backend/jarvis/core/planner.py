@@ -105,7 +105,7 @@ class Planner:
 
     async def freeform(self, objective: str, notes: list[str]) -> tuple[list[dict], str]:
         catalog = "\n".join(
-            f"- {t.name} [{t.permission.value}]: {t.description}\n  args schema: {t.parameters}"
+            f"tool: {t.name}\n  does: {t.description}\n  args: {_compact_args(t.parameters)}"
             for t in self.tools.all() if t.plannable and t.permission is not Permission.EXPLICIT
         )
         msgs = [
@@ -147,6 +147,11 @@ class Planner:
 
     def _check_step(self, step: dict[str, Any]) -> dict[str, Any]:
         name = step.get("tool")
+        if isinstance(name, str) and not self.tools.has(name):
+            # Small models sometimes decorate names ("memory_search [autonomous]").
+            m = re.match(r"\s*`?([a-z][a-z0-9_]*)", name)
+            if m and self.tools.has(m.group(1)):
+                name = step["tool"] = m.group(1)
         if not isinstance(name, str) or not self.tools.has(name):
             raise PlanningError(f"unknown tool '{name}'")
         tool = self.tools.get(name)
@@ -154,6 +159,18 @@ class Planner:
             raise PlanningError(f"tool '{name}' cannot be used in automatic plans")
         step["args"] = validate_args(tool.parameters, step.get("args") or {})
         return step
+
+
+def _compact_args(schema: dict[str, Any]) -> str:
+    """'query: string (required), limit: integer' — shorter than raw JSON schema."""
+    req = set(schema.get("required", []))
+    parts = []
+    for key, spec in schema.get("properties", {}).items():
+        typ = spec.get("type", "any")
+        if "enum" in spec:
+            typ = "one of " + "|".join(map(str, spec["enum"][:12]))
+        parts.append(f"{key}: {typ}{' (required)' if key in req else ''}")
+    return ", ".join(parts) or "none"
 
 
 _COUNTRY_WORDS = {
