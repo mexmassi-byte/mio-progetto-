@@ -220,5 +220,6 @@
     // the kit's moments and fonts change heights after load: measure again once they settle
     setTimeout(() => ScrollTrigger.refresh(), 1200);
   };
-  (document.fonts ? document.fonts.ready : Promise.resolve()).then(start);
+  // a frame-by-frame recording (window.__mtHold, set by the recorder) starts the choreography itself
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { if (window.__mtHold) window.__mtRelease = start; else start(); });
 })();
