@@ -25,3 +25,7 @@ dist-ssr
 # JARVIS local runtime data (database, knowledge, backups, logs, workspaces)
 jarvis/data/
 jarvis-hardware-report.txt
+__pycache__/
+*.egg-info/
+.pytest_cache/
+jarvis/backend/.env
