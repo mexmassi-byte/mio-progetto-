@@ -67,8 +67,8 @@ const GLOBE_VERTEX = /* glsl */ `
     float front = smoothstep(-0.05, 0.25, ndv);
     float fres = pow(1.0 - max(ndv, 0.0), 2.5);
     float light = 0.35 + 0.65 * max(dot(n, normalize(uLight)), 0.0);
-    float a = aLand > 0.5 ? (0.30 + 0.70 * light) : 0.07 + 0.08 * light;
-    a += fres * (aLand > 0.5 ? 0.9 : 0.35);
+    float a = aLand > 0.5 ? (0.36 + 0.74 * light) : 0.06 + 0.07 * light;
+    a += fres * (aLand > 0.5 ? 1.1 : 0.45);
     vAlpha = a * front * (0.75 + 0.25 * aRand);
     gl_PointSize = (aLand > 0.5 ? 1.25 : 0.9) * uPixel / -mv.z;
   }
@@ -163,6 +163,7 @@ export class ParticleGlobe implements Scene3D {
     this.halo = this.buildHalo();
     this.markers = this.buildMarkers();
     this.addStars();
+    stage.setBloom(0.45, 0.35, 0.5);
     this.ready = this.buildGlobe();
   }
 
@@ -176,7 +177,7 @@ export class ParticleGlobe implements Scene3D {
 
   private async buildGlobe() {
     const isLand = await landMask();
-    const step = { low: 1.0, medium: 0.72, high: 0.52 }[this.stage.quality];
+    const step = { low: 1.0, medium: 0.62, high: 0.44 }[this.stage.quality];
     const pts: number[] = [];
     const land: number[] = [];
     const rand = rng(11);

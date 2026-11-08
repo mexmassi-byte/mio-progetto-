@@ -1,6 +1,10 @@
 // Shared WebGL stage: renderer, camera, render loop, adaptive quality,
 // reduced-motion handling, pause when hidden, and full resource cleanup.
 import * as THREE from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
 export type Quality = "low" | "medium" | "high";
 
@@ -30,14 +34,20 @@ export function prefersReducedMotion(): boolean {
   return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 }
 
-export function chooseQuality(): Quality {
-  let saved: string | null = null;
+/** Quality explicitly chosen by the user in Settings (null = automatic). */
+export function savedQuality(): Quality | null {
   try {
-    saved = localStorage.getItem("jarvis.quality");
+    const saved = localStorage.getItem("jarvis.quality");
+    if (saved === "low" || saved === "medium" || saved === "high") return saved;
   } catch {
     /* ignore */
   }
-  if (saved === "low" || saved === "medium" || saved === "high") return saved;
+  return null;
+}
+
+export function chooseQuality(): Quality {
+  const saved = savedQuality();
+  if (saved) return saved;
   const cores = navigator.hardwareConcurrency || 4;
   const mem = (navigator as any).deviceMemory || 8;
   if (cores >= 8 && mem >= 8) return "high";
@@ -71,6 +81,8 @@ export class Stage {
   private lastRender = 0;
   /** True when WebGL is emulated on the CPU (no GPU acceleration). */
   readonly software: boolean;
+  private composer: EffectComposer | null = null;
+  private bloomPass: UnrealBloomPass | null = null;
   fps = 0;
 
   constructor(private canvas: HTMLCanvasElement, fov = 40) {
@@ -79,8 +91,10 @@ export class Stage {
     // Without a GPU, WebGL runs on the CPU and would starve the local AI
     // model: use the lightest settings and cap the frame rate.
     this.software = isSoftwareRenderer(this.renderer);
-    this.quality = this.software ? "low" : chooseQuality();
-    if (this.software) this.minFrameMs = 1000 / 20;
+    // An explicit choice in Settings always wins over the automatic one.
+    const explicit = savedQuality();
+    this.quality = explicit ?? (this.software ? "low" : chooseQuality());
+    if (this.software && !explicit) this.minFrameMs = 1000 / 20;
     this.renderer.setClearColor(0x000000, 1);
     this.pixelRatio = Math.min(window.devicePixelRatio || 1, this.quality === "high" ? 2 : 1.5);
     this.renderer.setPixelRatio(this.pixelRatio);
@@ -91,8 +105,26 @@ export class Stage {
     document.addEventListener("visibilitychange", this.onVisibility);
   }
 
+  /** Cinematic glow on the brightest particles (as in the references).
+   *  Skipped in low quality: it costs one extra full-screen pass. */
+  setBloom(strength = 0.9, radius = 0.55, threshold = 0.1) {
+    if (this.quality === "low") return;
+    const w = this.canvas.clientWidth || 1;
+    const h = this.canvas.clientHeight || 1;
+    this.composer = new EffectComposer(this.renderer);
+    this.composer.addPass(new RenderPass(this.scene, this.camera));
+    this.bloomPass = new UnrealBloomPass(new THREE.Vector2(w, h), strength, radius, threshold);
+    this.composer.addPass(this.bloomPass);
+    this.composer.addPass(new OutputPass());
+    this.resize();
+  }
+
+  get bloomEnabled(): boolean {
+    return !!this.composer;
+  }
+
   get pixelScale(): number {
-    if (this.software) return (this.canvas.clientHeight || 600) / 800;
+    if (this.software && this.quality === "low") return (this.canvas.clientHeight || 600) / 800;
     return this.renderer.getPixelRatio() * (this.canvas.clientHeight || 600) / 800;
   }
 
@@ -114,6 +146,8 @@ export class Stage {
     const w = this.canvas.clientWidth || 1;
     const h = this.canvas.clientHeight || 1;
     this.renderer.setSize(w, h, false);
+    this.composer?.setPixelRatio(this.renderer.getPixelRatio());
+    this.composer?.setSize(w, h);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
   }
@@ -129,7 +163,8 @@ export class Stage {
     // so state changes stay visible.
     this.elapsed += this.reducedMotion ? dt * 0.2 : dt;
     this.content?.update(this.reducedMotion ? dt * 0.2 : dt, this.elapsed);
-    this.renderer.render(this.scene, this.camera);
+    if (this.composer) this.composer.render(dt);
+    else this.renderer.render(this.scene, this.camera);
     this.adapt(dt);
   };
 
@@ -141,7 +176,9 @@ export class Stage {
     this.fps = Math.round(1 / avg);
     if (avg > 1 / 40) {
       // Too slow: first lower resolution, then particle count.
-      if (this.pixelRatio > 1) {
+      if (this.composer && this.pixelRatio <= 1.25) {
+        this.disableBloom(); // the glow goes before resolution and particles
+      } else if (this.pixelRatio > 1) {
         this.pixelRatio = Math.max(1, this.pixelRatio - 0.25);
         this.renderer.setPixelRatio(this.pixelRatio);
         this.resize();
@@ -155,8 +192,16 @@ export class Stage {
     }
   }
 
+  private disableBloom() {
+    this.bloomPass?.dispose();
+    this.composer?.dispose();
+    this.composer = null;
+    this.bloomPass = null;
+  }
+
   dispose() {
     cancelAnimationFrame(this.raf);
+    this.disableBloom();
     document.removeEventListener("visibilitychange", this.onVisibility);
     this.ro.disconnect();
     this.content?.dispose();

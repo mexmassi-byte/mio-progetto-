@@ -9,6 +9,31 @@ export const CATEGORIES = ["tasks", "research", "leads", "chat", "dev"] as const
 export type Category = (typeof CATEGORIES)[number];
 export type Series = Record<Category, number[]>;
 
+// Ridged fractal noise (CPU, computed once per point): gives the peaks the
+// sharp creases of the reference instead of smooth hills.
+function hash2(x: number, y: number): number {
+  const h = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+  return h - Math.floor(h);
+}
+function valueNoise(x: number, y: number): number {
+  const xi = Math.floor(x), yi = Math.floor(y);
+  const xf = x - xi, yf = y - yi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  const a = hash2(xi, yi), b = hash2(xi + 1, yi), c = hash2(xi, yi + 1), d = hash2(xi + 1, yi + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+function ridged(x: number, y: number): number {
+  let sum = 0, amp = 0.55, freq = 1, norm = 0;
+  for (let o = 0; o < 5; o++) {
+    const n = 1 - Math.abs(valueNoise(x * freq, y * freq) * 2 - 1);
+    sum += n * n * amp;
+    norm += amp;
+    amp *= 0.5;
+    freq *= 2.03;
+  }
+  return sum / norm;
+}
+
 const W = 3.4; // world width (x)
 const D = 1.7; // world depth (z)
 const H = 1.05; // max height
@@ -51,12 +76,13 @@ export class DataLandscape implements Scene3D {
   private total: number;
   private cellX: Float32Array;
   private cellZ: Float32Array;
+  private ridge: Float32Array;
   private mix = 1;
   private shown = 1;
   private orbit = 0;
 
   constructor(private stage: Stage) {
-    const [gx, gz, haze] = { low: [170, 85, 6000], medium: [240, 120, 12000], high: [320, 160, 22000] }[stage.quality];
+    const [gx, gz, haze] = { low: [170, 85, 6000], medium: [260, 130, 14000], high: [360, 180, 26000] }[stage.quality];
     this.terrainCount = gx * gz;
     this.total = this.terrainCount + haze;
     const rand = rng(3);
@@ -88,6 +114,8 @@ export class DataLandscape implements Scene3D {
       [{ arr: pos, stride: 3 }, { arr: rnd, stride: 1 }, { arr: isHaze, stride: 1 }, { arr: this.cellX, stride: 1 }, { arr: this.cellZ, stride: 1 }],
       this.total, rand,
     );
+    this.ridge = new Float32Array(this.total);
+    for (let i = 0; i < this.total; i++) this.ridge[i] = ridged(this.cellX[i] * 9, this.cellZ[i] * 9);
     this.from = new Float32Array(this.total);
     this.to = new Float32Array(this.total);
     const geo = new THREE.BufferGeometry();
@@ -109,6 +137,7 @@ export class DataLandscape implements Scene3D {
     // Keep the most recent hours (right end) clear of the right-hand panels.
     this.points.position.x = -0.55;
     stage.scene.add(this.points);
+    stage.setBloom(0.55, 0.4, 0.38);
     this.placeCamera(0);
   }
 
@@ -152,7 +181,13 @@ export class DataLandscape implements Scene3D {
       }
       let hmax = 0;
       for (let i = 0; i < this.total; i++) hmax = Math.max(hmax, heights[i]);
-      if (hmax > 0) for (let i = 0; i < this.total; i++) heights[i] = Math.pow(heights[i] / hmax, 0.85);
+      if (hmax > 0) {
+        for (let i = 0; i < this.total; i++) {
+          const h = Math.pow(heights[i] / hmax, 0.85);
+          // Creases only where there is data: flat ground stays flat.
+          heights[i] = h * (0.5 + 0.62 * this.ridge[i]) + h * h * 0.12 * this.ridge[i];
+        }
+      }
     }
     // Animate from the currently displayed heights to the new ones.
     const geo = this.points.geometry;

@@ -8,6 +8,31 @@ import { describeEvent, hhmm, STATUS_LABEL } from "../util";
 
 const CAT_LABEL: Record<string, string> = { tasks: "TASK", research: "RICERCA", leads: "LEAD", chat: "DIALOGO", dev: "SVILUPPO" };
 
+const ROW_LABEL: Record<string, string> = { ...STATUS_LABEL, user_preference: "preferenze", company: "azienda",
+  strategy: "strategia", customer: "clienti", project: "progetti", task: "documenti", decision: "decisioni",
+  procedure: "procedure", lesson: "lezioni" };
+
+/** Tiny monospace table of real counts (empty categories are shown as "—"). */
+function TinyTable({ title, rows }: { title: string; rows: Record<string, number> }) {
+  const entries = Object.entries(rows).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const total = entries.reduce((a, [, n]) => a + n, 0);
+  return (
+    <div>
+      <div className="row" style={{ justifyContent: "space-between", borderBottom: "1px solid var(--line)", paddingBottom: 2, marginBottom: 3 }}>
+        <span className="label" style={{ fontSize: 8.5 }}>{title}</span>
+        <span className="label num" style={{ fontSize: 8.5 }}>{total}</span>
+      </div>
+      {entries.length === 0 && <div style={{ fontSize: 9, color: "var(--fg-4)" }}>—</div>}
+      {entries.map(([k, n]) => (
+        <div key={k} className="row" style={{ justifyContent: "space-between", fontSize: 9, lineHeight: 1.6, gap: 6, flexWrap: "nowrap" }}>
+          <span style={{ color: "var(--fg-3)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{(ROW_LABEL[k] ?? k).toUpperCase()}</span>
+          <span className="num" style={{ color: "var(--fg-2)" }}>{n}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function Overview({ status }: { status: SystemStatus | null }) {
   const { data, error } = usePoll<Dashboard>("/dashboard?hours=48", 30000, ["task.", "research.", "lead.", "mission.", "chat.finished"]);
   const sceneRef = useRef<DataLandscape | null>(null);
@@ -94,7 +119,26 @@ export function Overview({ status }: { status: SystemStatus | null }) {
           <span>Modello</span><span>{status?.llm.model ?? "…"} {status && !status.llm.ok && <span className="error">· offline</span>}</span>
         </div>
         {error && <p className="error">{error}</p>}
+        {data && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 22px", marginTop: 22 }}>
+            <TinyTable title="Missioni" rows={data.mission_status} />
+            <TinyTable title="Passi" rows={data.task_status} />
+            <TinyTable title="Pipeline" rows={data.sales.by_status} />
+            <TinyTable title="Memoria" rows={data.memory} />
+          </div>
+        )}
       </div>
+
+      {/* thin technical strip, as in the reference */}
+      {data && (
+        <div className="overlay" style={{ left: 380, right: 400, top: 22, display: "flex", gap: 26, fontSize: 9, letterSpacing: ".1em", color: "var(--fg-3)", whiteSpace: "nowrap", overflow: "hidden" }}>
+          <span>EVT·TOT <b className="num" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{data.events_total}</b></span>
+          <span>FINESTRA <b className="num" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{window?.length ?? 0}H</b></span>
+          <span>PICCO/H <b className="num" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{Math.max(0, ...(window ?? []).map((a) => a.total))}</b></span>
+          <span>APPROV <b className="num" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{data.approvals_pending}</b></span>
+          <span>TICK <b className="num" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{data.engine.last_tick ? data.engine.last_tick.slice(11, 19) : "—"}</b></span>
+        </div>
+      )}
 
       {/* right column: missions + events */}
       <div className="overlay" style={{ right: 22, top: 18, width: 340, bottom: 230, display: "flex", flexDirection: "column", gap: 18 }}>

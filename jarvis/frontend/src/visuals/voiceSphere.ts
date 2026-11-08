@@ -42,7 +42,7 @@ const VERTEX = /* glsl */ `
     vec3 nv = normalize(normalMatrix * dir);
     float rim = 1.0 - abs(dot(nv, normalize(-mv.xyz)));
     float a = aRibbon > 0.5
-      ? 0.22 + 0.78 * pow(rim, 1.2)
+      ? 0.3 + 0.85 * pow(rim, 1.15)
       : 0.05 + 0.25 * pow(rim, 2.0);
     a *= 0.55 + 0.45 * aRand;
     vAlpha = clamp(a * (0.85 + uAudio * 0.7), 0.0, 1.0);
@@ -82,14 +82,14 @@ export class VoiceSphere implements Scene3D {
     const shell = new Float32Array(total);
     const rnd = new Float32Array(total);
     const ribbon = new Float32Array(total);
-    const ribbonCount = Math.floor(total * 0.65);
+    const ribbonCount = Math.floor(total * 0.75);
     for (let i = 0; i < total; i++) {
       const s = Math.floor(rand() * SHELLS);
       let x: number, y: number, z: number;
       if (i < ribbonCount) {
         const [u, v, w] = axes[s];
         const band = Math.floor(rand() * BANDS);
-        const lat = ((band + 0.5) / BANDS - 0.5) * Math.PI * 0.92 + gauss() * 0.018;
+        const lat = ((band + 0.5) / BANDS - 0.5) * Math.PI * 0.92 + gauss() * 0.03;
         const lon = rand() * Math.PI * 2;
         const c = Math.cos(lat);
         const d = new THREE.Vector3()
@@ -124,8 +124,9 @@ export class VoiceSphere implements Scene3D {
     });
     this.points = new THREE.Points(geo, this.material);
     stage.scene.add(this.points);
-    stage.camera.position.set(0, -0.12, 3.5);
-    stage.camera.lookAt(0, -0.12, 0);
+    stage.setBloom(0.5, 0.35, 0.56);
+    stage.camera.position.set(0, -0.1, 3.85);
+    stage.camera.lookAt(0, -0.1, 0);
   }
 
   setState(s: VoiceState) {
