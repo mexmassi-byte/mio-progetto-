@@ -36,10 +36,13 @@
 }
 </style>
 <link rel="stylesheet" href="assets/site.css">
+<script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('mt-pre');setTimeout(()=>document.documentElement.classList.remove('mt-pre'),3500)}</script>
 <script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
 
 </head>
-<body>
+<body class="page-datenschutz">
+<div class="curtain" data-curtain hidden aria-hidden="true"><span class="curtain__bar curtain__bar--top" data-curtain-bar="top"></span><span class="curtain__bar curtain__bar--bottom" data-curtain-bar="bottom"></span><span class="curtain__card" data-curtain-card></span></div>
+<script>try{if(sessionStorage.getItem('mt-cut')){document.documentElement.classList.add('is-cut');document.querySelector('[data-curtain]').hidden=false}}catch(e){}</script>
 <!-- type: service (law firm)
      deal: legal page: heading and running text on the page ground
      moments: none -->
@@ -133,7 +136,7 @@
   </section>
 </main>
 
-<footer class="footer closing footer--dark ground-inverse" id="kontakt" aria-labelledby="close-h">
+<footer class="footer closing footer--dark ground-inverse g2" id="kontakt" aria-labelledby="close-h">
   <div class="wrap">
     <div class="closing__cta close--type">
       <div class="section-head">
@@ -152,6 +155,7 @@
         <div class="span-3 footer__col"><h3>Kontakt</h3><ul><li><a href="mailto:info@medertal.com">info@medertal.com</a></li><li><a href="tel:+4915142325468">+49 151 423 25468</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Adresse</h3><ul><li>Via Corsica 15</li><li>16128 Genua, Italien</li></ul></div>
       </div>
+      <p class="footer__giant" aria-hidden="true">Meder &amp; Tal</p>
       <div class="footer__legal">
         <span>&copy; 2026 Meder &amp; Tal &nbsp; <a href="impressum.html">Impressum</a> &nbsp; <a href="datenschutz.html">Datenschutz</a></span>
         <details class="credits"><summary>Fotos der Städte: DXR, Francesco Ungaro, Coolcaesar, Tilman2007 und Bbruno, via Wikimedia Commons</summary><p>Frankfurt am Main von DXR (<a href="https://commons.wikimedia.org/wiki/File:Frankfurt_am_Main_Skyline_from_Ignatz_Bubis_Bridge.jpg">Quelle</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>); Mailand von Francesco Ungaro (<a href="https://commons.wikimedia.org/wiki/File:Milan_skyline_skyscrapers_of_Porta_Nuova_business_district.jpg">Quelle</a>, CC0); Berkeley von Coolcaesar (<a href="https://commons.wikimedia.org/wiki/File:Sather_Tower_from_Memorial_Glade.jpg">Quelle</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>); Oxford von Tilman2007 (<a href="https://commons.wikimedia.org/wiki/File:1099146_I_RADCLIFFE_CAMERA_Oxford_20250617_0012.jpg">Quelle</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>); Genua von Bbruno (<a href="https://commons.wikimedia.org/wiki/File:Genova_Carignano.jpg">Quelle</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>). Zugeschnitten und verkleinert.</p></details>
@@ -166,5 +170,9 @@
 <script type="module" src="assets/motion/motion.js"></script>
 <script type="module" src="assets/layout/layout.js"></script>
 <script type="module" src="assets/site.js"></script>
+<script src="assets/vendor/gsap.min.js" defer></script>
+<script src="assets/vendor/ScrollTrigger.min.js" defer></script>
+<script src="assets/vendor/SplitText.min.js" defer></script>
+<script src="assets/motion-wow.js" defer></script>
 </body>
 </html>

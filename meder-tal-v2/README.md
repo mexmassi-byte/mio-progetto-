@@ -27,7 +27,19 @@ node src/build.mjs
 Eigene Gestaltung: `assets/site.css`, Film-Steuerung: `assets/site.js`. Alles andere unter `assets/`
 ist das Taste-Skill-Kit (nicht von Hand ändern).
 
-## Das cinematische Konzept
+## Das cinematische Konzept (Stand: Version im Stil von MotionSites)
+
+- **Home-Hero:** der Film der Kanzlei bildschirmfüllend, Navigation als Pille aus „Liquid Glass“, die
+  Kinobalken öffnen sich beim Laden, die Überschrift erscheint Wort für Wort aus der Unschärfe.
+- **„Drei Versprechen“:** ein zweiter Film (Licht fällt in tiefes Wasser, Fische; aus der freien
+  MotionSites-Mediathek) hinter drei Glas-Karten.
+- **Elemente:** Überschriften steigen Zeile für Zeile auf, Linien zeichnen sich, Porträts werden
+  aufgedeckt, die sechs Phasen leuchten beim Lesen nacheinander auf, Buttons folgen leicht dem Zeiger,
+  der Name im Footer setzt sich Buchstabe für Buchstabe zusammen (`assets/motion-wow.js`, GSAP lokal).
+- **Seitenwechsel:** schwarze Kinobalken schließen sich, der Name der nächsten Seite erscheint, die
+  Balken öffnen sich auf der neuen Seite.
+
+### Erste Fassung
 
 - **Hero:** der echte Film der alten Website (Brandung von oben) in einem großen Kinorahmen. Beim Laden
   öffnet sich der Rahmen wie ein Kameraverschluss, der Film setzt mit einer langsamen Fahrt ein.

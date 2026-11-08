@@ -30,3 +30,22 @@ if (video && toggle) {
   show();
   apply();
 }
+
+// The second film (the promises) plays only while it is on screen; reduced motion keeps its poster.
+const bg = document.querySelector('[data-bg-video]');
+if (bg && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) bg.play().catch(() => {}); else bg.pause(); }, { rootMargin: '200px 0px' }).observe(bg);
+}
+
+// On the home page the bar lies transparent over the film, and turns back to paper below it.
+const heroCine = document.querySelector('[data-hero-cine]');
+const navBar = document.querySelector('header.nav');
+if (heroCine && navBar) {
+  const links = navBar.querySelector('.nav__links');
+  links && links.classList.add('liquid-glass');
+  new IntersectionObserver(([e]) => {
+    const over = e.isIntersecting;
+    navBar.classList.toggle('nav--over', over);
+    links && links.classList.toggle('liquid-glass', over);
+  }, { rootMargin: '-72px 0px -100% 0px' }).observe(heroCine);
+}

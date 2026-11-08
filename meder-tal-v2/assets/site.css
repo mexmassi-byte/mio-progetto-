@@ -128,19 +128,6 @@
 .legal__facts dt { font-weight: 500; }
 .legal__facts dd { margin: 2px 0 0; }
 
-/* -------------------------------------------- the cut between pages */
-/* cross-document view transition: the bar stays, the page dissolves into the next (Chrome, Edge,
-   Safari 18.2+; others simply load the page) */
-@view-transition { navigation: auto; }
-header.nav { view-transition-name: mt-nav; }
-@keyframes mt-out { to { opacity: 0; transform: translateY(-12px); } }
-@keyframes mt-in { from { opacity: 0; transform: translateY(18px); } }
-::view-transition-old(root) { animation: mt-out .28s cubic-bezier(.4, 0, 1, 1) both; }
-::view-transition-new(root) { animation: mt-in .55s cubic-bezier(.22, 1, .36, 1) .08s both; }
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
-}
-
 /* ---------------------------------------------------- fixes after the first look */
 .hero--film .hero__over h1 { max-width: 17ch; hyphens: manual; }
 .hero h1 { hyphens: manual; }
@@ -161,7 +148,6 @@ header.nav { view-transition-name: mt-nav; }
 @media (max-width: 1023px) { .promise-list { grid-column: 1 / -1; margin-top: var(--s-7); } }
 .mo-wh__text { overflow-wrap: break-word; }
 @media (max-width: 479px) {
-  .mo-wh__text { hyphens: auto; }
   .btn--xl { white-space: normal; text-align: left; }
   .footer__legal span { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); }
 }
@@ -182,3 +168,123 @@ a { text-underline-offset: .2em; }
 /* legal pages: running text, not screens */
 .section.legal-hero { min-height: 0; height: auto; padding-top: calc(var(--nav) + var(--s-9)); padding-bottom: var(--s-7); }
 .section.legal { min-height: 0; height: auto; padding-top: 0; }
+
+/* =====================================================================================
+   MotionSites layer (asked for by the client): full-screen film hero, liquid glass,
+   serif-italic accents, a second film behind glass cards, the letterbox cut between pages,
+   and the element choreography's resting styles (motion-wow.js animates from these).
+   ===================================================================================== */
+:root { --mt-ease: cubic-bezier(.16, 1, .3, 1); --mt-night: #0b1214; --serif: "Instrument Serif", Georgia, serif; }
+h1 em, h2 em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+
+/* liquid glass (surfaces-and-buttons.md, recipe 1) */
+.liquid-glass { position: relative; overflow: hidden; border: none; background: rgba(255,255,255,.01); background-blend-mode: luminosity;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); box-shadow: inset 0 1px 1px rgba(255,255,255,.1); }
+.liquid-glass::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.4px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,var(--rim-a,.45)) 0%, rgba(255,255,255,var(--rim-b,.15)) 20%, rgba(255,255,255,0) 40%,
+    rgba(255,255,255,0) 60%, rgba(255,255,255,var(--rim-b,.15)) 80%, rgba(255,255,255,var(--rim-a,.45)) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask-composite: exclude; }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .liquid-glass { background: rgba(255,255,255,.08); } }
+
+/* ---------------------------------------------------------------- the film hero */
+.hero-cine { position: relative; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end;
+  color: #fff; background: var(--mt-night); overflow: hidden; isolation: isolate; }
+.hero-cine__plate { position: absolute; inset: 0; z-index: -1; background: var(--mt-night); }
+.hero-cine__plate video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; }
+/* contrast: darker at the foot where the words are, then an eased fade into the paper below */
+.hero-cine__plate::after { content: ""; position: absolute; inset: 0; pointer-events: none; background:
+  linear-gradient(to right, rgba(8,14,16,.55), rgba(8,14,16,.15) 55%, rgba(8,14,16,0)),
+  linear-gradient(to bottom, rgba(8,14,16,.35), rgba(8,14,16,0) 22%, rgba(8,14,16,0) 45%, rgba(8,14,16,.55) 78%, rgba(8,14,16,.78) 100%); }
+.hero-cine__content { position: relative; padding-top: calc(var(--nav) + var(--s-9)); padding-bottom: var(--s-8); }
+.hero-cine__badge { display: inline-flex; align-items: center; gap: var(--s-3); border-radius: 999px; padding: 4px 16px 4px 4px; font-size: var(--t-small); color: rgba(255,255,255,.92); margin: 0 0 var(--s-6); }
+.hero-cine__badge span { background: #fff; color: var(--p-ink); border-radius: 999px; padding: 4px 12px; font-weight: 600; font-size: 13px; }
+.hero-cine h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(44px, 6.4vw, 104px); line-height: .98; letter-spacing: -0.04em;
+  max-width: 13ch; margin: 0; text-wrap: balance; hyphens: manual; }
+.hero-cine h1 em { display: inline; font-size: 1.06em; letter-spacing: -0.02em; color: rgba(255,255,255,.88); }
+.hero-cine__lead { max-width: 44ch; margin: var(--s-6) 0 0; font-size: clamp(17px, 1.1vw + 8px, 20px); line-height: 1.55; color: rgba(255,255,255,.86); }
+.hero-cine__actions { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-7); }
+.btn-white, .btn-glass { display: inline-flex; align-items: center; gap: var(--s-3); min-height: 52px; padding: 0 28px; border-radius: 999px; font-weight: 500;
+  font-size: 16px; text-decoration: none; transition: transform .35s var(--mt-ease), background-color .3s ease; }
+.btn-white { background: #fff; color: var(--p-ink); }
+.btn-white .m-arrow { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.btn-glass { color: #fff; }
+.btn-white:hover, .btn-glass:hover { transform: scale(1.03); }
+.btn-white:active, .btn-glass:active { transform: scale(.98); }
+.btn-white:focus-visible, .btn-glass:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.hero-cine__foot { position: relative; display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: var(--s-6); }
+.hero-cine__cue { position: relative; font-size: 13px; color: rgba(255,255,255,.75); padding-left: 28px; }
+.hero-cine__cue::before { content: ""; position: absolute; left: 0; top: 50%; width: 18px; height: 1px; background: currentColor; transform-origin: left;
+  animation: mt-cue 2.4s var(--mt-ease) infinite; }
+@keyframes mt-cue { 0% { transform: scaleX(0); } 50% { transform: scaleX(1); } 100% { transform: scaleX(1); opacity: 0; } }
+.hero-cine .film-toggle { border-radius: 999px; padding: 6px 18px 6px 6px; gap: var(--s-3); }
+.hero-cine .film-toggle__disc { width: 44px; height: 44px; }
+.hero-cine .film-toggle__label { background: none; padding: 0; color: #fff; }
+.hero-cine .film-toggle__label small { color: rgba(255,255,255,.7); }
+@media (max-width: 639px) {
+  .hero-cine__content { padding-bottom: var(--s-6); }
+  .hero-cine__actions a { width: 100%; justify-content: center; }
+  .hero-cine__cue { display: none; }
+  .hero-cine__foot { justify-content: flex-start; }
+  .hero-cine .film-toggle__label small { display: none; }
+}
+
+/* the bar over the film: transparent with a glass pill of links, the paper bar again below the hero */
+.page-index .nav { transition: background-color .5s ease, border-color .5s ease, color .5s ease; }
+.page-index .nav.nav--over { background: transparent; border-bottom-color: transparent; color: #fff; box-shadow: none; }
+.page-index .nav.nav--over .nav__logo, .page-index .nav.nav--over .nav__link, .page-index .nav.nav--over .nav__toggle { color: #fff; }
+.page-index .nav.nav--over .nav__links { border-radius: 999px; padding: 4px 8px; }
+.page-index .nav.nav--over .btn--primary { background: #fff; color: var(--p-ink); border-color: #fff; }
+.page-index .nav.nav--over .mark { background: #fff; }
+
+/* ---------------------------------------------------------------- the second film */
+.deep { position: relative; color: #fff; background: #05090c; overflow: hidden; isolation: isolate; min-height: 100vh; min-height: 100svh; display: flex; align-items: center; }
+.deep__plate { position: absolute; inset: 0; z-index: -1; }
+.deep__plate video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; }
+.deep__plate::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to right, rgba(5,9,12,.9), rgba(5,9,12,.55) 45%, rgba(5,9,12,.1)); }
+.deep__inner { position: relative; }
+.deep__head { max-width: 640px; }
+.deep h2 { color: #fff; font-size: clamp(36px, 3.6vw + 8px, 64px); line-height: 1.04; letter-spacing: -0.035em; font-weight: 400; margin: 0; }
+.deep h2 em { color: rgba(255,255,255,.85); }
+.deep__lead { margin: var(--s-5) 0 0; color: rgba(255,255,255,.82); font-size: 18px; line-height: 1.6; max-width: 46ch; }
+.deep__cards { list-style: none; padding: 0; margin: var(--s-9) 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5); }
+.glass-card { border-radius: 20px; padding: var(--s-6); min-height: 260px; display: flex; flex-direction: column; }
+.glass-card__no { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.7); font-variant-numeric: tabular-nums; }
+.glass-card h3 { margin: auto 0 var(--s-3); padding-top: var(--s-8); font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(26px, 1.4vw + 10px, 34px); line-height: 1.08; letter-spacing: -0.01em; color: #fff; }
+.glass-card p { margin: 0; color: rgba(255,255,255,.86); font-size: 16px; line-height: 1.55; }
+@media (max-width: 1023px) { .deep__cards { grid-template-columns: 1fr; } .glass-card { min-height: 0; } .glass-card h3 { padding-top: var(--s-5); } }
+
+/* ---------------------------------------------------------------- the letterbox cut */
+.curtain { position: fixed; inset: 0; z-index: 200; pointer-events: none; display: grid; place-items: center; }
+.curtain[hidden] { display: none; }
+.curtain__bar { position: absolute; left: 0; right: 0; height: 50.5%; background: #0b0b0a; transform-origin: top; }
+.curtain__bar--top { top: 0; }
+.curtain__bar--bottom { bottom: 0; transform-origin: bottom; }
+.curtain__card { position: relative; font-family: var(--serif); font-style: italic; font-size: clamp(32px, 3.2vw, 52px); color: #f1f0ea; }
+html.is-cut .curtain__bar { transform: scaleY(1); }
+
+/* ---------------------------------------------------------------- the footer word */
+.footer__giant { margin: var(--s-9) 0 var(--s-6); font-family: var(--font-display); font-size: clamp(64px, 15vw, 240px); line-height: .82; letter-spacing: -0.06em;
+  color: color-mix(in srgb, var(--ink) 14%, transparent); white-space: nowrap; overflow: hidden; user-select: none; }
+
+/* ---------------------------------------------------------------- choreography resting styles */
+.mt-row { position: relative; border-bottom-color: transparent !important; }
+.mt-row::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--line); transform-origin: left; transform: scaleX(var(--mt-row, 1)); }
+.mt-ruled { position: relative; border-top-color: transparent !important; }
+.mt-ruled::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--line); transform-origin: left; transform: scaleX(var(--mt-rule, 1)); }
+.promise.mt-ruled:first-child::before { background: var(--accent); }
+.phase-rows { position: relative; }
+.phase-track { position: absolute; left: -24px; top: 0; bottom: 0; width: 2px; background: var(--accent); transform-origin: top; border-radius: 2px; }
+.phase-rows > li { transition: opacity .5s var(--mt-ease); }
+.phase-rows > li .phase-no { transition: color .4s ease, transform .5s var(--mt-ease); display: inline-block; }
+.phase-rows > li.is-lit .phase-no { color: #6b640f; transform: scale(1.25); }
+@media (max-width: 1023px) { .phase-track { left: -12px; } }
+@media (prefers-reduced-motion: reduce) {
+  .hero-cine__cue::before { animation: none; }
+  .btn-white, .btn-glass { transition: none; }
+}
+/* before the choreography starts: the hero waits, the letterbox is closed (motion-wow.js lifts it) */
+html.mt-pre .hero-cine__content, html.mt-pre .hero-cine__foot, html.mt-pre .page-index .nav__bar,
+html.mt-pre main > .hero:first-child .hero-text { visibility: hidden; }
+html.mt-pre .hero-cine__plate { clip-path: inset(13% 0% 13% 0%); }
+.footer.closing.g2 .footer__giant { margin-top: var(--s-7); }

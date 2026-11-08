@@ -77,6 +77,7 @@ ${preload}
 }
 </style>
 <link rel="stylesheet" href="assets/site.css">
+<script>if(!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('mt-pre');setTimeout(()=>document.documentElement.classList.remove('mt-pre'),3500)}</script>
 <script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
 ${mo}
 </head>`;
@@ -128,7 +129,7 @@ function header(current) {
 }
 
 function footer({ closeTitle = cta, closeLine = "Schreib uns, worum es geht. Für jedes Mandat bekommst Du vorab einen Festpreis.", closeHref = "kontakt.html#anfrage", closeLabel = cta } = {}) {
-  return `<footer class="footer closing footer--dark ground-inverse" id="kontakt" aria-labelledby="close-h">
+  return `<footer class="footer closing footer--dark ground-inverse g2" id="kontakt" aria-labelledby="close-h">
   <div class="wrap">
     <div class="closing__cta close--type">
       <div class="section-head">
@@ -147,6 +148,7 @@ function footer({ closeTitle = cta, closeLine = "Schreib uns, worum es geht. Fü
         <div class="span-3 footer__col"><h3>Kontakt</h3><ul><li><a href="mailto:${firm.email}">${firm.email}</a></li><li><a href="${firm.tel}">${firm.phone}</a></li></ul></div>
         <div class="span-2 footer__col"><h3>Adresse</h3><ul><li>${firm.street}</li><li>${firm.city}</li></ul></div>
       </div>
+      <p class="footer__giant" aria-hidden="true">Meder &amp; Tal</p>
       <div class="footer__legal">
         <span>&copy; 2026 Meder &amp; Tal &nbsp; <a href="impressum.html">Impressum</a> &nbsp; <a href="datenschutz.html">Datenschutz</a></span>
         <details class="credits"><summary>Fotos der Städte: DXR, Francesco Ungaro, Coolcaesar, Tilman2007 und Bbruno, via Wikimedia Commons</summary><p>Frankfurt am Main von DXR (<a href="https://commons.wikimedia.org/wiki/File:Frankfurt_am_Main_Skyline_from_Ignatz_Bubis_Bridge.jpg">Quelle</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>); Mailand von Francesco Ungaro (<a href="https://commons.wikimedia.org/wiki/File:Milan_skyline_skyscrapers_of_Porta_Nuova_business_district.jpg">Quelle</a>, CC0); Berkeley von Coolcaesar (<a href="https://commons.wikimedia.org/wiki/File:Sather_Tower_from_Memorial_Glade.jpg">Quelle</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>); Oxford von Tilman2007 (<a href="https://commons.wikimedia.org/wiki/File:1099146_I_RADCLIFFE_CAMERA_Oxford_20250617_0012.jpg">Quelle</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>); Genua von Bbruno (<a href="https://commons.wikimedia.org/wiki/File:Genova_Carignano.jpg">Quelle</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA 4.0</a>). Zugeschnitten und verkleinert.</p></details>
@@ -159,13 +161,19 @@ function footer({ closeTitle = cta, closeLine = "Schreib uns, worum es geht. Fü
 const scripts = `<script type="module" src="assets/system.js"></script>
 <script type="module" src="assets/motion/motion.js"></script>
 <script type="module" src="assets/layout/layout.js"></script>
-<script type="module" src="assets/site.js"></script>`;
+<script type="module" src="assets/site.js"></script>
+<script src="assets/vendor/gsap.min.js" defer></script>
+<script src="assets/vendor/ScrollTrigger.min.js" defer></script>
+<script src="assets/vendor/SplitText.min.js" defer></script>
+<script src="assets/motion-wow.js" defer></script>`;
 
 function page({ file, title, description, moments, body, foot, deal, preload }) {
   const html = `<!doctype html>
 <html lang="de" data-type="service" data-radius="soft" data-buttons="solid" data-motion>
 ${head({ title, description, moments, preload })}
-<body>
+<body class="page-${file.replace('.html', '')}">
+<div class="curtain" data-curtain hidden aria-hidden="true"><span class="curtain__bar curtain__bar--top" data-curtain-bar="top"></span><span class="curtain__bar curtain__bar--bottom" data-curtain-bar="bottom"></span><span class="curtain__card" data-curtain-card></span></div>
+<script>try{if(sessionStorage.getItem('mt-cut')){document.documentElement.classList.add('is-cut');document.querySelector('[data-curtain]').hidden=false}}catch(e){}</script>
 <!-- type: service (law firm)
      deal: ${deal}
      moments: ${moments.join(", ") || "none"} -->
@@ -194,30 +202,34 @@ page({
   moments: ["word-highlight", "picture-develops"],
   deal: "hero film, nav-centre, close-type, footer-dark, rhythm dark-band, buttons solid, mark arc; palette paper-grey-brass, type hanken",
   preload: `<link rel="preload" as="image" href="media/brandung-poster.webp">`,
-  body: `  <!-- HERO (film): the firm's own film from medertal.com, the surf seen from above, in one cinema frame -->
-  <section class="hero hero--film hero--cine" data-enter aria-labelledby="hero-h">
-    <div class="wrap"><div class="hero-text hero__in">
-      <div class="hero__media hero__fill" data-film-frame>
-        <video class="film" muted loop playsinline preload="auto" poster="media/brandung-poster.webp" aria-hidden="true" data-film-video>
-          <source src="media/brandung.webm" type="video/webm">
-          <source src="media/brandung.mp4" type="video/mp4">
-        </video>
-        <div class="hero__over">
-          <div>
-            <h1 id="hero-h">Rechtsberatung für Unternehmer, von Unternehmern</h1>
-            <p class="hero__lead">Wir haben 2012 selbst ein Software-Startup gegründet, international aufgebaut und an einen US-Wettbewerber verkauft. Heute beraten wir Gründer, zum Festpreis.</p>
-            <div class="btn-row"><a class="btn btn--primary" href="kontakt.html#anfrage">${cta}${arrow}</a><a class="btn btn--secondary" href="ueber-uns.html">Unsere Geschichte</a></div>
-          </div>
-          <button class="film-toggle" type="button" data-film-toggle aria-pressed="false">
-            <span class="film-toggle__disc" aria-hidden="true">
-              <svg class="i-pause" viewBox="0 0 18 18"><path d="M5 3h2.6v12H5zM10.4 3H13v12h-2.6z" fill="currentColor"/></svg>
-              <svg class="i-play" viewBox="0 0 18 18"><path d="M4.5 2.6v12.8c0 .8.9 1.3 1.6.9l10.3-6.4c.6-.4.6-1.3 0-1.7L6.1 1.7c-.7-.4-1.6.1-1.6.9Z" fill="currentColor"/></svg>
-            </span>
-            <span class="film-toggle__label"><span data-film-label>Film anhalten</span><small>Die Brandung, ohne Ton</small></span>
-          </button>
-        </div>
+  body: `  <!-- HERO: the firm's own film full screen (MotionSites "cinematic video hero": background video,
+       edge-blend scrim, liquid glass, blur-rise, serif accent). The letterbox opens on load. -->
+  <section class="hero-cine" data-hero-cine aria-labelledby="hero-h">
+    <div class="hero-cine__plate">
+      <video class="film" muted loop playsinline preload="auto" poster="media/brandung-poster.webp" aria-hidden="true" data-film-video>
+        <source src="media/brandung.webm" type="video/webm">
+        <source src="media/brandung.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="wrap hero-cine__content">
+      <p class="liquid-glass hero-cine__badge"><span>Festpreis</span>für jedes Mandat, von der Gründung bis zum Exit</p>
+      <h1 id="hero-h">Rechtsberatung für Unternehmer, <em>von Unternehmern.</em></h1>
+      <p class="hero-cine__lead">Wir haben 2012 selbst ein Software-Startup gegründet, international aufgebaut und an einen US-Wettbewerber verkauft. Heute beraten wir Gründer.</p>
+      <div class="hero-cine__actions">
+        <a class="btn-white" href="kontakt.html#anfrage" data-cut="Kontakt">${cta}${arrow}</a>
+        <a class="btn-glass liquid-glass" href="ueber-uns.html" data-cut="Über uns">Unsere Geschichte</a>
       </div>
-    </div></div>
+    </div>
+    <div class="wrap hero-cine__foot">
+      <span class="hero-cine__cue" aria-hidden="true">Scrollen</span>
+      <button class="film-toggle liquid-glass" type="button" data-film-toggle aria-pressed="false">
+        <span class="film-toggle__disc" aria-hidden="true">
+          <svg class="i-pause" viewBox="0 0 18 18"><path d="M5 3h2.6v12H5zM10.4 3H13v12h-2.6z" fill="currentColor"/></svg>
+          <svg class="i-play" viewBox="0 0 18 18"><path d="M4.5 2.6v12.8c0 .8.9 1.3 1.6.9l10.3-6.4c.6-.4.6-1.3 0-1.7L6.1 1.7c-.7-.4-1.6.1-1.6.9Z" fill="currentColor"/></svg>
+        </span>
+        <span class="film-toggle__label"><span data-film-label>Film anhalten</span><small>Die Brandung, ohne Ton</small></span>
+      </button>
+    </div>
   </section>
 
   <!-- word-highlight: the firm's own sentence, word by word -->
@@ -246,17 +258,23 @@ page({
     </div>
   </section>
 
-  <!-- the dark band (rhythm dark-band): the three promises -->
-  <section class="section ground-inverse band" id="versprechen" aria-labelledby="versprechen-h">
-    <div class="wrap grid grid--top">
-      <div class="span-5">
-        <h2 id="versprechen-h">Drei Versprechen an unsere Mandanten</h2>
-        <p class="t-lead band__lead">Wir sind Unternehmer und versetzen uns in Deine Lage. Unser Rat berücksichtigt neben dem Recht auch Strategie und Zahlen, zu fairen und transparenten Konditionen.</p>
+  <!-- the promises over the second film (MotionSites shelf: light falling into deep water) -->
+  <section class="section deep" id="versprechen" aria-labelledby="versprechen-h">
+    <div class="deep__plate" aria-hidden="true">
+      <video muted loop playsinline preload="none" poster="media/tiefe-poster.webp" data-bg-video>
+        <source src="media/tiefe.webm" type="video/webm">
+        <source src="media/tiefe.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="wrap deep__inner">
+      <div class="deep__head">
+        <h2 id="versprechen-h">Drei Versprechen, <em>auf die Du Dich verlassen kannst.</em></h2>
+        <p class="deep__lead">Wir sind Unternehmer und versetzen uns in Deine Lage. Unser Rat berücksichtigt neben dem Recht auch Strategie und Zahlen, zu fairen und transparenten Konditionen.</p>
       </div>
-      <ol class="promise-list span-6 start-7">
-        <li class="promise"><h3>Rechtsrat aus vier Rechtsgebieten</h3><p>Gesellschafts-, Finanzierungs-, Vertrags- und Datenschutzrecht. Berührt ein Mandat andere Rechtsgebiete, ziehen wir Partnerkanzleien hinzu.</p></li>
-        <li class="promise"><h3>Empfehlungen für jede Entscheidung</h3><p>Rechtsrat ist nur dann wertvoll, wenn er in klare Handlungsempfehlungen mündet. Wir sagen Dir, was wir an Deiner Stelle tun würden.</p></li>
-        <li class="promise"><h3>Festpreis für jedes Mandat</h3><p>Du weißt vorher, was die Beratung kostet. Bevorzugst Du einen Stundensatz, bekommst Du volle Kostentransparenz über das ganze Mandat.</p></li>
+      <ol class="deep__cards">
+        <li class="liquid-glass glass-card"><span class="glass-card__no">01</span><h3>Rechtsrat aus vier Rechtsgebieten</h3><p>Gesellschafts-, Finanzierungs-, Vertrags- und Datenschutzrecht. Alles andere übernehmen Partnerkanzleien.</p></li>
+        <li class="liquid-glass glass-card"><span class="glass-card__no">02</span><h3>Empfehlungen für jede Entscheidung</h3><p>Rechtsrat ist nur wertvoll, wenn er in klare Handlungsempfehlungen mündet. Wir sagen Dir, was wir tun würden.</p></li>
+        <li class="liquid-glass glass-card"><span class="glass-card__no">03</span><h3>Festpreis für jedes Mandat</h3><p>Du weißt vorher, was die Beratung kostet. Oder Stundensatz, mit voller Kostentransparenz.</p></li>
       </ol>
     </div>
   </section>
@@ -297,7 +315,7 @@ page({
   moments: ["photo-chapters", "word-highlight"],
   deal: "hero photo (words on the dark calm sea), nav-centre, close-type, footer-dark, buttons solid, mark arc",
   preload: `<link rel="preload" as="image" href="assets/img/wellen.webp">`,
-  body: `  <section class="hero hero--photo" data-enter data-calm="left" data-box="none" data-tone="dark" aria-labelledby="hero-h">
+  body: `  <section class="hero hero--photo" data-enter="off" data-calm="left" data-box="none" data-tone="dark" aria-labelledby="hero-h">
     <img class="hero__bg" src="assets/img/wellen.webp" alt="Eine dunkle Welle auf offenem Meer, darüber Nebel" style="--ly-pos: 50% 70%; --ly-pos-phone: 50% 70%" fetchpriority="high" width="2400" height="1602">
     <div class="wrap"><div class="hero-text">
       <div class="hero__text">
@@ -368,7 +386,7 @@ page({
   description: "Gründung, Shareholder-Agreements, Beteiligungsprogramme, Finanzierungsrunden, Verträge, Datenschutz und Exit: was Meder & Tal für Wachstumsunternehmen übernimmt, zum Festpreis.",
   moments: ["picture-develops"],
   deal: "hero split, nav-centre, close-type, footer-dark, rhythm dark-band, buttons solid, mark arc",
-  body: `  <section class="hero hero--split" data-enter aria-labelledby="hero-h">
+  body: `  <section class="hero hero--split" data-enter="off" aria-labelledby="hero-h">
     <div class="wrap"><div class="hero-text grid hero__grid">
       <div class="hero__text span-5">
         <p class="hero__kicker"><span class="dot" aria-hidden="true"></span>Festpreis für jedes Mandat</p>
@@ -433,7 +451,7 @@ page({
   description: "Die beiden Partner von Meder & Tal: Rechtsanwälte, Gründer und Geschäftsführer. Direkte Telefonnummern, E-Mail-Adressen und LinkedIn-Profile.",
   moments: ["word-highlight"],
   deal: "hero split (two portraits), nav-centre, close-type, footer-dark, buttons solid, mark arc",
-  body: `  <section class="hero hero--split" data-enter aria-labelledby="hero-h">
+  body: `  <section class="hero hero--split" data-enter="off" aria-labelledby="hero-h">
     <div class="wrap"><div class="hero-text grid hero__grid">
       <div class="hero__text span-5">
         <h1 id="hero-h">Zwei Partner, die Du direkt erreichst</h1>
@@ -481,7 +499,7 @@ page({
   description: "Schreib Meder & Tal, worum es geht: Gründung, Finanzierungsrunde, Beteiligungsprogramm, Vertrag oder Verkauf. Via Corsica 15, Genua. info@medertal.com.",
   moments: ["picture-develops"],
   deal: "hero split, nav-centre, close-type, footer-dark, buttons solid, mark arc",
-  body: `  <section class="hero hero--split" data-enter aria-labelledby="hero-h">
+  body: `  <section class="hero hero--split" data-enter="off" aria-labelledby="hero-h">
     <div class="wrap"><div class="hero-text grid hero__grid">
       <div class="hero__text span-5">
         <h1 id="hero-h">Erstgespräch vereinbaren</h1>
