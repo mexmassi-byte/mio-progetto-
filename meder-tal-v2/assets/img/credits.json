@@ -1,0 +1,93 @@
+{
+ "note": "Credits for the photographs in this folder: photos.mjs credits prints the footer block for the ones the pages use.",
+ "photos": [
+  {
+   "file": "photo-f46440956.webp",
+   "files": [
+    "photo-f46440956-500.webp",
+    "photo-f46440956-960.webp",
+    "photo-f46440956.webp"
+   ],
+   "id": "f46440956",
+   "alt": "Frankfurt am Main Skyline from Ignatz Bubis Bridge",
+   "by": "DXR",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Frankfurt_am_Main_Skyline_from_Ignatz_Bubis_Bridge.jpg",
+   "source": "Wikimedia Commons"
+  },
+  {
+   "file": "photo-f59053766.webp",
+   "files": [
+    "photo-f59053766-500.webp",
+    "photo-f59053766-960.webp",
+    "photo-f59053766.webp"
+   ],
+   "id": "f59053766",
+   "alt": "Milan skyline skyscrapers of Porta Nuova business district",
+   "by": "Francesco Ungaro",
+   "licence": "CC0",
+   "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+   "page": "https://commons.wikimedia.org/wiki/File:Milan_skyline_skyscrapers_of_Porta_Nuova_business_district.jpg",
+   "source": "Wikimedia Commons"
+  },
+  {
+   "file": "photo-f134851732.webp",
+   "files": [
+    "photo-f134851732-500.webp",
+    "photo-f134851732-960.webp",
+    "photo-f134851732.webp"
+   ],
+   "id": "f134851732",
+   "alt": "Sather Tower from Memorial Glade",
+   "by": "Coolcaesar",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Sather_Tower_from_Memorial_Glade.jpg",
+   "source": "Wikimedia Commons"
+  },
+  {
+   "file": "photo-f74488434-960.webp",
+   "files": [
+    "photo-f74488434-500.webp",
+    "photo-f74488434-960.webp"
+   ],
+   "id": "f74488434",
+   "alt": "Genova Carignano",
+   "by": "Bbruno",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Genova_Carignano.jpg",
+   "source": "Wikimedia Commons"
+  },
+  {
+   "file": "photo-f175158141-960.webp",
+   "files": [
+    "photo-f175158141-500.webp",
+    "photo-f175158141-960.webp"
+   ],
+   "id": "f175158141",
+   "alt": "1099146 I RADCLIFFE CAMERA Oxford 20250617 0012",
+   "by": "Tilman2007",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:1099146_I_RADCLIFFE_CAMERA_Oxford_20250617_0012.jpg",
+   "source": "Wikimedia Commons"
+  },
+  {
+   "file": "photo-f95647703.webp",
+   "files": [
+    "photo-f95647703-500.webp",
+    "photo-f95647703-960.webp",
+    "photo-f95647703.webp"
+   ],
+   "id": "f95647703",
+   "alt": "Genova (GE) Panorama Belvedere Castelletto 2016 (13)",
+   "by": "EvelinaRibarova",
+   "licence": "CC BY-SA 4.0",
+   "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+   "page": "https://commons.wikimedia.org/wiki/File:Genova_(GE)_Panorama_Belvedere_Castelletto_2016_(13).jpg",
+   "source": "Wikimedia Commons"
+  }
+ ]
+}

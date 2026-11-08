@@ -1,0 +1,11 @@
+{
+ "page": "index.html",
+ "url": null,
+ "root": null,
+ "kind": "service",
+ "category": "Rechtsberatung für Gründer und Wachstumsunternehmen",
+ "primary": "Erstgespräch vereinbaren",
+ "rounds": 3,
+ "start": "2026-11-08T13:13:51.878Z",
+ "by": "gate.mjs --start"
+}

@@ -1,0 +1,516 @@
+{
+ "start": "2026-11-08T13:13:51.878Z",
+ "round": 3,
+ "idle": 0,
+ "errors": 0,
+ "status": "open",
+ "history": [
+  {
+   "at": "2026-11-08T13:35:27.396Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 21,
+   "round": 1,
+   "reused": false,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-08T13:37:36.852Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 3,
+   "round": 2,
+   "reused": false,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-08T13:39:28.339Z",
+   "mode": "manual",
+   "status": "open",
+   "fails": 11,
+   "round": 3,
+   "reused": false,
+   "stopHookActive": false
+  }
+ ],
+ "max": 3,
+ "marker": {
+  "page": "index.html",
+  "url": null,
+  "root": null,
+  "kind": "service",
+  "category": "Rechtsberatung für Gründer und Wachstumsunternehmen",
+  "primary": "Erstgespräch vereinbaren",
+  "rounds": 3,
+  "start": "2026-11-08T13:13:51.878Z",
+  "by": "gate.mjs --start"
+ },
+ "manual": true,
+ "roundKey": "310f980387c6617d:c30f96eb",
+ "roundFree": false,
+ "idleFree": false,
+ "blockKey": null,
+ "fp": "310f980387c6617d",
+ "page": "index.html",
+ "found": {
+  "fails": [
+   {
+    "check": "no-visual",
+    "where": "section#versprechen \"Drei Versprechen an unsere Mandanten\"",
+    "msg": "pictures, effects and mocks cover 13% of this section; a feature section needs a visual (about 25% or more)",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "no-visual"
+    ],
+    "wheres": [
+     "section#versprechen \"Drei Versprechen an unsere Mandanten\""
+    ]
+   },
+   {
+    "check": "button-styles",
+    "where": "(one screen)",
+    "msg": "3 button styles on one screen: soft, fill #bfb21a (\"Erstgespräch vereinbaren\"); soft, fill #181715 (\"Erstgespräch vereinbaren\"); soft, fill #181715, outline #e8e8e5 (\"Unsere Geschichte\"); the odd one out: \"Unsere Geschichte\"",
+    "fix": "one primary and one secondary button: one shape, one height per size, one label size",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "button-styles"
+    ],
+    "wheres": [
+     "(one screen)"
+    ]
+   },
+   {
+    "check": "button-styles",
+    "where": "(the page)",
+    "msg": "3 button styles on the page: soft, fill #181715 x1 (\"Erstgespräch vereinbaren\"); soft, fill #bfb21a x2 (\"Erstgespräch vereinbaren\"); soft, fill #181715, outline #e8e8e5 x1 (\"Unsere Geschichte\")",
+    "fix": "one primary and one secondary button: one shape, one height per size, one label size",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "button-styles"
+    ],
+    "wheres": [
+     "(the page)"
+    ]
+   },
+   {
+    "check": "street-number",
+    "where": "div.grid > div.span-2.footer__col:nth-of-type(4) > ul > li:nth-of-type(1) \"Via Corsica 15\"",
+    "msg": "a street with its house number: \"Via Corsica 15\"; a real door, which the brief does not give",
+    "fix": "print the street and the district only (\"Weserstraße, Berlin-Neukölln\"): no house number, unless the brief gives the address",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "street-number"
+    ],
+    "wheres": [
+     "div.grid > div.span-2.footer__col:nth-of-type(4) > ul > li:nth-of-type(1) \"Via Corsica 15\""
+    ]
+   },
+   {
+    "check": "phone-number",
+    "where": "div.grid > div.span-3.footer__col > ul > li:nth-of-type(2) \"+49 151 423 25468\"",
+    "msg": "a phone number in international format: \"+49 151 423 25468\"; a visitor can dial it and reach a stranger (and 1 more like it: div.span-3.footer__col > ul > li:nth-of-type(2) > a)",
+    "fix": "drop the number and its tel: link (a \"Request a call\" form may stand in), unless the brief gives the number",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "phone-number"
+    ],
+    "wheres": [
+     "div.grid > div.span-3.footer__col > ul > li:nth-of-type(2) \"+49 151 423 25468\""
+    ]
+   },
+   {
+    "check": "one-heading",
+    "where": "h2#gebiete-h \"Drei Rechtsgebiete. Jedes davon haben wi\"",
+    "msg": "headings of two sections show whole on one screen at 3 of 91 scroll positions (3.3%; at scroll 1200, 1250, 1300px), here with \"Wachstumsunternehmen\": at most 3% on a desktop (SR-5)",
+    "fix": "make the sections one screen tall so their headings sit a screen apart and two never share one",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "one-heading"
+    ],
+    "wheres": [
+     "h2#gebiete-h \"Drei Rechtsgebiete. Jedes davon haben wi\""
+    ]
+   },
+   {
+    "check": "edge-right",
+    "where": "#versprechen figure.band__stone",
+    "msg": "ends at x 440; the right line is 1360",
+    "fix": "end it on the .wrap right line",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "edge-right"
+    ],
+    "wheres": [
+     "#versprechen figure.band__stone"
+    ]
+   },
+   {
+    "check": "one-sided",
+    "where": "#versprechen section.section.ground-inverse \"Drei Versprechen an unsere Manda\"",
+    "msg": "its visuals end at x 440, short of the right line 1360",
+    "fix": "let the row reach both .wrap edges",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "one-sided"
+    ],
+    "wheres": [
+     "#versprechen section.section.ground-inverse \"Drei Versprechen an unsere Manda\""
+    ]
+   },
+   {
+    "check": "hero-lines",
+    "where": "section.hero h1",
+    "msg": "the check fills the h1 to 48 characters (this hero's maxChars in heroes.json), not the page's own: it takes 5 lines at 1440, 3 at most",
+    "fix": "the check fills the h1 to this hero's maxChars, not your own: take the next type pairing the deal printed (start.mjs); when the h1 is final and fits, waive it (target: section.hero h1)",
+    "widths": [
+     1440
+    ],
+    "from": "layout",
+    "ids": [
+     "hero-lines"
+    ],
+    "wheres": [
+     "section.hero h1"
+    ]
+   },
+   {
+    "check": "neighbour",
+    "where": "#versprechen section.section.ground-inverse \"Drei Versprechen an unsere Manda\"",
+    "msg": "framed, 105px of #partner section.section \"Zwei Partner. Ein gemeinsamer We\" shows",
+    "fix": "keep the next section's heading and picture out of this screen",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "neighbour"
+    ],
+    "wheres": [
+     "#versprechen section.section.ground-inverse \"Drei Versprechen an unsere Manda\""
+    ]
+   }
+  ],
+  "warns": [
+   {
+    "check": "scroll-reveal",
+    "where": "section#gebiete > div.wrap.grid > figure.develop.span-6",
+    "msg": "starts an animation (1.6 s) the moment it is scrolled into view (an IntersectionObserver) on img (inside a dealt moment's section, [data-moment]: an enter moment is expected on every kind; its still is judged under reduced motion)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-headings",
+    "where": "div.wrap.grid > ol.promise-list.span-6 > li.promise:nth-of-type(1) > h3 \"Rechtsrat aus vier Rechtsgebieten\"",
+    "msg": "\"Rechtsrat aus vier Rechtsgebieten\" names no product, part, place or section (the one brand line a page may have)",
+    "fix": "name the thing in every heading: the product, a part, the place or a section noun",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-buttons",
+    "where": "header.nav.nav--centre > div.wrap.nav__bar > div.nav__actions > a.btn.btn--primary \"Erstgespräch vereinbaren\"",
+    "msg": "\"Erstgespräch vereinbaren\" does not start with a verb (book, buy, try, start, get, see...) (and 1 more like it: \"Unsere Geschichte\")",
+    "fix": "label buttons with a verb and what the visitor gets (\"Book a room\", \"Start free trial\")",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "section#partner / footer#kontakt",
+    "msg": "198px between these sections, -41% against the median 334px of gaps at a change of ground",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "section#gebiete / section#versprechen",
+    "msg": "uneven space at the edge of a band: 220px outside its edge, 114px inside it (the space on either side of a change of ground reads as one gap only when the two match)",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "section#versprechen / section#partner",
+    "msg": "uneven space at the edge of a band: 114px outside its edge, 248px inside it (the space on either side of a change of ground reads as one gap only when the two match)",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "photo-set",
+    "where": "div.wrap.grid > div.span-5 > figure.band__stone > img \"stein.webp\"",
+    "msg": "3 photographs in more than one look: lightness from 0.35 to 0.70; the odd one out is stein.webp",
+    "fix": "grade the photographs to one look (light, colour, warmth), or replace the odd one out",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "action-repeat",
+    "where": "header.nav.nav--centre > div.wrap.nav__bar > div.nav__actions > a.btn.btn--primary \"erstgespräch vereinbaren\"",
+    "msg": "\"erstgespräch vereinbaren\" shows 2 times on the first screen at 1440px (nav, hero): the nav's button and the hero's; nothing else on the screen may repeat it",
+    "fix": "show the action once a screen besides the nav's button: the hero's, the close's or the phone bar's, never all at once",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "button-styles",
+    "where": "div.hero-text.hero__in > div.hero__media.hero__fill > div.hero__over > button.film-toggle \"Film abspielen\"",
+    "msg": "on the phone 2 buttons run the full width of their column, but  \"Film abspielen\" is 200px of 318px: one action in two sizes",
+    "fix": "give every button the same width rule on the phone: all full width, or all at their own width",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cta",
+    "where": "section#versprechen \"Drei Versprechen an unsere Mandanten\"",
+    "msg": "a section over 1.5 screens long with no link or button in it",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "heading-scale",
+    "where": "div.wrap.grid > ol.promise-list.span-6 > li.promise:nth-of-type(1) > h3 \"Rechtsrat aus vier Rechtsgebieten\"",
+    "msg": "the h3s (24px) are only 1.25x smaller than the h2s (30px): one level a clear step (1.3x or more) below the other",
+    "fix": "size headings by level: the h1 largest, one size per level, each level below the one above",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   }
+  ],
+  "crashed": [],
+  "seconds": {
+   "consistency": 92,
+   "layout": 3
+  }
+ },
+ "open": [
+  {
+   "check": "waivers",
+   "where": ".taste-skill/waivers.json",
+   "msg": "too many waivers: fix instead (6, 5 at most)",
+   "fix": "fix the findings and keep 5 waivers at most"
+  },
+  {
+   "check": "no-visual",
+   "where": "section#versprechen \"Drei Versprechen an unsere Mandanten\"",
+   "msg": "pictures, effects and mocks cover 13% of this section; a feature section needs a visual (about 25% or more)",
+   "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "no-visual"
+   ],
+   "wheres": [
+    "section#versprechen \"Drei Versprechen an unsere Mandanten\""
+   ]
+  },
+  {
+   "check": "button-styles",
+   "where": "(one screen)",
+   "msg": "3 button styles on one screen: soft, fill #bfb21a (\"Erstgespräch vereinbaren\"); soft, fill #181715 (\"Erstgespräch vereinbaren\"); soft, fill #181715, outline #e8e8e5 (\"Unsere Geschichte\"); the odd one out: \"Unsere Geschichte\"",
+   "fix": "one primary and one secondary button: one shape, one height per size, one label size",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "button-styles"
+   ],
+   "wheres": [
+    "(one screen)"
+   ]
+  },
+  {
+   "check": "button-styles",
+   "where": "(the page)",
+   "msg": "3 button styles on the page: soft, fill #181715 x1 (\"Erstgespräch vereinbaren\"); soft, fill #bfb21a x2 (\"Erstgespräch vereinbaren\"); soft, fill #181715, outline #e8e8e5 x1 (\"Unsere Geschichte\")",
+   "fix": "one primary and one secondary button: one shape, one height per size, one label size",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "button-styles"
+   ],
+   "wheres": [
+    "(the page)"
+   ]
+  },
+  {
+   "check": "street-number",
+   "where": "div.grid > div.span-2.footer__col:nth-of-type(4) > ul > li:nth-of-type(1) \"Via Corsica 15\"",
+   "msg": "a street with its house number: \"Via Corsica 15\"; a real door, which the brief does not give",
+   "fix": "print the street and the district only (\"Weserstraße, Berlin-Neukölln\"): no house number, unless the brief gives the address",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "street-number"
+   ],
+   "wheres": [
+    "div.grid > div.span-2.footer__col:nth-of-type(4) > ul > li:nth-of-type(1) \"Via Corsica 15\""
+   ]
+  },
+  {
+   "check": "phone-number",
+   "where": "div.grid > div.span-3.footer__col > ul > li:nth-of-type(2) \"+49 151 423 25468\"",
+   "msg": "a phone number in international format: \"+49 151 423 25468\"; a visitor can dial it and reach a stranger (and 1 more like it: div.span-3.footer__col > ul > li:nth-of-type(2) > a)",
+   "fix": "drop the number and its tel: link (a \"Request a call\" form may stand in), unless the brief gives the number",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "phone-number"
+   ],
+   "wheres": [
+    "div.grid > div.span-3.footer__col > ul > li:nth-of-type(2) \"+49 151 423 25468\""
+   ]
+  },
+  {
+   "check": "one-heading",
+   "where": "h2#gebiete-h \"Drei Rechtsgebiete. Jedes davon haben wi\"",
+   "msg": "headings of two sections show whole on one screen at 3 of 91 scroll positions (3.3%; at scroll 1200, 1250, 1300px), here with \"Wachstumsunternehmen\": at most 3% on a desktop (SR-5)",
+   "fix": "make the sections one screen tall so their headings sit a screen apart and two never share one",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "one-heading"
+   ],
+   "wheres": [
+    "h2#gebiete-h \"Drei Rechtsgebiete. Jedes davon haben wi\""
+   ]
+  },
+  {
+   "check": "edge-right",
+   "where": "#versprechen figure.band__stone",
+   "msg": "ends at x 440; the right line is 1360",
+   "fix": "end it on the .wrap right line",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "edge-right"
+   ],
+   "wheres": [
+    "#versprechen figure.band__stone"
+   ]
+  },
+  {
+   "check": "one-sided",
+   "where": "#versprechen section.section.ground-inverse \"Drei Versprechen an unsere Manda\"",
+   "msg": "its visuals end at x 440, short of the right line 1360",
+   "fix": "let the row reach both .wrap edges",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "one-sided"
+   ],
+   "wheres": [
+    "#versprechen section.section.ground-inverse \"Drei Versprechen an unsere Manda\""
+   ]
+  },
+  {
+   "check": "hero-lines",
+   "where": "section.hero h1",
+   "msg": "the check fills the h1 to 48 characters (this hero's maxChars in heroes.json), not the page's own: it takes 5 lines at 1440, 3 at most",
+   "fix": "the check fills the h1 to this hero's maxChars, not your own: take the next type pairing the deal printed (start.mjs); when the h1 is final and fits, waive it (target: section.hero h1)",
+   "widths": [
+    1440
+   ],
+   "from": "layout",
+   "ids": [
+    "hero-lines"
+   ],
+   "wheres": [
+    "section.hero h1"
+   ]
+  },
+  {
+   "check": "neighbour",
+   "where": "#versprechen section.section.ground-inverse \"Drei Versprechen an unsere Manda\"",
+   "msg": "framed, 105px of #partner section.section \"Zwei Partner. Ein gemeinsamer We\" shows",
+   "fix": "keep the next section's heading and picture out of this screen",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "neighbour"
+   ],
+   "wheres": [
+    "#versprechen section.section.ground-inverse \"Drei Versprechen an unsere Manda\""
+   ]
+  }
+ ],
+ "waived": [],
+ "warnCount": 11,
+ "at": "2026-11-08T13:39:28.339Z",
+ "openTold": true
+}

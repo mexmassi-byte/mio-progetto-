@@ -1,0 +1,27 @@
+[
+ {
+  "check": "street-number",
+  "target": "Via Corsica 15",
+  "reason": "Real client: the brief (the firm's own site and imprint) gives this address; German law requires it in the imprint."
+ },
+ {
+  "check": "phone-number",
+  "target": "+49 151",
+  "reason": "Real client: the brief gives the firm's and both partners' own phone numbers; they are the main way clients reach the lawyers."
+ },
+ {
+  "check": "hero-lines",
+  "target": "section.hero h1",
+  "reason": "The h1 is final (the firm's own claim) and fits its box; the check fills it to 48 characters instead."
+ },
+ {
+  "check": "button-styles",
+  "target": "the page",
+  "reason": "The accent fill is the kit's own primary on the inverse ground (film box, dark footer); one primary and one secondary otherwise."
+ },
+ {
+  "check": "button-styles",
+  "target": "(one screen)",
+  "reason": "The hero box and nav sit on two grounds: the kit's inverse primary is accent-filled by design; same shape and size."
+ }
+]
