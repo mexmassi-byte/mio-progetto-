@@ -98,6 +98,12 @@ class Settings(BaseSettings):
     piper_binary: str = "piper"
     piper_voice: str | None = None  # path to a .onnx voice model
 
+    # Optional Claude Code delegation for development work (uses the Claude
+    # account logged in on this computer). Approval required unless autonomous.
+    claude_code_binary: str = "claude"
+    claude_code_autonomous: bool = False
+    claude_code_timeout_s: int = 1800
+
     backup_keep: int = 14
 
     @property

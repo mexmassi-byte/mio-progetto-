@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+from ...db.database import now_iso
 from ...llm.base import Message, extract_json
+from ...security.permissions import Permission
+from .claude_code import find_claude, run_claude_code
 from ...prompts import POLICY
 from ...tools.registry import ToolContext, ToolError, ToolRegistry
 from .workspace import WorkspaceError
@@ -16,6 +19,8 @@ def _ws_call(fn, *args, **kw):
 
 
 def register(reg: ToolRegistry) -> None:
+    register_claude_code(reg)
+
     @reg.tool(
         "dev_create_project",
         "Create a new isolated project workspace (folder + README + git repository).",
@@ -127,3 +132,41 @@ def register(reg: ToolRegistry) -> None:
             raise ToolError(str(exc), retryable=False) from exc
         ctx.emit("dev.command", project=project, command=res["command"], exit_code=res["exit_code"])
         return res
+
+
+def register_claude_code(reg: ToolRegistry) -> None:
+    @reg.tool(
+        "dev_claude_code",
+        "Delegate a development job (build a website or app, fix or extend code) to Claude Code, "
+        "confined to one project workspace. Uses the user's Claude account on this computer.",
+        {"type": "object", "properties": {
+            "project": {"type": "string"},
+            "instructions": {"type": "string", "maxLength": 8000},
+        }, "required": ["project", "instructions"]},
+        permission=Permission.APPROVAL, external=True, category="dev", timeout_s=3700,
+    )
+    async def dev_claude_code(ctx: ToolContext, project: str, instructions: str) -> dict:
+        s = ctx.services.settings
+        binary = find_claude(s.claude_code_binary)
+        if not binary:
+            raise ToolError("Claude Code is not installed on this computer (npm install -g @anthropic-ai/claude-code, "
+                            "then run `claude` once to log in)", retryable=False)
+        ws = ctx.services.workspaces
+        path = _ws_call(ws.path_of, project)
+        ctx.emit("dev.claude_code", project=project, stage="started")
+        result = await run_claude_code(binary, path, instructions, s.company_name, s.claude_code_timeout_s)
+        ctx.emit("dev.claude_code", project=project, stage="finished", ok=result["ok"])
+        p = ws.get(project)
+        ctx.services.db.insert("command_runs", {
+            "project_id": p["id"] if p else None, "command": "claude -p (delegated job)",
+            "exit_code": 0 if result["ok"] else 1, "output": (result.get("summary") or result.get("error") or "")[:20000],
+            "duration_ms": int((result.get("seconds") or 0) * 1000), "ts": now_iso()})
+        if not result["ok"]:
+            raise ToolError(f"Claude Code did not finish: {result['error']}", retryable=False)
+        try:  # keep a local history of what was produced (never pushed)
+            await ws.run(project, ["git", "add", "."], timeout_s=60)
+            await ws.run(project, ["git", "commit", "-m", "JARVIS: lavoro di Claude Code"], timeout_s=60)
+        except Exception:
+            pass
+        return {"summary": result["summary"], "files": [f["path"] for f in ws.files(project)][:100],
+                "cost_usd": result.get("cost_usd"), "turns": result.get("turns"), "seconds": result.get("seconds")}

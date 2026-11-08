@@ -80,12 +80,19 @@ def website_audit(params: dict[str, Any]) -> tuple[list[dict], str]:
     return steps, f"Esiste un audit per ciascuno dei {len(urls)} siti."
 
 
-def dev_project(params: dict[str, Any], objective: str) -> tuple[list[dict], str]:
+def dev_project(params: dict[str, Any], objective: str, use_claude: bool = False) -> tuple[list[dict], str]:
     name = (params.get("project_name") or "").strip() or "Nuovo progetto"
-    files = [f for f in params.get("files") or [] if isinstance(f, str) and f.strip()][:8] or ["index.html"]
-    params.update({"project_name": name, "files": files})
     steps: list[dict] = [{"title": f"Crea il progetto '{name}'", "tool": "dev_create_project",
                           "args": {"name": name, "description": objective[:2000]}}]
+    if use_claude:
+        params.update({"project_name": name, "files": [], "engine": "claude_code"})
+        steps.append({"title": "Sviluppo con Claude Code", "tool": "dev_claude_code", "depends_on": [1],
+                      "args": {"project": name, "instructions": objective}, "timeout_s": 3600})
+        steps.append({"title": "Controlla i file del progetto", "tool": "dev_list_files",
+                      "args": {"project": name}, "depends_on": [2]})
+        return steps, f"Il progetto '{name}' contiene file prodotti da Claude Code."
+    files = [f for f in params.get("files") or [] if isinstance(f, str) and f.strip()][:8] or ["index.html"]
+    params.update({"project_name": name, "files": files})
     for path in files:
         steps.append({"title": f"Scrivi {path}", "tool": "dev_generate_code", "depends_on": [1],
                       "args": {"project": name, "path": path,
@@ -125,6 +132,9 @@ def verify_dev_project(services: Any, mission: dict[str, Any]) -> dict[str, Any]
     except Exception:
         present = {}
     wanted = params.get("files") or []
+    if not wanted:  # Claude Code decides the files: anything beyond the README counts
+        made = [f for f, size in present.items() if f != "README.md" and size > 0]
+        return {"passed": bool(made), "check": f"file prodotti: {len(made)} (non è una verifica funzionale)"}
     ok = [f for f in wanted if present.get(f, 0) > 0]
     return {"passed": len(ok) == len(wanted) and bool(wanted),
             "check": f"file presenti e non vuoti: {len(ok)} / {len(wanted)} (non è una verifica funzionale del codice)"}

@@ -167,6 +167,28 @@ JARVIS_SMTP_FROM=VEYRO Web <info@veyroweb.com>
 Il file `.env` è escluso da git. Ogni invio passa dalla coda approvazioni e
 finisce nel registro audit.
 
+### Claude Code (facoltativo) per lo sviluppo
+
+Se sul Mac è installato Claude Code e hai fatto l'accesso (`claude` nel
+Terminale), puoi scrivere: *"JARVIS, con Claude Code creami il sito per lo
+studio Bianchi a Genova"*. JARVIS crea un progetto isolato in
+`data/workspaces/`, affida il lavoro a Claude Code solo dentro quella cartella
+(modifiche ai file, npm, test, git locale; niente push, deploy o pubblicazione)
+e salva il risultato.
+
+- La prima volta chiede la tua approvazione, perché usa il tuo account Claude.
+  Per renderlo automatico: `JARVIS_CLAUDE_CODE_AUTONOMOUS=true`.
+- Se Claude Code non è installato, JARVIS scrive il codice con il suo modello
+  locale. JARVIS non dipende da Claude Code.
+
+### Un secondo computer (co-founder)
+
+JARVIS si installa allo stesso modo sul computer del co-founder: ognuno ha il
+suo JARVIS locale, con la sua memoria e il suo CRM. Il "cervello" non usa
+Claude, quindi l'account Claude non conta; Claude Code, se usato, userà
+l'account con cui si è fatto l'accesso su quel computer. Condividere lo stesso
+CRM tra i due computer richiede una sincronizzazione che non esiste ancora.
+
 ## 6. Configurazione
 
 Tutte le opzioni sono variabili `JARVIS_*` (o righe in `jarvis/backend/.env`):
@@ -176,7 +198,7 @@ Tutte le opzioni sono variabili `JARVIS_*` (o righe in `jarvis/backend/.env`):
 | `JARVIS_LLM_PROVIDER` | `ollama` | `ollama`, `openai` (LM Studio / llama.cpp), `fake` |
 | `JARVIS_LLM_BASE_URL` | `http://127.0.0.1:11434` | indirizzo del runtime AI |
 | `JARVIS_LLM_MODEL` | `qwen3:8b` | modello principale |
-| `JARVIS_USER_NAME` | `Massimiliano` | come JARVIS ti chiama |
+| `JARVIS_TITLE_IT` / `_EN` / `_DE` | `Signore` / `Sir` / `Master` | come JARVIS si rivolge a voi |
 | `JARVIS_LANGUAGE` | `it` | lingua delle risposte |
 | `JARVIS_DATA_DIR` | `jarvis/data` | database, memoria, backup, log, workspace |
 | `JARVIS_ENGINE_MAX_PARALLEL_MISSIONS` | `1` | missioni in parallelo |

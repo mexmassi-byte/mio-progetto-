@@ -88,7 +88,7 @@ class Planner:
         elif kind == "website_audit":
             steps, cond = playbooks.website_audit(params)
         elif kind == "dev_project":
-            steps, cond = playbooks.dev_project(params, objective)
+            steps, cond = playbooks.dev_project(params, objective, use_claude=self._wants_claude(objective))
         elif kind == "freeform":
             steps, cond = await self.freeform(objective, notes)
         else:
@@ -149,6 +149,15 @@ class Planner:
                                 + "\nReturn a corrected plan."))
         raise PlanningError("Could not produce a valid plan: " + "; ".join(last_errors))
 
+    def _wants_claude(self, objective: str) -> bool:
+        """Delegate to Claude Code when the user asks for it and it is installed."""
+        if not re.search(r"\bclaude\b", objective, re.IGNORECASE) or not self.tools.has("dev_claude_code"):
+            return False
+        from ..departments.dev.claude_code import find_claude
+        return find_claude(self.claude_binary) is not None
+
+    claude_binary = "claude"
+
     def _check_step(self, step: dict[str, Any]) -> dict[str, Any]:
         name = step.get("tool")
         if isinstance(name, str) and not self.tools.has(name):
@@ -198,7 +207,7 @@ _NUMBER_WORDS = {"un": 1, "uno": 1, "due": 2, "tre": 3, "quattro": 4, "cinque": 
                  "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "fünf": 5, "zehn": 10}
 _LEAD_WORDS = ("client", "prospect", "lead", "kunde", "customer", "contatt", "acquisi")
 _DEV_CREATE = ("crea", "create", "scrivi", "write", "sviluppa", "build", "costruisci", "genera", "erstelle")
-_DEV_OBJECT = ("progetto", "project", "sito", "website", "app", "pagina", "page", "codice", "code", "file")
+_DEV_OBJECT = ("progetto", "project", "sito", "website", "webseite", "app", "pagina", "page", "codice", "code", "file")
 _FILE_RE = re.compile(r"\b[\w/-]+\.(?:html|css|js|ts|tsx|jsx|py|md|json)\b", re.I)
 _NAME_RE = re.compile(r"(?:chiamato|chiamata|called|named|nome)\s+[\"'“]?([\w][\w .-]{1,60}?)[\"'”]?(?:\s+(?:e|and|con|with)\b|[,.:;]|$)", re.I)
 
@@ -230,7 +239,9 @@ def heuristic_classification(objective: str) -> dict[str, Any]:
                 break
     files = _FILE_RE.findall(objective)
     if (any(w in text for w in _DEV_CREATE) and any(w in text for w in _DEV_OBJECT)
-            and (files or "progett" in text or "project" in text) and not any(w in text for w in _LEAD_WORDS)):
+            and (files or "progett" in text or "project" in text or "claude" in text
+                 or re.search(r"\b(sito|website|webseite|landing)\b", text))
+            and not (any(w in text for w in _LEAD_WORDS) and "claude" not in text)):
         m = _NAME_RE.search(objective)
         return {"playbook": "dev_project", "project_name": m.group(1).strip() if m else None, "files": files,
                 "sector": None, "country": None, "city": None, "count": None, "urls": []}

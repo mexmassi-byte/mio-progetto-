@@ -153,17 +153,20 @@ class Engine:
                 notify(self.s, "Missione non riuscita", f"{m['objective'][:120]}\n{failed['error'] or ''}"[:500],
                        "warning", mission_id)
                 return True
-            if waiting and not pending:
+            if pending:
+                # A dependency failed: skip (cascades down the chain on next steps).
+                dep_blocked = [t for t in pending if _deps_failed(t, tasks)]
+                for t in dep_blocked:
+                    ms.update_task(t["id"], status="skipped", error="a required earlier step failed")
+                if dep_blocked:
+                    return True
+            if waiting:
+                # Steps wait for the user (directly, or behind a step that does).
                 if m["status"] != "awaiting_approval":
                     ms.set_status(mission_id, "awaiting_approval")
                 return False
             if pending:
-                # Pending but not runnable: a dependency failed (skip it, which
-                # cascades down the chain on the next steps) or waiting for backoff.
-                dep_blocked = [t for t in pending if _deps_failed(t, tasks)]
-                for t in dep_blocked:
-                    ms.update_task(t["id"], status="skipped", error="a required earlier step failed")
-                return bool(dep_blocked)
+                return False  # waiting for a retry backoff
             ms.set_status(mission_id, "verifying")
             return True
 

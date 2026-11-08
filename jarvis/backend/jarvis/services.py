@@ -75,6 +75,9 @@ def build_services(settings: Settings, llm: LLMProvider | None = None) -> Servic
     tools = ToolRegistry()
     for module in (builtin, web, sales_tools, dev_tools, chat_tools):
         module.register(tools)
+    if settings.claude_code_autonomous:  # the user chose to let JARVIS use Claude Code freely
+        from .security.permissions import Permission
+        tools.get("dev_claude_code").permission = Permission.AUTONOMOUS
     s = Services(
         settings=settings, db=db, bus=bus, audit=AuditLog(db), llm=llm,
         memory=MemoryStore(db, bus, llm), knowledge=knowledge, tools=tools,
@@ -82,6 +85,7 @@ def build_services(settings: Settings, llm: LLMProvider | None = None) -> Servic
     )
     s.missions = MissionService(db, bus, settings)
     s.planner = Planner(llm, tools)
+    s.planner.claude_binary = settings.claude_code_binary
     s.crm = CRM(db, bus)
     s.workspaces = Workspaces(settings.workspaces_dir, db)
     s.engine = Engine(s)
