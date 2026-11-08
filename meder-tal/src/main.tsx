@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, createHashRouter, RouterProvider } from "react-router-dom";
+import { HASH_ROUTING } from "./lib/env";
 import "@fontsource/bodoni-moda/400.css";
 import "@fontsource/bodoni-moda/500.css";
 import "@fontsource/bodoni-moda/400-italic.css";
@@ -20,7 +21,7 @@ import { LangProvider } from "./lib/i18n";
 
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
-const router = createBrowserRouter([
+const router = (HASH_ROUTING ? createHashRouter : createBrowserRouter)([
   {
     element: <App />,
     children: [

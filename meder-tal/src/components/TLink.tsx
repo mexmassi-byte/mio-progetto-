@@ -1,5 +1,6 @@
 import type { AnchorHTMLAttributes, MouseEvent } from "react";
 import { useGo } from "./Curtain";
+import { href } from "../lib/env";
 
 type Props = AnchorHTMLAttributes<HTMLAnchorElement> & { to: string; onNavigate?: () => void };
 
@@ -14,7 +15,7 @@ export function TLink({ to, onNavigate, onClick, children, ...rest }: Props) {
     go(to);
   };
   return (
-    <a href={to} onClick={handle} {...rest}>
+    <a href={href(to)} onClick={handle} {...rest}>
       {children}
     </a>
   );
