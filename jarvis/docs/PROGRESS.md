@@ -87,6 +87,15 @@ Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
 11. Sicurezza: il token passava nell'URL del WebSocket e finiva nei log. Ora
     viene inviato come primo messaggio.
 
+## Cambio automatico delle modalità
+
+JARVIS sceglie da solo la schermata: conversazione → Voce, ricerca autonoma →
+Ricerca globale, dati o risultati → Command Center. Passaggio con dissolvenza
+breve ed etichetta della modalità. Interruttore AUTO/MANUALE nella barra in
+alto; una scelta manuale sospende il cambio automatico per 60 s; minimo 6 s in
+ogni modalità; non cambia mai pagina se sei su Missioni, Vendite, Sviluppo,
+Memoria o Sistema. Provato nel browser con uno scenario completo, senza errori.
+
 ## Cosa NON è ancora verificato
 
 - **Il tuo PC:** nessun test sul tuo hardware. Serve l'output di

@@ -1,8 +1,8 @@
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, streamChat, synthesize, uploadAudio } from "../api/client";
 import type { SystemStatus } from "../api/types";
 import { Visual } from "../components/Visual";
-import { events } from "../state/events";
+import { events, useEventListener } from "../state/events";
 import { VoiceSphere, VoiceState } from "../visuals/voiceSphere";
 
 const SILENCE_MS = 1300;
@@ -23,7 +23,6 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
   const [answer, setAnswer] = useState("");
   const [note, setNote] = useState<string | null>(null);
   const [amplitudeSource, setAmplitudeSource] = useState<"mic" | "tts" | "none">("none");
-  const [typed, setTyped] = useState("");
   const conv = useRef<string | null>(null);
   const audioCtx = useRef<AudioContext | null>(null);
   const analyser = useRef<AnalyserNode | null>(null);
@@ -215,6 +214,13 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
     } else setState("idle");
   }
 
+  // A conversation typed in the command bar also animates the sphere.
+  useEventListener(["chat.started", "chat.finished"], (e) => {
+    if (stateRef.current !== "idle" && stateRef.current !== "thinking") return;
+    if (e.type === "chat.started" && stateRef.current === "idle") sphere.current?.setState("thinking");
+    if (e.type === "chat.finished" && stateRef.current === "idle") sphere.current?.setState("idle");
+  });
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.code === "Space" && (e.target as HTMLElement).tagName !== "INPUT") {
@@ -228,14 +234,6 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  function submitTyped(e: FormEvent) {
-    e.preventDefault();
-    if (!typed.trim()) return;
-    setTranscript(typed);
-    const q = typed;
-    setTyped("");
-    void ask(q);
-  }
 
   const STATE_LABEL: Record<VoiceState, string> = { idle: "In attesa", listening: "Ascolto", thinking: "Elaborazione", speaking: "Risposta" };
 
@@ -251,7 +249,7 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
             state === "speaking" ? "voce di sistema (ampiezza non misurabile)" : "—"}
         </div>
       </div>
-      <div className="overlay" style={{ left: "50%", bottom: 26, transform: "translateX(-50%)", width: "min(640px, 90%)", textAlign: "center" }}>
+      <div className="overlay" style={{ left: "50%", bottom: 84, transform: "translateX(-50%)", width: "min(640px, 90%)", textAlign: "center" }}>
         {transcript && <div className="dim2" style={{ fontFamily: "var(--sans)", fontSize: 13, marginBottom: 6 }}>“{transcript}”</div>}
         {answer && <div style={{ fontFamily: "var(--sans)", fontSize: 14, color: "var(--fg)", maxHeight: 140, overflow: "auto", marginBottom: 12, whiteSpace: "pre-wrap" }}>{answer}</div>}
         <div className="row" style={{ justifyContent: "center", marginBottom: 10 }}>
@@ -259,10 +257,7 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
             {state === "listening" ? "Fine" : state === "idle" ? "Parla (spazio)" : "Interrompi"}
           </button>
         </div>
-        <form onSubmit={submitTyped} className="row" style={{ flexWrap: "nowrap" }}>
-          <input className="input mono" value={typed} onChange={(e) => setTyped(e.target.value)}
-            placeholder={sttOk ? "oppure scrivi…" : "Riconoscimento vocale non installato: scrivi qui"} aria-label="Messaggio" />
-        </form>
+
         {note && <div className="error" style={{ marginTop: 8 }}>{note}</div>}
         {!ttsOk && status && <div className="label" style={{ marginTop: 8 }}>voce locale (Piper) non installata: uso la voce del sistema</div>}
       </div>

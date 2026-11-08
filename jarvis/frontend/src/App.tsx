@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { api, getToken, setToken } from "./api/client";
 import type { JEvent, SystemStatus } from "./api/types";
 import { CommandBar } from "./components/CommandBar";
@@ -11,7 +11,12 @@ import { ResearchPage } from "./pages/Research";
 import { SalesPage } from "./pages/Sales";
 import { SettingsPage } from "./pages/Settings";
 import { VoicePage } from "./pages/Voice";
+import { AutoMode, VISUAL_MODES, VisualMode } from "./state/autoMode";
 import { events, useEventListener, usePoll } from "./state/events";
+
+const MODE_NAME: Record<VisualMode, string> = {
+  overview: "Command Center", research: "Ricerca globale", voice: "Voce",
+};
 
 const PAGES: PageId[] = ["overview", "research", "voice", "missions", "sales", "dev", "memory", "settings"];
 
@@ -67,6 +72,14 @@ function Shell() {
   const [page, setPage] = useState<PageId>(pageFromHash());
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [clock, setClock] = useState(new Date());
+  const [fading, setFading] = useState(false);
+  const [banner, setBanner] = useState<{ text: string; id: number } | null>(null);
+  const [autoOn, setAutoOn] = useState(true);
+  const pageRef = useRef(page);
+  pageRef.current = page;
+  const fadeTimer = useRef<number | null>(null);
+  const bannerTimer = useRef<number | null>(null);
+  const auto = useRef<AutoMode | null>(null);
   const { data: status } = usePoll<SystemStatus>("/system/status", 20000, ["mission.", "approval.", "system."]);
 
   useEffect(() => {
@@ -94,10 +107,48 @@ function Shell() {
     }
   });
 
-  const go = (p: PageId) => {
-    location.hash = p;
-    setPage(p);
+  /** Change page with a short fade; the latest request always wins. */
+  const switchTo = (p: PageId, reason?: string) => {
+    if (fadeTimer.current) window.clearTimeout(fadeTimer.current);
+    if (p === pageRef.current) {
+      setFading(false);
+      return;
+    }
+    const visualToVisual = (VISUAL_MODES as string[]).includes(p) && (VISUAL_MODES as string[]).includes(pageRef.current);
+    setFading(true);
+    fadeTimer.current = window.setTimeout(() => {
+      fadeTimer.current = null;
+      pageRef.current = p;
+      if (location.hash !== `#${p}`) history.replaceState(null, "", `#${p}`);
+      setPage(p);
+      setFading(false);
+      if (visualToVisual) {
+        const id = Date.now();
+        setBanner({ text: `${MODE_NAME[p as VisualMode]}${reason ? ` · ${reason}` : ""}`, id });
+        if (bannerTimer.current) window.clearTimeout(bannerTimer.current);
+        bannerTimer.current = window.setTimeout(() => setBanner(null), 2200);
+      }
+    }, 260);
   };
+
+  const go = (p: PageId) => {
+    auto.current?.manual();
+    switchTo(p);
+  };
+
+  useEffect(() => {
+    const a = new AutoMode(() => pageRef.current, (mode, reason) => switchTo(mode, reason));
+    auto.current = a;
+    setAutoOn(a.enabled);
+    const off = events.on((e) => a.handle(e));
+    return () => {
+      off();
+      a.dispose();
+      if (fadeTimer.current) window.clearTimeout(fadeTimer.current);
+      if (bannerTimer.current) window.clearTimeout(bannerTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const llmOk = status?.llm.ok;
   const counts = status?.counts ?? {};
 
@@ -114,9 +165,13 @@ function Shell() {
           <span>APPROVAZIONI <b className="num">{counts.approvals_pending ?? 0}</b></span>
           <span>LEAD <b className="num">{counts.leads ?? 0}</b></span>
           <span className="grow" />
+          <button className="modebtn" onClick={() => { const on = !autoOn; auto.current?.setEnabled(on); setAutoOn(on); }}
+            title="Cambio automatico tra Command Center, Ricerca e Voce in base a cosa fa JARVIS">
+            MODALITÀ <b>{autoOn ? "AUTO" : "MANUALE"}</b>
+          </button>
           <span className="num">{clock.toLocaleDateString("it-IT")} <b>{clock.toLocaleTimeString("it-IT")}</b></span>
         </div>
-        <div className={`page ${["overview", "research", "voice"].includes(page) ? "full" : ""}`}>
+        <div className={`page ${["overview", "research", "voice"].includes(page) ? "full" : ""} ${fading ? "fading" : ""}`}>
           {page === "overview" && <Overview status={status} />}
           {page === "research" && <ResearchPage />}
           {page === "voice" && <VoicePage status={status} />}
@@ -126,7 +181,8 @@ function Shell() {
           {page === "memory" && <MemoryPage />}
           {page === "settings" && <SettingsPage status={status} />}
         </div>
-        {page !== "voice" && <CommandBar />}
+        {banner && <div key={banner.id} className="mode-banner" role="status">{banner.text}</div>}
+        <CommandBar />
         <div className="toasts" aria-live="polite">
           {toasts.map((t) => (
             <div key={t.id} className="toast" role="status">

@@ -103,6 +103,7 @@ class ChatService:
                 msgs.append(Message("assistant", answer, tool_calls=calls))
                 for call in calls:
                     yield {"type": "tool", "name": call.name, "args": call.arguments, "status": "running"}
+                    self.s.bus.emit("chat.tool", conversation_id=conversation_id, name=call.name)
                     result = await self._run_tool(call, tainted)
                     if call.name in UNTRUSTED_TOOLS:
                         tainted = True
