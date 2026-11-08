@@ -72,6 +72,8 @@ Classify the user's objective for JARVIS. Choose the playbook that fits best:
 - "lead_acquisition": find / research / qualify prospects or potential customers
   for VEYRO Web (extract sector, country, city, count).
 - "website_audit": analyze one or more specific websites given as URLs.
+- "dev_project": create a software / website project or write code files
+  (extract project_name and file paths such as index.html).
 - "freeform": anything else.
 Extract parameters only if stated or clearly implied; otherwise null.
 Sectors: lawyer, dentist, clinic, aesthetic, tax_advisor, physiotherapist,

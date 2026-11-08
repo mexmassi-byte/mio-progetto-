@@ -38,7 +38,9 @@ class Plan:
 CLASSIFY_SCHEMA = {
     "type": "object",
     "properties": {
-        "playbook": {"type": "string", "enum": ["lead_acquisition", "website_audit", "freeform"]},
+        "playbook": {"type": "string", "enum": ["lead_acquisition", "website_audit", "dev_project", "freeform"]},
+        "project_name": {"type": ["string", "null"]},
+        "files": {"type": "array", "items": {"type": "string"}},
         "sector": {"type": ["string", "null"]},
         "country": {"type": ["string", "null"]},
         "city": {"type": ["string", "null"]},
@@ -85,6 +87,8 @@ class Planner:
             steps, cond = playbooks.lead_acquisition(params)
         elif kind == "website_audit":
             steps, cond = playbooks.website_audit(params)
+        elif kind == "dev_project":
+            steps, cond = playbooks.dev_project(params, objective)
         elif kind == "freeform":
             steps, cond = await self.freeform(objective, notes)
         else:
@@ -97,7 +101,7 @@ class Planner:
         try:
             data = await self.llm.chat_json(
                 [Message("system", CLASSIFIER_PROMPT), Message("user", objective)], CLASSIFY_SCHEMA)
-            if isinstance(data, dict) and data.get("playbook") in ("lead_acquisition", "website_audit", "freeform"):
+            if isinstance(data, dict) and data.get("playbook") in ("lead_acquisition", "website_audit", "dev_project", "freeform"):
                 return _normalize_classification(data, objective)
         except LLMError:
             pass
@@ -193,6 +197,10 @@ _NUMBER_WORDS = {"un": 1, "uno": 1, "due": 2, "tre": 3, "quattro": 4, "cinque": 
                  "otto": 8, "nove": 9, "dieci": 10, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
                  "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "fünf": 5, "zehn": 10}
 _LEAD_WORDS = ("client", "prospect", "lead", "kunde", "customer", "contatt", "acquisi")
+_DEV_CREATE = ("crea", "create", "scrivi", "write", "sviluppa", "build", "costruisci", "genera", "erstelle")
+_DEV_OBJECT = ("progetto", "project", "sito", "website", "app", "pagina", "page", "codice", "code", "file")
+_FILE_RE = re.compile(r"\b[\w/-]+\.(?:html|css|js|ts|tsx|jsx|py|md|json)\b", re.I)
+_NAME_RE = re.compile(r"(?:chiamato|chiamata|called|named|nome)\s+[\"'“]?([\w][\w .-]{1,60}?)[\"'”]?(?:\s+(?:e|and|con|with)\b|[,.:;]|$)", re.I)
 
 
 def heuristic_classification(objective: str) -> dict[str, Any]:
@@ -209,6 +217,12 @@ def heuristic_classification(objective: str) -> dict[str, Any]:
             if re.search(rf"\b{w}\b", text):
                 count = n
                 break
+    files = _FILE_RE.findall(objective)
+    if (any(w in text for w in _DEV_CREATE) and any(w in text for w in _DEV_OBJECT)
+            and (files or "progett" in text or "project" in text) and not any(w in text for w in _LEAD_WORDS)):
+        m = _NAME_RE.search(objective)
+        return {"playbook": "dev_project", "project_name": m.group(1).strip() if m else None, "files": files,
+                "sector": None, "country": None, "city": None, "count": None, "urls": []}
     if any(w in text for w in _LEAD_WORDS):
         return {"playbook": "lead_acquisition", "sector": sector, "country": country, "city": None,
                 "count": count, "urls": []}
@@ -226,6 +240,8 @@ def _normalize_classification(data: dict[str, Any], objective: str) -> dict[str,
         "city": data.get("city") or None,
         "count": data.get("count") if isinstance(data.get("count"), int) else None,
         "urls": [u for u in data.get("urls") or [] if isinstance(u, str)][:20],
+        "project_name": data.get("project_name") or None,
+        "files": [f for f in data.get("files") or [] if isinstance(f, str)][:8],
     }
     # Fill gaps with the deterministic parser (cheap and verifiable).
     h = heuristic_classification(objective)
@@ -234,4 +250,9 @@ def _normalize_classification(data: dict[str, Any], objective: str) -> dict[str,
             out[k] = h[k]
     if out["playbook"] == "website_audit" and not out["urls"]:
         out["urls"] = h.get("urls") or []
+    if h.get("playbook") == "dev_project" and out["playbook"] == "freeform":
+        out["playbook"] = "dev_project"  # deterministic signal beats a vague model answer
+    if out["playbook"] == "dev_project":
+        out["project_name"] = out["project_name"] or h.get("project_name")
+        out["files"] = out["files"] or h.get("files") or []
     return out

@@ -11,13 +11,13 @@ Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
 | 2 | Identità visiva: 3 modalità a particelle | fatto, da rifinire con il tuo feedback |
 | 3 | Motore autonomo | fatto e testato |
 | 4 | Reparto vendite | fatto e provato su dati reali (OpenStreetMap + siti veri) |
-| 5 | Reparto sviluppo | fatto e testato (base) |
+| 5 | Reparto sviluppo | fatto e provato con il modello reale |
 | 6 | Voce e notifiche | fatto e provato nel browser con microfono simulato |
-| 7 | Test e ottimizzazione | in parte: 50 test automatici, eval e missioni con modello reale |
+| 7 | Test e ottimizzazione | in parte: 52 test automatici, eval e missioni con modello reale |
 
 ## Cosa è stato verificato davvero
 
-- **50 test automatici** passano (`pytest`): database e migrazioni, backup,
+- **52 test automatici** passano (`pytest`): database e migrazioni, backup,
   memoria con revisioni, permessi, timeout, URL privati rifiutati, prompt
   injection (blocco in codice), pianificazione, missioni end-to-end, retry,
   budget, ripresa dopo riavvio, annullamento, audit siti, punteggio, CRM,
@@ -39,6 +39,9 @@ Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
   tedesco, **verificata 3/3** in 6 min 45 s. Il primo tentativo di ricerca è
   fallito (server sovraccarico) ed è stato ripetuto da solo. Nessun messaggio
   inviato.
+- **Missione di sviluppo reale** ("crea il progetto Studio Rossi e scrivi
+  index.html"): progetto creato nel workspace isolato, pagina HTML scritta dal
+  modello, verificata (file presente e non vuoto) in 20 s.
 - **Conversazione vocale completa nel browser** (Chromium con microfono
   simulato da file audio): ascolto → rilevamento della pausa → trascrizione →
   risposta del modello → voce Piper → di nuovo in attesa, in 10 s totali; la
@@ -78,6 +81,12 @@ Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
 9. Le bozze ricevevano i problemi del sito in italiano mentre dovevano essere
    in tedesco: ora il modello riceve fatti neutri in inglese e ruoli espliciti.
 
+10. Con il modello piccolo il piano libero per un lavoro di sviluppo era
+    sbagliato (ricerca web invece di scrivere codice). Aggiunto un playbook
+    fisso "progetto di sviluppo": il modello estrae solo nome e file.
+11. Sicurezza: il token passava nell'URL del WebSocket e finiva nei log. Ora
+    viene inviato come primo messaggio.
+
 ## Cosa NON è ancora verificato
 
 - **Il tuo PC:** nessun test sul tuo hardware. Serve l'output di
@@ -95,10 +104,10 @@ Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
 
 - La qualità dell'autonomia dipende dal modello: con un modello < 8/10 nella
   eval, usa JARVIS soprattutto per ricerca, audit e bozze, e controlla i piani.
-- Le missioni di acquisizione clienti usano un playbook fisso e testato
-  (cerca → analizza → punteggio → seleziona → bozze → report); le missioni
-  libere sono "completate, non verificate" perché non esiste un controllo
-  automatico del risultato.
+- Tre playbook fissi e testati: acquisizione clienti, audit di siti, progetto di
+  sviluppo. Le altre missioni usano un piano libero (più fragile con modelli
+  piccoli) e risultano "completate, non verificate" perché non esiste un
+  controllo automatico del risultato.
 - Nessun invio automatico: è una scelta legale (UWG §7, art. 130 Codice
   Privacy), non un limite tecnico.
 - Il globo usa dati Natural Earth 1:50M: coste riconoscibili, non dettagliate.

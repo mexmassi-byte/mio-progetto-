@@ -64,7 +64,13 @@ class Workspaces:
         return self.get(pid)  # type: ignore[return-value]
 
     def get(self, project_id: str) -> dict[str, Any] | None:
-        row = self.db.one("SELECT * FROM projects WHERE id = ? OR slug = ?", (project_id, project_id))
+        """By id, slug or display name (plans often refer to a project by name)."""
+        try:
+            slug = slugify(project_id)
+        except WorkspaceError:
+            slug = project_id
+        row = self.db.one("SELECT * FROM projects WHERE id = ? OR slug = ? OR slug = ?",
+                          (project_id, project_id, slug))
         if row:
             row["path"] = str(self.root / row["slug"])
         return row

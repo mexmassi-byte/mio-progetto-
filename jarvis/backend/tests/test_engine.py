@@ -187,3 +187,16 @@ async def test_mission_stops_when_no_business_is_found(services, llm, fake_sales
     assert done["params"]["cities"] == ["München"]
     assert done["status"] == "failed" and "No 'lawyer' businesses found" in done["error"]
     assert [t["status"] for t in done["tasks"]][:2] == ["failed", "skipped"]
+
+
+def test_dev_project_classification():
+    c = heuristic_classification("Crea un nuovo progetto chiamato Studio Rossi e scrivi il file index.html per lo studio")
+    assert c["playbook"] == "dev_project" and c["project_name"] == "Studio Rossi" and c["files"] == ["index.html"]
+
+
+async def test_dev_project_mission_writes_files_and_verifies(services, llm):
+    llm.queue({"playbook": "freeform"}, {"content": "<!doctype html><h1>Studio Rossi</h1>", "notes": "ok"})
+    m = services.missions.create("Crea un nuovo progetto chiamato Studio Rossi e scrivi il file index.html")
+    done = await services.engine.run_until_idle(m["id"])
+    assert done["status"] == "completed", [(t["tool"], t["status"], t["error"]) for t in done["tasks"]]
+    assert services.workspaces.read("Studio Rossi", "index.html").startswith("<!doctype html>")
