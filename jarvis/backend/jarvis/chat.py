@@ -15,7 +15,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from .services import Services
 
 CHAT_TOOLS = [
-    "memory_search", "memory_save", "knowledge_read", "create_mission", "mission_status",
+    "memory_search", "memory_save", "knowledge_read", "create_mission", "mission_status", "set_daily_goals",
     "crm_list_leads", "sales_audit_url", "fetch_page", "web_search", "request_action",
     "dev_list_files", "dev_read_file",
 ]
@@ -24,7 +24,7 @@ MAX_TOOL_ROUNDS = 4
 UNTRUSTED_TOOLS = {"web_search", "fetch_page", "sales_audit_url"}
 # Tools a web page must never be able to trigger: after untrusted content was
 # read in the same turn they are refused, whatever the model decides.
-TAINT_BLOCKED = {"request_action", "create_mission"}
+TAINT_BLOCKED = {"request_action", "create_mission", "set_daily_goals"}
 HISTORY_CHARS = 12000
 
 

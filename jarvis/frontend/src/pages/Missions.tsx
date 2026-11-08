@@ -37,6 +37,8 @@ export function MissionsPage() {
       </form>
       {err && <p className="error">{err}</p>}
 
+      <DailyGoals />
+
       {approvals && approvals.length > 0 && (
         <>
           <div className="h2">Da approvare · {approvals.length}</div>
@@ -187,5 +189,73 @@ function Schedules() {
         <button className="btn" disabled={obj.trim().length < 3}>Aggiungi</button>
       </form>
     </>
+  );
+}
+
+interface Goal {
+  id: string; objective: string; kind: string; target: number; progress: number; status: string;
+  attempts: number; max_attempts: number; note: string | null;
+}
+
+const GOAL_STATUS: Record<string, string> = {
+  active: "in corso", achieved: "raggiunto", exhausted: "non raggiunto", cancelled: "annullato",
+};
+
+/** Morning briefing: objectives JARVIS pursues on its own all day. */
+function DailyGoals() {
+  const { data: briefing, reload } = usePoll<{ id?: string; text?: string; report?: string | null; goals?: Goal[] }>(
+    "/briefing/latest", 15000, ["goals.", "mission."]);
+  const [text, setText] = useState("");
+  const [err, setErr] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  async function send(e: FormEvent) {
+    e.preventDefault();
+    setErr(null);
+    setBusy(true);
+    try {
+      await api.post("/briefing", { text });
+      setText("");
+      reload();
+    } catch (ex) {
+      setErr(String((ex as Error).message));
+    } finally {
+      setBusy(false);
+    }
+  }
+  const goals = briefing?.goals ?? [];
+  return (
+    <div style={{ margin: "18px 0 6px" }}>
+      <div className="h2">Obiettivi del giorno</div>
+      <form onSubmit={send} style={{ display: "grid", gap: 8 }}>
+        <textarea className="textarea" style={{ minHeight: 70, fontFamily: "var(--sans)", fontSize: 13 }} value={text}
+          onChange={(e) => setText(e.target.value)} aria-label="Briefing del giorno"
+          placeholder="Es.: Oggi trova 10 studi dentistici a Monaco e 5 studi legali a Berlino, poi analizza il sito https://esempio.de" />
+        <div className="row">
+          <button className="btn primary" disabled={busy || text.trim().length < 8}>{busy ? "…" : "Affida a JARVIS"}</button>
+          <span className="dim" style={{ fontSize: 11 }}>JARVIS lavora da solo finché ogni obiettivo è raggiunto, poi ti manda il rapporto.</span>
+        </div>
+        {err && <p className="error">{err}</p>}
+      </form>
+      {goals.length > 0 && (
+        <table className="t" style={{ marginTop: 10 }}>
+          <tbody>
+            {goals.map((g) => (
+              <tr key={g.id}>
+                <td style={{ width: "55%" }}>{g.objective}
+                  {g.note && <div className="dim" style={{ fontSize: 11 }}>{g.note}</div>}</td>
+                <td style={{ width: 130 }}>
+                  <div className="bar"><i style={{ width: `${Math.min(100, Math.round((g.progress / g.target) * 100))}%` }} /></div>
+                  <span className="dim num" style={{ fontSize: 10 }}>{g.progress}/{g.target} · tentativo {g.attempts}/{g.max_attempts}</span>
+                </td>
+                <td><span className={g.status === "achieved" ? "pill ok" : g.status === "active" ? "pill live" :
+                  g.status === "exhausted" ? "pill warn" : "pill"}>{GOAL_STATUS[g.status] ?? g.status}</span></td>
+                <td>{g.status === "active" && <button className="btn ghost" onClick={async () => { await api.post(`/goals/${g.id}/cancel`); reload(); }}>Annulla</button>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {briefing?.report && <pre className="code" style={{ marginTop: 10 }}>{briefing.report}</pre>}
+    </div>
   );
 }

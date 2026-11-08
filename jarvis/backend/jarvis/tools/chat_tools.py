@@ -7,6 +7,8 @@ from .registry import ToolContext, ToolError, ToolRegistry
 
 
 def register(reg: ToolRegistry) -> None:
+    register_goals(reg)
+
     @reg.tool(
         "create_mission",
         "Start an autonomous mission for a multi-step objective (research, finding customers, website "
@@ -61,3 +63,20 @@ def register(reg: ToolRegistry) -> None:
                                                    reason=reason)
         return {"approval_id": a["id"], "status": "pending",
                 "note": "Waiting for the user's decision in the Missions page."}
+
+
+def register_goals(reg: ToolRegistry) -> None:
+    @reg.tool(
+        "set_daily_goals",
+        "Set the user's objectives for the day (e.g. 'find 10 dentists in Munich and audit 3 websites'). "
+        "JARVIS then works on its own all day, launching and retrying missions until each target is "
+        "reached, and reports at the end. Use when the user describes what to achieve today.",
+        {"type": "object", "properties": {"briefing": {"type": "string", "maxLength": 4000}},
+         "required": ["briefing"]},
+        category="missions", plannable=False,
+    )
+    async def set_daily_goals(ctx: ToolContext, briefing: str) -> dict:
+        b = await ctx.services.goals.brief(briefing)
+        return {"goals": [{"objective": g["objective"], "kind": g["kind"], "target": g["target"]}
+                          for g in b["goals"]],
+                "note": "Goals set. JARVIS will keep working until they are reached."}

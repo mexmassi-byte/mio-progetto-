@@ -203,6 +203,17 @@ _FILE_RE = re.compile(r"\b[\w/-]+\.(?:html|css|js|ts|tsx|jsx|py|md|json)\b", re.
 _NAME_RE = re.compile(r"(?:chiamato|chiamata|called|named|nome)\s+[\"'“]?([\w][\w .-]{1,60}?)[\"'”]?(?:\s+(?:e|and|con|with)\b|[,.:;]|$)", re.I)
 
 
+def _find_city(text: str) -> str | None:
+    """Known city (or alias such as 'Monaco', 'Colonia', 'Munich') named in the text."""
+    from ..departments.sales.geo import ALIASES, CITIES
+
+    low = text.lower()
+    for name in sorted(list(CITIES) + list(ALIASES), key=len, reverse=True):
+        if re.search(rf"\b{re.escape(name.lower())}\b", low):
+            return ALIASES.get(name.lower(), name) if name not in CITIES else name
+    return None
+
+
 def heuristic_classification(objective: str) -> dict[str, Any]:
     text = objective.lower()
     urls = re.findall(r"https?://[^\s,;]+|\b[\w-]+\.(?:de|it|com|at|ch|eu|net|org)\b[^\s,;]*", objective)
@@ -223,8 +234,11 @@ def heuristic_classification(objective: str) -> dict[str, Any]:
         m = _NAME_RE.search(objective)
         return {"playbook": "dev_project", "project_name": m.group(1).strip() if m else None, "files": files,
                 "sector": None, "country": None, "city": None, "count": None, "urls": []}
-    if any(w in text for w in _LEAD_WORDS):
-        return {"playbook": "lead_acquisition", "sector": sector, "country": country, "city": None,
+    if any(w in text for w in _LEAD_WORDS) or (sector and count):
+        city = _find_city(objective)
+        if city and not country:
+            country = next((c for c, cities in playbooks.DEFAULT_CITIES.items() if city in cities), None)
+        return {"playbook": "lead_acquisition", "sector": sector, "country": country, "city": city,
                 "count": count, "urls": []}
     if urls and any(w in text for w in ("analizz", "audit", "analy", "controlla", "check", "prüf")):
         return {"playbook": "website_audit", "urls": urls, "sector": None, "country": None,
@@ -245,8 +259,8 @@ def _normalize_classification(data: dict[str, Any], objective: str) -> dict[str,
     }
     # Fill gaps with the deterministic parser (cheap and verifiable).
     h = heuristic_classification(objective)
-    for k in ("sector", "country", "count"):
-        if out[k] is None and h.get(k) is not None:
+    for k in ("sector", "country", "count", "city"):
+        if out.get(k) is None and h.get(k) is not None:
             out[k] = h[k]
     if out["playbook"] == "website_audit" and not out["urls"]:
         out["urls"] = h.get("urls") or []

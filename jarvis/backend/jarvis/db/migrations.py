@@ -253,4 +253,36 @@ MIGRATIONS: list[tuple[int, str]] = [
         )
         """,
     ),
+    (
+        5,
+        """
+        CREATE TABLE briefings (
+            id TEXT PRIMARY KEY,
+            day TEXT NOT NULL,
+            text TEXT NOT NULL,
+            report TEXT,
+            created_at TEXT NOT NULL,
+            finished_at TEXT
+        );
+        CREATE TABLE goals (
+            id TEXT PRIMARY KEY,
+            briefing_id TEXT REFERENCES briefings(id) ON DELETE CASCADE,
+            day TEXT NOT NULL,
+            objective TEXT NOT NULL,
+            kind TEXT NOT NULL,
+            params TEXT,
+            target INTEGER NOT NULL DEFAULT 1,
+            progress INTEGER NOT NULL DEFAULT 0,
+            status TEXT NOT NULL,
+            attempts INTEGER NOT NULL DEFAULT 0,
+            max_attempts INTEGER NOT NULL DEFAULT 5,
+            last_mission_id TEXT,
+            note TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        CREATE INDEX idx_goals_day ON goals(day, status);
+        ALTER TABLE missions ADD COLUMN goal_id TEXT
+        """,
+    ),
 ]

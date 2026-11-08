@@ -82,6 +82,10 @@ class Engine:
     async def tick(self) -> None:
         self.last_tick = now_iso()
         self._start_due_schedules()
+        try:
+            self.s.goals.tick()  # daily objectives: launch / measure / retry missions
+        except Exception:
+            log.exception("goal tick failed")
         for mid, task in list(self._running.items()):
             if task.done():
                 self._running.pop(mid, None)

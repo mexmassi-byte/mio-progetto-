@@ -49,6 +49,10 @@ class Settings(BaseSettings):
 
     # User identity used in prompts.
     user_name: str = "Massimiliano"
+    # How JARVIS addresses the founders, per language (not by first name).
+    title_it: str = "Signore"
+    title_en: str = "Sir"
+    title_de: str = "Master"
     company_name: str = "VEYRO Web"
     language: str = "it"
 

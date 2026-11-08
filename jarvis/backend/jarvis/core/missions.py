@@ -35,7 +35,7 @@ class MissionService:
     def create(self, objective: str, *, kind: str = "auto", params: dict | None = None,
                priority: int = 5, max_steps: int | None = None, max_seconds: int | None = None,
                permission_level: str = Permission.APPROVAL.value,
-               completion_condition: str = "") -> dict[str, Any]:
+               completion_condition: str = "", goal_id: str | None = None) -> dict[str, Any]:
         objective = objective.strip()
         if not objective:
             raise ValueError("Objective is empty")
@@ -50,8 +50,9 @@ class MissionService:
             "steps_used": 0, "completion_condition": completion_condition or "(set by the planner)",
             "verification": None, "result": None, "error": None,
             "created_at": ts, "updated_at": ts, "started_at": None, "finished_at": None,
+            "goal_id": goal_id,
         })
-        self.bus.emit("mission.created", mission_id=mid, objective=objective[:200])
+        self.bus.emit("mission.created", mission_id=mid, objective=objective[:200], goal_id=goal_id)
         return self.get(mid)  # type: ignore[return-value]
 
     def get(self, mission_id: str) -> dict[str, Any] | None:

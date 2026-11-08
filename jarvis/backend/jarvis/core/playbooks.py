@@ -28,7 +28,10 @@ def lead_acquisition(params: dict[str, Any]) -> tuple[list[dict], str]:
     if sector not in SECTORS:
         sector = "other"
     city = canonical_city(params.get("city"))
-    cities = [city] if city else DEFAULT_CITIES.get(country, DEFAULT_CITIES["DE"])[:4]
+    if params.get("cities"):  # explicit list (e.g. a goal moving on to new cities)
+        cities = [canonical_city(c) or c for c in params["cities"]][:6]
+    else:
+        cities = [city] if city else DEFAULT_CITIES.get(country, DEFAULT_CITIES["DE"])[:4]
     params.pop("urls", None)  # not used by this playbook (models sometimes invent some)
     params.update({"count": count, "country": country, "sector": sector, "city": city, "cities": cities})
     lang = COUNTRY_LANGUAGE.get(country, "en")

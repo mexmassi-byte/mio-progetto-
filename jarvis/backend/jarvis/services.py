@@ -19,6 +19,7 @@ from .tools.registry import ToolRegistry
 if TYPE_CHECKING:  # pragma: no cover
     from .chat import ChatService
     from .core.engine import Engine
+    from .core.goals import GoalService
     from .core.missions import MissionService
     from .core.planner import Planner
     from .departments.dev.workspace import Workspaces
@@ -42,6 +43,7 @@ class Services:
     crm: "CRM" = None  # type: ignore[assignment]
     workspaces: "Workspaces" = None  # type: ignore[assignment]
     chat: "ChatService" = None  # type: ignore[assignment]
+    goals: "GoalService" = None  # type: ignore[assignment]
 
     def set_llm(self, llm: LLMProvider) -> None:
         """Swap the model at runtime (settings page) without restarting."""
@@ -53,6 +55,7 @@ class Services:
 def build_services(settings: Settings, llm: LLMProvider | None = None) -> Services:
     from .chat import ChatService
     from .core.engine import Engine
+    from .core.goals import GoalService
     from .core.missions import MissionService
     from .core.planner import Planner
     from .departments.dev import tools as dev_tools
@@ -83,6 +86,7 @@ def build_services(settings: Settings, llm: LLMProvider | None = None) -> Servic
     s.workspaces = Workspaces(settings.workspaces_dir, db)
     s.engine = Engine(s)
     s.chat = ChatService(s)
+    s.goals = GoalService(s)
     return s
 
 

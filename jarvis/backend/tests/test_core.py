@@ -17,9 +17,9 @@ from jarvis.tools.web import assert_public_url, untrusted
 
 def test_migrations_are_idempotent(tmp_path):
     db = Database(tmp_path / "x.db")
-    assert db.migrate() == [1, 2, 3, 4]
+    assert db.migrate() == [1, 2, 3, 4, 5]
     assert db.migrate() == []
-    assert db.schema_version() == 4
+    assert db.schema_version() == 5
 
 
 def test_backup_and_rotation(services, tmp_path):

@@ -12,7 +12,7 @@ def test_health_is_public_everything_else_needs_token(client):
     r = client.get("/api/system/status", headers={"Authorization": "Bearer wrong"})
     assert r.status_code == 401
     st = client.get("/api/system/status").json()
-    assert st["llm"]["provider"] == "fake" and st["schema_version"] == 4
+    assert st["llm"]["provider"] == "fake" and st["schema_version"] == 5
     assert st["voice"]["stt"]["available"] in (True, False)
 
 
@@ -122,3 +122,9 @@ def test_actions_blocked_after_reading_web_content(client, monkeypatch):
     assert [d["ok"] for d in done] == [True, False]
     assert client.get("/api/missions").json() == []
     assert any(a["decision"] == "blocked_after_untrusted_content" for a in client.app_services.audit.list())
+
+
+def test_jarvis_addresses_founders_with_titles(settings):
+    from jarvis.prompts import chat_system_prompt
+    p = chat_system_prompt(settings, "", "")
+    assert '"Signore" in Italian' in p and '"Sir" in English' in p and '"Master" in German' in p

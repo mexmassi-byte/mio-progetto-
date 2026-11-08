@@ -358,6 +358,33 @@ async def approval_decide(aid: str, body: Decision, s: Services = Depends(requir
         raise HTTPException(403, str(exc)) from exc
 
 
+class BriefingIn(BaseModel):
+    text: str = Field(min_length=8, max_length=8000)
+
+
+@api.post("/briefing")
+async def briefing_create(body: BriefingIn, s: Services = Depends(require_token)) -> dict:
+    try:
+        return await s.goals.brief(body.text)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
+
+@api.get("/briefing/latest")
+async def briefing_latest(s: Services = Depends(require_token)) -> dict:
+    return s.goals.latest_briefing() or {}
+
+
+@api.get("/goals")
+async def goals(day: str | None = None, s: Services = Depends(require_token)) -> list:
+    return s.goals.list(day)
+
+
+@api.post("/goals/{gid}/cancel")
+async def goal_cancel(gid: str, s: Services = Depends(require_token)) -> dict:
+    return {"ok": s.goals.cancel(gid)}
+
+
 class ScheduleIn(BaseModel):
     objective: str = Field(min_length=3, max_length=4000)
     interval_hours: int = Field(24, ge=1, le=24 * 30)
