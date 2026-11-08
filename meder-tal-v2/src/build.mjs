@@ -289,7 +289,7 @@ page({
         ${people
           .map(
             (p) => `<a class="tile partner-tile span-6" href="team.html#${p.id}">
-          <div class="frame frame--photo partner-tile__photo"><img class="frame__img" src="assets/img/${p.id}-700.webp" srcset="assets/img/${p.id}-700.webp 700w, assets/img/${p.id}.webp 1400w" sizes="(max-width: 639px) 100vw, 50vw" alt="Porträt von ${p.name}" width="700" height="579" loading="lazy" data-source="client" data-subject="person"></div>
+          <div class="frame frame--photo partner-tile__photo"><img class="frame__img" src="assets/img/${p.id}-700.webp" srcset="assets/img/${p.id}-700.webp 700w, assets/img/${p.id}.webp 1400w" sizes="(max-width: 639px) 100vw, 50vw" alt="Porträt von ${p.name}" width="700" height="583" loading="lazy" data-source="client" data-subject="person"></div>
           <span class="t-card">${p.name}</span>
           <span class="t-small muted">${p.role}</span>
         </a>`,
@@ -459,8 +459,8 @@ page({
         <div class="btn-row"><a class="btn btn--primary" href="kontakt.html#anfrage">${cta}${arrow}</a><a class="btn btn--secondary" href="#meder">Die Partner ansehen</a></div>
       </div>
       <div class="hero__media hero__media--pair span-6 start-7">
-        <img src="assets/img/meder.webp" srcset="assets/img/meder-700.webp 700w, assets/img/meder.webp 1400w" sizes="(max-width: 1023px) 50vw, 25vw" alt="Porträt von Dr. Manuel Meder" width="1400" height="1158" fetchpriority="high">
-        <img src="assets/img/tal.webp" srcset="assets/img/tal-700.webp 700w, assets/img/tal.webp 1400w" sizes="(max-width: 1023px) 50vw, 25vw" alt="Porträt von Dr. Michael Tal" width="1400" height="1157" fetchpriority="high">
+        <img src="assets/img/meder.webp" srcset="assets/img/meder-700.webp 700w, assets/img/meder.webp 1400w" sizes="(max-width: 1023px) 50vw, 25vw" alt="Porträt von Dr. Manuel Meder" width="1400" height="1167" fetchpriority="high">
+        <img src="assets/img/tal.webp" srcset="assets/img/tal-700.webp 700w, assets/img/tal.webp 1400w" sizes="(max-width: 1023px) 50vw, 25vw" alt="Porträt von Dr. Michael Tal" width="1400" height="1167" fetchpriority="high">
       </div>
     </div></div>
   </section>
@@ -469,7 +469,7 @@ ${people
   .map(
     (p, i) => `  <section class="section member${i % 2 ? " member--flip" : ""}" id="${p.id}" aria-labelledby="${p.id}-h">
     <div class="wrap grid grid--middle">
-      <div class="frame frame--photo member__photo span-6${i % 2 ? " start-7" : ""}"><img class="frame__img" src="assets/img/${p.id}.webp" srcset="assets/img/${p.id}-700.webp 700w, assets/img/${p.id}.webp 1400w" sizes="(max-width: 1023px) 100vw, 50vw" alt="Porträt von ${p.name}" width="1400" height="1158" loading="lazy" data-source="client" data-subject="person"></div>
+      <div class="frame frame--photo member__photo span-6${i % 2 ? " start-7" : ""}"><img class="frame__img" src="assets/img/${p.id}.webp" srcset="assets/img/${p.id}-700.webp 700w, assets/img/${p.id}.webp 1400w" sizes="(max-width: 1023px) 100vw, 50vw" alt="Porträt von ${p.name}" width="1400" height="1167" loading="lazy" data-source="client" data-subject="person"></div>
       <div class="member__info span-5${i % 2 ? "" : " start-8"}">
         <h2 id="${p.id}-h">${p.name}</h2>
         <p class="t-lead muted">${p.role}</p>
