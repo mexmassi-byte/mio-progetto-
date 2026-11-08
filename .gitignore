@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# JARVIS local runtime data (database, knowledge, backups, logs, workspaces)
+jarvis/data/
+jarvis-hardware-report.txt
