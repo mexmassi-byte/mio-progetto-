@@ -72,11 +72,12 @@ export async function streamChat(
   conversationId: string | null,
   onEvent: (e: ChatEvent) => void,
   signal?: AbortSignal,
+  mode: "text" | "voice" = "text",
 ): Promise<void> {
   const res = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken() ?? ""}` },
-    body: JSON.stringify({ text, conversation_id: conversationId }),
+    body: JSON.stringify({ text, conversation_id: conversationId, mode }),
     signal,
   });
   if (!res.ok || !res.body) {

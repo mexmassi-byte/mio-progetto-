@@ -30,7 +30,7 @@ const VERTEX = /* glsl */ `
     float tt = uTime;
     float n1 = snoise(n * uFreq + vec3(0.0, tt, aShell * 1.7));
     float n2 = snoise(n * uFreq * 2.4 + vec3(tt * 1.3, aShell * 3.1, 0.0));
-    float disp = (n1 * 0.72 + n2 * 0.28) * (uAmp + uAudio * 0.42);
+    float disp = (n1 * 0.72 + n2 * 0.28) * (uAmp + uAudio * 0.22);
     // Ribbons also slide along the surface, so the folds keep changing.
     vec3 flow = vec3(snoise(n * 1.7 + vec3(tt * 0.6, 0.0, aShell)),
                      snoise(n * 1.7 + vec3(0.0, tt * 0.6, aShell + 5.0)),

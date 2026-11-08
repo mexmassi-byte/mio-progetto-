@@ -82,10 +82,12 @@ class LLMUnavailable(LLMError):
 class LLMProvider(ABC):
     name: str = "base"
 
-    def __init__(self, model: str, embed_model: str | None = None, temperature: float = 0.3):
+    def __init__(self, model: str, embed_model: str | None = None, temperature: float = 0.3,
+                 max_tokens: int = 1500):
         self.model = model
         self.embed_model = embed_model
         self.temperature = temperature
+        self.max_tokens = max_tokens
 
     @abstractmethod
     def stream_chat(

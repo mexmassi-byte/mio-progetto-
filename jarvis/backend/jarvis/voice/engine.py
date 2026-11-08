@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import shutil
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -17,6 +18,18 @@ from ..config import Settings
 
 class VoiceUnavailable(RuntimeError):
     pass
+
+
+def find_piper(name: str) -> str | None:
+    """Piper from PATH, or installed with `pip install piper-tts` in JARVIS's venv."""
+    found = shutil.which(name)
+    if found:
+        return found
+    venv_bin = Path(sys.executable).parent
+    for candidate in (venv_bin / name, venv_bin / f"{name}.exe"):
+        if candidate.exists():
+            return str(candidate)
+    return None
 
 
 class VoiceEngine:
@@ -31,7 +44,7 @@ class VoiceEngine:
             stt = True
         except ImportError:
             stt = False
-        piper = shutil.which(self.settings.piper_binary) is not None
+        piper = find_piper(self.settings.piper_binary) is not None
         voice_ok = bool(self.settings.piper_voice and Path(self.settings.piper_voice).exists())
         return {
             "stt": {"available": stt, "engine": "faster-whisper", "model": self.settings.whisper_model,
@@ -66,7 +79,7 @@ class VoiceEngine:
             Path(path).unlink(missing_ok=True)
 
     async def synthesize(self, text: str) -> bytes:
-        exe = shutil.which(self.settings.piper_binary)
+        exe = find_piper(self.settings.piper_binary)
         voice = self.settings.piper_voice
         if not exe or not voice or not Path(voice).exists():
             raise VoiceUnavailable("Speech synthesis not installed (Piper + JARVIS_PIPER_VOICE)")

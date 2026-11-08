@@ -40,6 +40,12 @@ class Settings(BaseSettings):
     llm_timeout_s: float = 300.0
     llm_temperature: float = 0.3
     llm_context_tokens: int = 8192
+    # Hidden "thinking" of reasoning models (qwen3, deepseek-r1...). Off by
+    # default: measured 7x faster answers on CPU. None = model default.
+    llm_think: bool | None = False
+    # Hard cap on generated tokens per answer: a degenerate model that loops
+    # must not generate forever (seen with very small models).
+    llm_max_tokens: int = 1500
 
     # User identity used in prompts.
     user_name: str = "Massimiliano"

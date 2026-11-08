@@ -15,6 +15,17 @@ export function webglAvailable(): boolean {
   }
 }
 
+export function isSoftwareRenderer(renderer: THREE.WebGLRenderer): boolean {
+  try {
+    const gl = renderer.getContext();
+    const ext = gl.getExtension("WEBGL_debug_renderer_info");
+    const name = String(ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    return /swiftshader|llvmpipe|software|basic render/i.test(name);
+  } catch {
+    return false;
+  }
+}
+
 export function prefersReducedMotion(): boolean {
   return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 }
@@ -56,12 +67,20 @@ export class Stage {
   private frameTimes: number[] = [];
   private density = 1;
   private pixelRatio: number;
+  private minFrameMs = 0;
+  private lastRender = 0;
+  /** True when WebGL is emulated on the CPU (no GPU acceleration). */
+  readonly software: boolean;
   fps = 0;
 
   constructor(private canvas: HTMLCanvasElement, fov = 40) {
     if (!webglAvailable()) throw new WebGLUnavailable("WebGL non disponibile");
-    this.quality = chooseQuality();
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: "high-performance" });
+    // Without a GPU, WebGL runs on the CPU and would starve the local AI
+    // model: use the lightest settings and cap the frame rate.
+    this.software = isSoftwareRenderer(this.renderer);
+    this.quality = this.software ? "low" : chooseQuality();
+    if (this.software) this.minFrameMs = 1000 / 20;
     this.renderer.setClearColor(0x000000, 1);
     this.pixelRatio = Math.min(window.devicePixelRatio || 1, this.quality === "high" ? 2 : 1.5);
     this.renderer.setPixelRatio(this.pixelRatio);
@@ -73,6 +92,7 @@ export class Stage {
   }
 
   get pixelScale(): number {
+    if (this.software) return (this.canvas.clientHeight || 600) / 800;
     return this.renderer.getPixelRatio() * (this.canvas.clientHeight || 600) / 800;
   }
 
@@ -101,6 +121,8 @@ export class Stage {
   private loop = () => {
     this.raf = requestAnimationFrame(this.loop);
     const now = performance.now();
+    if (this.minFrameMs && now - this.lastRender < this.minFrameMs) return;
+    this.lastRender = now;
     const dt = Math.min(0.1, (now - this.last) / 1000);
     this.last = now;
     // Reduced motion: animation runs 5x slower instead of stopping entirely,

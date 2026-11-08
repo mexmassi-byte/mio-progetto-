@@ -31,6 +31,7 @@ class OpenAICompatProvider(LLMProvider):
             "messages": [_oa_message(m) for m in messages],
             "stream": True,
             "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
         }
         if tools:
             body["tools"] = [t.as_openai() for t in tools]

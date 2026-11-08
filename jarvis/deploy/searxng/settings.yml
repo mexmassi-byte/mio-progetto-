@@ -1,0 +1,12 @@
+# Minimal SearXNG configuration for JARVIS.
+use_default_settings: true
+server:
+  limiter: false          # local use only (port bound to 127.0.0.1)
+  image_proxy: false
+search:
+  safe_search: 0
+  formats:
+    - html
+    - json                # required: JARVIS reads results as JSON
+ui:
+  default_locale: it

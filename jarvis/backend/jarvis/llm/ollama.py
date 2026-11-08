@@ -21,8 +21,11 @@ class OllamaProvider(LLMProvider):
         temperature: float = 0.3,
         timeout_s: float = 300.0,
         context_tokens: int = 8192,
+        think: bool | None = False,
     ):
         super().__init__(model, embed_model, temperature)
+        self.think = think
+        self._think_supported = True
         self.base_url = base_url.rstrip("/")
         self.timeout = httpx.Timeout(timeout_s, connect=5.0)
         self.context_tokens = context_tokens
@@ -38,12 +41,15 @@ class OllamaProvider(LLMProvider):
             "model": model or self.model,
             "messages": [m.as_dict() for m in messages],
             "stream": True,
-            "options": {"temperature": self.temperature, "num_ctx": self.context_tokens},
+            "options": {"temperature": self.temperature, "num_ctx": self.context_tokens,
+                        "num_predict": self.max_tokens},
         }
         if tools:
             body["tools"] = [t.as_openai() for t in tools]
         if json_schema is not None:
             body["format"] = json_schema or "json"
+        if self.think is not None and self._think_supported:
+            body["think"] = self.think
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 async with client.stream("POST", f"{self.base_url}/api/chat", json=body) as resp:
@@ -52,6 +58,12 @@ class OllamaProvider(LLMProvider):
                         raise LLMUnavailable(f"Model not found in Ollama: {detail}")
                     if resp.status_code >= 400:
                         detail = (await resp.aread()).decode(errors="replace")
+                        if "think" in body and "think" in detail.lower():
+                            # This model has no thinking switch: retry without it.
+                            self._think_supported = False
+                            async for chunk in self.stream_chat(messages, tools, json_schema, model):
+                                yield chunk
+                            return
                         raise LLMError(f"Ollama error {resp.status_code}: {detail}")
                     async for line in resp.aiter_lines():
                         if not line.strip():

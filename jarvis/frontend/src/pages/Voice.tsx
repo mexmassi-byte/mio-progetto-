@@ -162,7 +162,7 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
           setAnswer(full);
         }
         if (ev.type === "error") setNote(ev.error);
-      }, abort.current.signal);
+      }, abort.current.signal, "voice");
     } catch {
       setState("idle");
       return;

@@ -176,12 +176,13 @@ async def delete_conversation(cid: str, s: Services = Depends(require_token)) ->
 class ChatIn(BaseModel):
     text: str = Field(min_length=1, max_length=20000)
     conversation_id: str | None = None
+    mode: str = Field("text", pattern="^(text|voice)$")
 
 
 @api.post("/chat")
 async def chat(body: ChatIn, s: Services = Depends(require_token)) -> StreamingResponse:
     async def stream():
-        async for ev in s.chat.send(body.conversation_id, body.text):
+        async for ev in s.chat.send(body.conversation_id, body.text, body.mode):
             yield f"data: {json.dumps(ev, ensure_ascii=False, default=str)}\n\n"
     return StreamingResponse(stream(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})

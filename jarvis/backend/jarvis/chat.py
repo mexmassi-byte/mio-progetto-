@@ -61,7 +61,7 @@ class ChatService:
         return mid
 
     # ------------------------------------------------------------------ send
-    async def send(self, conversation_id: str | None, text: str) -> AsyncIterator[dict[str, Any]]:
+    async def send(self, conversation_id: str | None, text: str, mode: str = "text") -> AsyncIterator[dict[str, Any]]:
         """Stream the answer as events: conversation, token, tool, done, error."""
         text = text.strip()
         if not text:
@@ -76,7 +76,7 @@ class ChatService:
         memories = await self.s.memory.search(text, limit=6)
         mem_text = "\n".join(f"- [{m['category']}/{m['reliability']}] {m['title']}: {m['content'][:400]}"
                              for m in memories)
-        system = chat_system_prompt(self.s.settings, mem_text, self.s.knowledge.all_text(2500))
+        system = chat_system_prompt(self.s.settings, mem_text, self.s.knowledge.all_text(2500), voice=mode == "voice")
         msgs = [Message("system", system)] + self._history(conversation_id)
         tools = self.s.tools.specs(max_permission=Permission.AUTONOMOUS, names=CHAT_TOOLS)
         tainted = "UNTRUSTED_WEB_CONTENT" in text

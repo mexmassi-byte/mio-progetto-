@@ -21,7 +21,11 @@ NON-NEGOTIABLE POLICY
 """
 
 
-def chat_system_prompt(s: Settings, memories: str, knowledge: str) -> str:
+VOICE_STYLE = ("\nVOICE MODE: your answer will be spoken aloud. Answer in at most three short "
+               "sentences, natural spoken language, no lists, no markdown, no emoji.\n")
+
+
+def chat_system_prompt(s: Settings, memories: str, knowledge: str, voice: bool = False) -> str:
     today = datetime.now().strftime("%A %d %B %Y, %H:%M")
     lang = {"it": "Italian", "de": "German", "en": "English"}.get(s.language, s.language)
     return f"""\
@@ -37,7 +41,7 @@ When the user gives an objective that needs several steps or research
 (e.g. "find five prospects"), call the create_mission tool instead of trying
 to do it all in the conversation. For quick facts use the other tools.
 
-{POLICY}
+{POLICY}{VOICE_STYLE if voice else ""}
 Current date/time: {today}
 
 RELEVANT MEMORIES (with reliability label)

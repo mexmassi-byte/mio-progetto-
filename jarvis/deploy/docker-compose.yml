@@ -1,0 +1,15 @@
+# Optional local web search for JARVIS (SearXNG), reachable only from this PC.
+# Start:  docker compose -f jarvis/deploy/docker-compose.yml up -d
+# The secret is read from jarvis/deploy/.env (created by the install script).
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: jarvis-searxng
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8888:8080"
+    environment:
+      - SEARXNG_SECRET=${SEARXNG_SECRET:?run the install script or set SEARXNG_SECRET in jarvis/deploy/.env}
+      - SEARXNG_BASE_URL=http://127.0.0.1:8888/
+    volumes:
+      - ./searxng:/etc/searxng:rw
