@@ -10,6 +10,7 @@ from typing import Any
 
 from ...llm.base import LLMError, LLMProvider, Message
 from ...prompts import POLICY
+from .quality import check_draft
 
 KIND_INSTRUCTIONS = {
     "email": "A short first-contact email (max 140 words) with a subject line. Mention 2-3 concrete "
@@ -86,15 +87,24 @@ async def generate_draft(llm: LLMProvider | None, lead: dict[str, Any], kind: st
             Message("user", f"Draft type: {kind}\nInstructions: {KIND_INSTRUCTIONS[kind]}\n\n"
                             f"FACTS\n{facts_for(lead)}\n\nCOMPANY KNOWLEDGE\n{company_knowledge[:2500]}"),
         ]
-        try:
-            data = await llm.chat_json(msgs, DRAFT_SCHEMA)
-            if isinstance(data, dict) and str(data.get("body", "")).strip():
-                subject = str(data.get("subject") or "").strip() or None
-                if subject is None and kind in ("email", "followup", "proposal", "audit_report"):
-                    subject = template_draft(lead, kind, language, sender, company)[0]
-                return subject, str(data["body"]).strip(), f"llm:{llm.model}"
-        except LLMError:
-            pass
+        for attempt in range(2):
+            try:
+                data = await llm.chat_json(msgs, DRAFT_SCHEMA)
+            except LLMError:
+                break
+            if not (isinstance(data, dict) and str(data.get("body", "")).strip()):
+                continue
+            subject = str(data.get("subject") or "").strip() or None
+            body = str(data["body"]).strip()
+            if subject is None and kind in ("email", "followup", "proposal", "audit_report"):
+                subject = template_draft(lead, kind, language, sender, company)[0]
+            problems = check_draft(kind, language, subject, body, lead)
+            if not problems:
+                return subject, body, f"llm:{llm.model}" + ("+revisione" if attempt else "")
+            # One rewrite with precise feedback, then fall back to the template.
+            msgs = msgs + [Message("assistant", str(data)[:3000]),
+                           Message("user", "Rewrite it. Problems found by the quality check:\n- "
+                                   + "\n- ".join(problems))]
     subject, body = template_draft(lead, kind, language, sender, company)
     return subject, body, "template"
 

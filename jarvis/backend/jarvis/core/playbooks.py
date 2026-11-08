@@ -44,18 +44,20 @@ def lead_acquisition(params: dict[str, Any]) -> tuple[list[dict], str]:
         {"title": "Calcola il punteggio dei lead", "tool": "sales_score_leads", "args": {}, "depends_on": [2]},
         {"title": f"Seleziona i {count} migliori", "tool": "sales_qualify_top",
          "args": {"count": count}, "depends_on": [3]},
+        {"title": "Arricchisci i contatti (Impressum / pagina contatti)", "tool": "sales_enrich_leads",
+         "args": {}, "depends_on": [4], "optional": True},
         {"title": "Prepara outreach personalizzato (bozze, nessun invio)", "tool": "sales_draft_outreach",
-         "args": {"kinds": ["email", "call_script"], "language": lang}, "depends_on": [4], "timeout_s": 3600},
+         "args": {"kinds": ["email", "call_script"], "language": lang}, "depends_on": [5], "timeout_s": 3600},
         {"title": "Scrivi il report della missione", "tool": "write_document",
          "args": {"title": f"Report acquisizione clienti — {sector} {country}",
                   "instructions": "Summarize the qualified prospects found, why each one is a fit "
                                   "(based only on the audit facts), and the recommended next actions. "
                                   "State clearly that no message has been sent.",
                   "language": "it"},
-         "depends_on": [5], "optional": True},
+         "depends_on": [6], "optional": True},
         {"title": "Avvisa l'utente", "tool": "notify_user",
          "args": {"title": "Missione lead completata: bozze pronte da approvare", "level": "decision"},
-         "depends_on": [5]},
+         "depends_on": [6]},
     ]
     cond = (f"Almeno {count} lead di questa missione qualificati, con audit del sito "
             f"e almeno una bozza di contatto.")

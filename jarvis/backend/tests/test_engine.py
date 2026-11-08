@@ -40,6 +40,12 @@ def fake_sales(monkeypatch):
         n = int(url.rstrip("/").split("kanzlei")[-1].split(".")[0])
         return analyze_html(BAD_SITE if n % 2 == 0 else GOOD_SITE, url, elapsed_ms=4000 if n % 2 == 0 else 300)
 
+    async def no_network(url, ctx, timeout=None):
+        from jarvis.tools.registry import ToolError
+        raise ToolError("network disabled in tests", retryable=False)
+
+    from jarvis.tools import web
+    monkeypatch.setattr(web, "http_get", no_network)
     monkeypatch.setattr(sales_tools, "overpass_search", fake_overpass)
     monkeypatch.setattr(sales_tools, "audit_url", fake_audit)
     return businesses

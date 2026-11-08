@@ -15,6 +15,7 @@ from .crm import DRAFT_KINDS, LEAD_STATUSES
 from .discovery import SECTOR_TAGS, overpass_search
 from .geo import canonical_city, city_coords
 from .outreach import generate_draft
+from .quality import CONTACT_PATHS, contact_links, extract_contacts
 from .scoring import score_lead
 
 
@@ -166,6 +167,61 @@ def register(reg: ToolRegistry) -> None:
                 "target": count, "below_threshold": max(0, count - len(chosen)),
                 "note": None if len(chosen) >= count else
                 f"only {len(chosen)} leads reached the minimum score {min_score}"}
+
+    @reg.tool(
+        "sales_enrich_leads",
+        "For this mission's qualified leads, read the public Impressum / contact page and add the "
+        "business email, phone and the person responsible (legally required public information).",
+        {"type": "object", "properties": {"max_pages": {"type": "integer", "default": 2, "minimum": 1, "maximum": 4}}},
+        external=True, category="sales", timeout_s=1200,
+    )
+    async def sales_enrich_leads(ctx: ToolContext, max_pages: int = 2) -> dict:
+        from urllib.parse import urljoin
+
+        from ...tools.web import http_get, page_text
+        crm = ctx.services.crm
+        enriched = 0
+        for lead in crm.list(status="qualified", mission_id=ctx.mission_id):
+            if not lead["website"]:
+                continue
+            audit = lead["audit"] or {}
+            pages: list[str] = []
+            try:  # follow the site's own links: Impressum URLs are not predictable
+                home = await http_get(lead["website"], ctx)
+                from urllib.parse import urlparse
+                pages = contact_links(page_text(home.text, str(home.url))["links"], urlparse(str(home.url)).netloc)
+            except ToolError:
+                pass
+            pages += [p for p in [(audit.get("contacts") or {}).get("contact_page")] if p]
+            pages += [urljoin(lead["website"].rstrip("/") + "/", path) for path in CONTACT_PATHS]
+            found: dict = {"emails": [], "phones": [], "owner": None}
+            for url in list(dict.fromkeys(pages))[: max_pages + 1]:
+                try:
+                    resp = await http_get(url, ctx)
+                except ToolError:
+                    continue
+                if resp.status_code >= 400:
+                    continue
+                c = extract_contacts(page_text(resp.text, str(resp.url), 20000)["text"])
+                found["emails"] += [e for e in c["emails"] if e not in found["emails"]]
+                found["phones"] += [p for p in c["phones"] if p not in found["phones"]]
+                found["owner"] = found["owner"] or c["owner"]
+                if found["emails"] and found["owner"]:
+                    break
+            updates: dict = {}
+            if found["emails"] and not lead["email"]:
+                updates["email"] = found["emails"][0]
+            if found["phones"] and not lead["phone"]:
+                updates["phone"] = found["phones"][0]
+            if found["owner"]:
+                note = f"Responsabile (Impressum): {found['owner']}"
+                if note not in (lead["notes"] or ""):
+                    updates["notes"] = ((lead["notes"] or "") + "\n" + note).strip()
+            if updates:
+                crm.update(lead["id"], actor="jarvis", **updates)
+                enriched += 1
+                ctx.emit("lead.enriched", lead_id=lead["id"], fields=sorted(updates))
+        return {"enriched": enriched}
 
     @reg.tool(
         "sales_draft_outreach",
