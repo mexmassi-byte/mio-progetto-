@@ -106,6 +106,8 @@ export class DataLandscape implements Scene3D {
     });
     this.points = new THREE.Points(geo, this.material);
     this.points.frustumCulled = false;
+    // Keep the most recent hours (right end) clear of the right-hand panels.
+    this.points.position.x = -0.55;
     stage.scene.add(this.points);
     this.placeCamera(0);
   }
@@ -164,7 +166,7 @@ export class DataLandscape implements Scene3D {
 
   /** Screen position (CSS px) of a point on the ground plane, for HTML labels. */
   project(u: number, v: number, y = 0): { x: number; y: number; visible: boolean } {
-    const p = new THREE.Vector3((u - 0.5) * W, y, (v - 0.5) * D).project(this.stage.camera);
+    const p = new THREE.Vector3((u - 0.5) * W + this.points.position.x, y, (v - 0.5) * D).project(this.stage.camera);
     const el = this.stage.renderer.domElement;
     return { x: ((p.x + 1) / 2) * el.clientWidth, y: ((1 - p.y) / 2) * el.clientHeight, visible: p.z < 1 };
   }

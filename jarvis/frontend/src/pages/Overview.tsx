@@ -13,12 +13,21 @@ export function Overview({ status }: { status: SystemStatus | null }) {
   const sceneRef = useRef<DataLandscape | null>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
 
-  const series: Series | null = useMemo(() => {
+  // Adaptive window: start shortly before the first activity (at least 12 h),
+  // so recent work spreads across the terrain instead of one edge.
+  const window = useMemo(() => {
     if (!data) return null;
-    const s = {} as Series;
-    for (const c of CATEGORIES) s[c] = data.activity.map((a) => a[c]);
-    return s;
+    const first = data.activity.findIndex((a) => a.total > 0);
+    const start = first < 0 ? 0 : Math.max(0, Math.min(first - 2, data.activity.length - 12));
+    return data.activity.slice(start);
   }, [data]);
+
+  const series: Series | null = useMemo(() => {
+    if (!window) return null;
+    const s = {} as Series;
+    for (const c of CATEGORIES) s[c] = window.map((a) => a[c]);
+    return s;
+  }, [window]);
 
   useEffect(() => {
     if (series && sceneRef.current) sceneRef.current.setData(series);
@@ -68,7 +77,7 @@ export function Overview({ status }: { status: SystemStatus | null }) {
         {[0, 0.5, 1].map((u) => (
           <span key={u} data-u={u} data-v="1.02"
             style={{ position: "absolute", left: 0, top: 0, fontSize: 9, color: "var(--fg-3)", marginLeft: -14 }}>
-            {u === 1 ? "ORA" : u === 0.5 ? "-24H" : "-48H"}
+            {u === 1 ? "ORA" : `-${Math.round((window?.length ?? 48) * (1 - u))}H`}
           </span>
         ))}
       </div>

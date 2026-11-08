@@ -583,12 +583,19 @@ async def voice_state(state: str = Body(..., embed=True), s: Services = Depends(
 
 
 @public.websocket("/ws")
-async def websocket(ws: WebSocket, token: str = "") -> None:
+async def websocket(ws: WebSocket) -> None:
+    """Live events. The token is sent as the first message, never in the URL,
+    so it cannot end up in access logs or browser history."""
     s: Services = ws.app.state.services
+    await ws.accept()
+    try:
+        first = await asyncio.wait_for(ws.receive_text(), timeout=5)
+        token = json.loads(first).get("token") if first.startswith("{") else None
+    except (asyncio.TimeoutError, WebSocketDisconnect, ValueError):
+        token = None
     if not token_matches(s.token, token):
         await ws.close(code=4401)
         return
-    await ws.accept()
     q = s.bus.subscribe()
     try:
         await ws.send_text(json.dumps({"type": "hello", "payload": {"version": __version__}}))

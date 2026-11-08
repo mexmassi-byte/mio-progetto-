@@ -18,9 +18,10 @@ class EventStore {
   start() {
     if (this.ws || !getToken()) return;
     const proto = location.protocol === "https:" ? "wss" : "ws";
-    const ws = new WebSocket(`${proto}://${location.host}/api/ws?token=${encodeURIComponent(getToken() ?? "")}`);
+    const ws = new WebSocket(`${proto}://${location.host}/api/ws`);
     this.ws = ws;
     ws.onopen = () => {
+      ws.send(JSON.stringify({ token: getToken() ?? "" }));
       this.retry = 0;
       this.connected = true;
       this.notify();

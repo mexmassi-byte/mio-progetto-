@@ -93,9 +93,11 @@ def test_websocket_requires_token(client):
     import pytest
     from starlette.websockets import WebSocketDisconnect
     with pytest.raises(WebSocketDisconnect):
-        with client.websocket_connect("/api/ws?token=bad") as ws:
+        with client.websocket_connect("/api/ws") as ws:
+            ws.send_text(json.dumps({"token": "bad"}))
             ws.receive_text()
-    with client.websocket_connect(f"/api/ws?token={client.app_services.token}") as ws:
+    with client.websocket_connect("/api/ws") as ws:
+        ws.send_text(json.dumps({"token": client.app_services.token}))
         assert json.loads(ws.receive_text())["type"] == "hello"
 
 
