@@ -30,6 +30,9 @@ from .voice.engine import VoiceEngine
 
 log = logging.getLogger("jarvis")
 FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+CSP = ("default-src 'self'; connect-src 'self' ws: wss:; img-src 'self' data: blob:; media-src 'self' blob:; "
+       "style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self'; object-src 'none'; "
+       "frame-ancestors 'none'; base-uri 'none'")
 
 
 def setup_logging(settings: Settings) -> None:
@@ -94,6 +97,8 @@ def create_app(settings: Settings | None = None, llm: LLMProvider | None = None,
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "no-referrer")
+        if not request.url.path.startswith("/api/"):
+            response.headers.setdefault("Content-Security-Policy", CSP)
         return response
 
     from .api.routes import api, public
