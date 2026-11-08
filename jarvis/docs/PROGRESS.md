@@ -6,7 +6,7 @@ Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
 
 | Fase | Contenuto | Stato |
 | --- | --- | --- |
-| 0 | Audit, riferimenti, architettura | fatto, **manca l'audit del tuo PC** |
+| 0 | Audit, riferimenti, architettura | fatto: MacBook Air M2 8 GB, modello qwen3:4b (docs/HARDWARE.md) |
 | 1 | Core: backend, DB, Ollama, chat, memoria | fatto e testato |
 | 2 | Identità visiva: 3 modalità a particelle | fatto, da rifinire con il tuo feedback |
 | 3 | Motore autonomo | fatto e testato |
