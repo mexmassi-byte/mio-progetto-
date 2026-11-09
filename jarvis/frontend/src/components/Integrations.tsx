@@ -7,7 +7,7 @@ interface Status {
   google: { client_configured: boolean; connected: boolean; account: string | null; scopes: string[]; autonomous_writes: boolean };
   phone: { configured: boolean; enabled: boolean; calls_today: number; max_per_day: number; quiet_hours: string; two_way: boolean };
   wake: { available: boolean; hint?: string | null; state?: string; error?: string | null; enabled?: boolean; muted?: boolean;
-    sensitivity?: number; phrases?: Record<string, string[]>; last?: { phrase?: string; lang?: string; at?: string } | null };
+    sensitivity?: number; phrases?: Record<string, string[]>; universal?: string[]; last?: { phrase?: string; lang?: string; at?: string } | null };
   vault: string[];
   webhook: { host: string; port: number; path: string };
 }
@@ -150,7 +150,8 @@ export function Integrations() {
               () => wake.muted ? "Microfono riaperto." : "Microfono chiuso.")}>{wake.muted ? "Riapri microfono" : "Silenzia"}</button>}
           </div>
           <p className="dim" style={{ fontSize: 11 }}>
-            Riconoscimento solo sul computer: l'audio non viene mai inviato. Frasi:{" "}
+            Riconoscimento solo sul computer: l'audio non viene mai inviato. Accensione generale, in ogni lingua:{" "}
+            {(wake.universal ?? []).map((p) => `«${p}»`).join(" ")}. Frasi per lingua:{" "}
             {Object.values(wake.phrases ?? {}).flat().map((p) => `«${p}»`).join(" ")}
           </p>
 

@@ -40,6 +40,13 @@ PHRASES: dict[str, list[str]] = {
     "en": ["JARVIS, I'm home.", "Hey JARVIS, I'm home.", "JARVIS, I'm back."],
     "de": ["JARVIS, ich bin zu Hause.", "Hey JARVIS, ich bin zu Hause.", "JARVIS, ich bin zurück."],
 }
+# General power-on, the same in every language. JARVIS answers in his main language.
+UNIVERSAL: list[str] = ["JARVIS, wake up."]
+UNIVERSAL_GREETINGS: dict[str, list[str]] = {
+    "it": ["Sono qui, {t}. Tutti i sistemi sono operativi.", "Ai suoi ordini, {t}. Tutti i sistemi sono operativi."],
+    "en": ["At your service, {t}. All systems are online.", "Good to see you, {t}. All systems are online."],
+    "de": ["Zu Ihren Diensten, {t}. Alle Systeme sind bereit.", "Ich bin da, {t}. Alle Systeme sind bereit."],
+}
 GREETINGS: dict[str, list[str]] = {
     "it": ["Bentornato, {t}.", "Bentornato a casa, {t}."],
     "en": ["Welcome back, {t}.", "Welcome home, {t}."],
@@ -58,6 +65,7 @@ def normalize(text: str) -> str:
     t = re.sub(r"\bzuhause\b", "zu hause", t)
     t = re.sub(r"\bhi jarvis\b|\bhei jarvis\b|\bei jarvis\b", "hey jarvis", t)
     t = re.sub(r"\bi am\b", "im", t)
+    t = re.sub(r"\bwakeup\b|\bwake-up\b|\bwakup\b", "wake up", t)
     return " ".join(t.split())
 
 
@@ -66,7 +74,7 @@ def _content(norm: str) -> str:
 
 
 _NORM_PHRASES = [(lang, i, normalize(p).startswith("hey "), _content(normalize(p)))
-                 for lang, ps in PHRASES.items() for i, p in enumerate(ps)]
+                 for lang, ps in {**PHRASES, "any": UNIVERSAL}.items() for i, p in enumerate(ps)]
 
 
 def match_phrase(text: str, sensitivity: float = 0.6) -> dict[str, Any] | None:
@@ -92,7 +100,8 @@ def match_phrase(text: str, sensitivity: float = 0.6) -> dict[str, Any] | None:
                     for k in range(max(1, n - 1), n + 2))
         score += 0.01 if has_hey == said_hey else 0.0  # pick the "Hey" variant when "hey" was said
         if best is None or score > best["score"]:
-            best = {"lang": lang, "index": idx, "phrase": PHRASES[lang][idx], "score": round(score, 3)}
+            phrase = UNIVERSAL[idx] if lang == "any" else PHRASES[lang][idx]
+            best = {"lang": lang, "index": idx, "phrase": phrase, "score": round(score, 3)}
     return best if best and best["score"] >= threshold else None
 
 
@@ -113,8 +122,9 @@ def looks_like_activation(text: str) -> bool:
     return False
 
 
-def greeting(lang: str, title: str, rnd: random.Random | None = None) -> str:
-    return (rnd or random).choice(GREETINGS.get(lang, GREETINGS["it"])).format(t=title)
+def greeting(lang: str, title: str, rnd: random.Random | None = None, universal: bool = False) -> str:
+    table = UNIVERSAL_GREETINGS if universal else GREETINGS
+    return (rnd or random).choice(table.get(lang, table["it"])).format(t=title)
 
 
 class Segmenter:
@@ -255,7 +265,8 @@ class WakeService:
     def status(self) -> dict[str, Any]:
         cfg = self._cfg()
         return {"available": self.dependencies() is None, "hint": self.dependencies(), "state": self.state,
-                "error": self.error, **cfg, "phrases": PHRASES, "last": self.last}
+                "error": self.error, **cfg, "phrases": PHRASES, "universal": UNIVERSAL,
+                "last": self.last}
 
     def _set_state(self, state: str) -> None:
         if state != self.state:
@@ -412,12 +423,16 @@ class WakeService:
         text, hit = await asyncio.to_thread(self.detect, samples)
         if not hit:
             return None
-        self._lang = hit["lang"]
-        title = {"it": self.s.settings.title_it, "en": self.s.settings.title_en,
-                 "de": self.s.settings.title_de}[hit["lang"]]
-        hello = greeting(hit["lang"], title)
+        universal = hit["lang"] == "any"
+        # "JARVIS, wake up." is the same in every language: he answers in his main language.
+        lang = (self.s.settings.language if self.s.settings.language in PHRASES else "it") if universal else hit["lang"]
+        self._lang = lang
+        title = {"it": self.s.settings.title_it, "en": self.s.settings.title_en, "de": self.s.settings.title_de}[lang]
+        hello = greeting(lang, title, universal=universal)
+        hit = {**hit, "lang": lang, "universal": universal}
         self.last = {**hit, "heard": text, "greeting": hello}
-        self.s.bus.emit("voice.wake", lang=hit["lang"], phrase=hit["phrase"], greeting=hello, score=hit["score"])
+        self.s.bus.emit("voice.wake", lang=lang, phrase=hit["phrase"], greeting=hello, score=hit["score"],
+                        universal=universal)
         if len(self.s.bus._subscribers) == 0:  # no dashboard open: talk through the speakers
             await self._headless_greeting(hello)
         return self.last

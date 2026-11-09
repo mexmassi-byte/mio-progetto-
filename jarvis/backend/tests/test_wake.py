@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from jarvis.voice.wake import PHRASES, RATE, Segmenter, WakeService, match_phrase
+from jarvis.voice.wake import PHRASES, RATE, UNIVERSAL, Segmenter, WakeService, match_phrase
 
 ALL = [(lang, p) for lang, ps in PHRASES.items() for p in ps]
 
@@ -32,6 +32,34 @@ def test_tolerates_transcription_variants(heard, lang):
 ])
 def test_ignores_other_speech(heard):
     assert match_phrase(heard) is None
+
+
+@pytest.mark.parametrize("heard", ["JARVIS, wake up.", "Jarvis wakeup", "Hey Jarvis, wake up!", "JARVIS. Wake up.",
+                                   "Giarvis, wake-up"])
+def test_universal_wake_up(heard):
+    hit = match_phrase(heard)
+    assert hit and hit["lang"] == "any" and hit["phrase"] == UNIVERSAL[0]
+
+
+@pytest.mark.parametrize("heard", ["Wake up, it's already late.", "Jarvis, make a note.", "Jarvis, wait up"])
+def test_wake_up_needs_the_name_and_the_phrase(heard):
+    assert match_phrase(heard) is None
+
+
+async def test_wake_up_answers_in_the_main_language(services):
+    played = []
+    wake = WakeService(services, recognizer=lambda s, language=None, stage="screen": ("JARVIS, wake up.", "en"),
+                       player=lambda data, suffix: played.append(data))
+
+    async def fake_speak(text):
+        return text.encode(), "audio/mpeg"
+
+    services.voice.speak = fake_speak
+    hit = await wake.process_segment(np.zeros(RATE, dtype="float32"))
+    assert hit["universal"] and hit["lang"] == "it"
+    assert hit["greeting"].endswith("Tutti i sistemi sono operativi.") and "Signore" in hit["greeting"]
+    ev = next(e for e in services.bus.recent(50) if e["type"] == "voice.wake")
+    assert ev["payload"]["universal"] is True
 
 
 def test_segmenter_finds_speech_between_silences():
@@ -80,3 +108,4 @@ def test_settings_and_unavailable_microphone_are_reported(services):
     assert cfg["enabled"] and cfg["sensitivity"] == 0.8 and not cfg["muted"]
     st = wake.status()
     assert set(st["phrases"]) == {"it", "en", "de"} and all(len(v) == 3 for v in st["phrases"].values())
+    assert st["universal"] == ["JARVIS, wake up."]

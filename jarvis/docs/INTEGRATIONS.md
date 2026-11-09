@@ -196,9 +196,17 @@ Twilio, in italiano) e ti rimanda a WhatsApp o alla dashboard. La
 conversazione a due vie in chiamata richiede Twilio Media Streams e un
 indirizzo pubblico per l'audio in tempo reale: è il passo successivo.
 
-## 4. Attivazione vocale ("JARVIS, sono a casa.")
+## 4. Attivazione vocale ("JARVIS, wake up." / "JARVIS, sono a casa.")
 
 ### Le frasi
+
+**Accensione generale, uguale in tutte le lingue:** «JARVIS, wake up.»
+JARVIS risponde nella sua lingua principale (`JARVIS_LANGUAGE`, italiano):
+"Sono qui, Signore. Tutti i sistemi sono operativi." Provata su voce
+sintetizzata con tre voci e con accento italiano e tedesco: 6 su 6, nessuna
+attivazione con "Wake up, it's already late." o "JARVIS, make a note.".
+
+Poi tre frasi per lingua, a cui risponde nella lingua usata:
 
 | Italiano | English | Deutsch |
 | --- | --- | --- |
@@ -244,7 +252,8 @@ Microfono).
   chiuso** (senza monitor esterno) il Mac dorme e non sente nulla.
 - Su MacBook Air M2 8 GB l'ascolto continuo usa poca CPU; il riconoscimento
   (circa 2 secondi) parte solo quando c'è voce.
-- Provato nel container con frasi sintetizzate: 13 attivazioni corrette su 13,
+- Provato nel container con frasi sintetizzate: 22 risultati corretti su 22
+  (10 frasi di attivazione e 7 frasi di controllo che non devono attivarlo),
   0 falsi positivi. Con il microfono vero del tuo Mac va provato in casa
   (rumore, distanza): se non risponde, alza la sensibilità.
 
@@ -262,4 +271,4 @@ solo per la dashboard.
 | WhatsApp | firma dei webhook, verifica token, ricezione testo/voce/documenti, risposte, finestra 24 h, duplicati, estranei: test automatici contro un'API Meta simulata. Endpoint reale Meta raggiunto (risponde "token non valido" senza credenziali) | invio e ricezione reali (serve la tua app Meta) |
 | Google | OAuth con PKCE, rinnovo token, triage Gmail → lead, bozze, invio solo con approvazione, Calendar, Docs, Contatti, rapporto email: test automatici contro API Google simulate. Endpoint reali raggiunti | accesso reale al tuo account |
 | Chiamate | verifiche degli eventi, limiti, orari, `CONFERMO`: test automatici. Endpoint Twilio reale raggiunto | chiamata reale (serve account Twilio con credito) |
-| Attivazione vocale | 13/13 frasi riconosciute, 0 falsi positivi, saluto e passaggio alla sfera provati nel browser | microfono vero del Mac |
+| Attivazione vocale | 22/22 corrette (le 10 frasi e 7 frasi di controllo), 0 falsi positivi, saluto e passaggio alla sfera provati nel browser | microfono vero del Mac |

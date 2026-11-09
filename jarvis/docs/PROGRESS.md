@@ -158,11 +158,12 @@ l'indicatore MIC nella barra in alto.
   Contatti. Rapporto serale anche via email, solo a voi.
 - **Chiamate Twilio:** solo eventi verificati nei dati, limiti giornalieri,
   orari di silenzio, attivazione con `CONFERMO`. A una via per ora.
-- **Attivazione vocale** con le 9 frasi in IT/EN/DE, riconoscimento locale a
-  due stadi (Whisper tiny + small): 13/13 corrette, 0 falsi positivi su voce
+- **Attivazione vocale**: accensione generale «JARVIS, wake up.» (tutte le
+  lingue) più le 9 frasi in IT/EN/DE, riconoscimento locale a due stadi
+  (Whisper tiny + small): 22/22 corrette, 0 falsi positivi su voce
   sintetizzata. Saluto nella lingua usata, poi ascolto.
 - **Una conversazione** condivisa tra dashboard, voce e WhatsApp.
-- **118 test automatici** passano.
+- **127 test automatici** passano.
 
 Da provare con i vostri account: app Meta, progetto Google Cloud, account
 Twilio, microfono del Mac.
