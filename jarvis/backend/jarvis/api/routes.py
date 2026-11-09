@@ -290,6 +290,25 @@ async def phone_test(body: PhoneEnable, s: Services = Depends(require_token)) ->
                                        external_id=f"test:{now_iso()}")
 
 
+class WakeIn(BaseModel):
+    enabled: bool | None = None
+    muted: bool | None = None
+    sensitivity: float | None = Field(None, ge=0, le=1)
+
+
+@api.get("/wake")
+async def wake_status(request: Request) -> dict:
+    return request.app.state.wake.status()
+
+
+@api.post("/wake")
+async def wake_configure(body: WakeIn, request: Request) -> dict:
+    """Enable/disable, mute (closes the microphone) and sensitivity."""
+    wake = request.app.state.wake
+    wake.configure(**body.model_dump())
+    return await wake.apply()
+
+
 @api.get("/integrations/log")
 async def comms_log(limit: int = 100, s: Services = Depends(require_token)) -> list:
     return s.db.query("SELECT * FROM comms_log ORDER BY id DESC LIMIT ?", (min(limit, 500),))

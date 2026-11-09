@@ -94,12 +94,14 @@ def create_app(settings: Settings | None = None, llm: LLMProvider | None = None,
             services.engine.start()
         backups = asyncio.create_task(_daily_backups(services))
         webhook_server = await _start_webhooks(services)
+        await app.state.wake.apply()
         try:
             yield
         finally:
             backups.cancel()
             if webhook_server:
                 webhook_server.should_exit = True
+            await app.state.wake.stop()
             await services.engine.stop()
             services.db.close()
 
@@ -107,6 +109,8 @@ def create_app(settings: Settings | None = None, llm: LLMProvider | None = None,
                   docs_url="/api/docs", openapi_url="/api/openapi.json")
     app.state.services = services
     app.state.voice = services.voice
+    from .voice.wake import WakeService
+    app.state.wake = WakeService(services)
     app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins, allow_credentials=False,
                        allow_methods=["*"], allow_headers=["*"])
 

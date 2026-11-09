@@ -144,7 +144,8 @@ class Settings(BaseSettings):
     # Always-on wake phrases (local microphone, nothing leaves the computer).
     wake_enabled: bool = False
     wake_sensitivity: float = 0.6            # 0..1, higher = easier to trigger
-    wake_whisper_model: str = "tiny"
+    wake_whisper_model: str = "tiny"          # always listening (light)
+    wake_confirm_model: str = "small"         # checks only likely activations (accurate)
 
     backup_keep: int = 14
 
