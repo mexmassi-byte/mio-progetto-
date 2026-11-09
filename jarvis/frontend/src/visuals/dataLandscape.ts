@@ -135,7 +135,7 @@ export class DataLandscape implements Scene3D {
     this.points = new THREE.Points(geo, this.material);
     this.points.frustumCulled = false;
     // Keep the most recent hours (right end) clear of the right-hand panels.
-    this.points.position.x = -0.55;
+    this.points.position.x = -0.15;
     stage.scene.add(this.points);
     stage.setBloom(0.55, 0.4, 0.38);
     this.placeCamera(0);

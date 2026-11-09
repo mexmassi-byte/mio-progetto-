@@ -172,3 +172,7 @@ pre.code { font-family: var(--mono); font-size: 11.5px; line-height: 1.55; white
 .modebtn { background: none; border: 0; padding: 0; cursor: pointer; color: var(--fg-3); font: inherit; letter-spacing: inherit; }
 .modebtn b { color: var(--fg); font-weight: 400; }
 .modebtn:hover b { text-decoration: underline; }
+
+/* keep text readable over the particle scenes */
+.readout { background: linear-gradient(90deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0) 100%); }
+.subtitle { display: inline-block; background: rgba(0,0,0,0.62); padding: 4px 12px; backdrop-filter: blur(2px); }

@@ -54,6 +54,7 @@ async def system_status(request: Request, s: Services = Depends(require_token)) 
             "base_url": s.settings.llm_base_url, "language": s.settings.language,
             "searxng_url": s.settings.searxng_url, "smtp_configured": bool(s.settings.smtp_host),
             "data_dir": str(s.settings.data_dir),
+            "titles": {"it": s.settings.title_it, "en": s.settings.title_en, "de": s.settings.title_de},
         },
     }
 

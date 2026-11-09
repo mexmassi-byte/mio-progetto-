@@ -49,8 +49,16 @@ export function describeEvent(type: string, p: Record<string, any>): string {
     case "mission.created": return `missione: ${p.objective}`;
     case "notify": return `◆ ${p.title}`;
     case "memory.created": return `memoria: ${p.title}`;
-    case "approval.requested": return `approvazione richiesta: ${p.tool}`;
+    case "lead.enriched": return "contatti del lead arricchiti";
+    case "lead.won": return "nuovo cliente (pagamento verificato)";
     case "chat.started": return "conversazione";
+    case "goals.briefing": return `obiettivi del giorno: ${p.goals}`;
+    case "goals.mission": return `nuovo tentativo per un obiettivo (${p.attempt})`;
+    case "goals.report": return `rapporto giornaliero: ${p.achieved}/${p.total}`;
+    case "dev.claude_code": return p.stage === "started" ? "Claude Code al lavoro" : "Claude Code ha finito";
+    case "dev.project_created": return "nuovo progetto di sviluppo";
+    case "system.backup": return "backup del database";
+    case "approval.requested": return `approvazione richiesta: ${p.tool}`;
     case "system.started": return `sistema avviato (${p.model})`;
     default: return type.startsWith("mission.") ? `missione ${STATUS_LABEL[type.slice(8)] ?? type.slice(8)}` : type;
   }

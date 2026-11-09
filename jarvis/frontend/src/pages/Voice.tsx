@@ -139,6 +139,7 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
   }
 
   function interrupt() {
+    presenting.current = false;
     abort.current?.abort();
     player.current?.pause();
     window.speechSynthesis?.cancel();
@@ -173,7 +174,8 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
     await speak(full);
   }
 
-  async function speak(text: string) {
+  /** Speak and resolve when playback has finished. */
+  async function speak(text: string): Promise<void> {
     const clean = text.replace(/[*#`_>]/g, "").slice(0, 1500);
     if (ttsOk) {
       try {
@@ -190,13 +192,18 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
         analyser.current = an;
         setAmplitudeSource("tts");
         setState("speaking");
-        el.onended = () => {
-          URL.revokeObjectURL(url);
-          analyser.current = null;
-          setAmplitudeSource("none");
-          setState("idle");
-        };
-        await el.play();
+        await new Promise<void>((resolve) => {
+          const done = () => {
+            URL.revokeObjectURL(url);
+            analyser.current = null;
+            setAmplitudeSource("none");
+            setState("idle");
+            resolve();
+          };
+          el.onended = done;
+          el.onpause = () => { if (!el.ended) done(); };
+          el.play().catch(done);
+        });
         return;
       } catch (err) {
         setNote(`Sintesi vocale locale non riuscita: ${(err as Error).message}`);
@@ -207,11 +214,40 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
     if ("speechSynthesis" in window) {
       const u = new SpeechSynthesisUtterance(clean);
       u.lang = "it-IT";
-      u.onend = () => setState("idle");
       setAmplitudeSource("none");
       setState("speaking");
-      window.speechSynthesis.speak(u);
+      await new Promise<void>((resolve) => {
+        u.onend = () => { setState("idle"); resolve(); };
+        u.onerror = () => { setState("idle"); resolve(); };
+        window.speechSynthesis.speak(u);
+      });
     } else setState("idle");
+  }
+
+  const presenting = useRef(false);
+  /** JARVIS introduces himself in the three languages (voice test). */
+  async function present() {
+    if (presenting.current) return;
+    presenting.current = true;
+    const t = status?.settings.titles ?? { it: "Signore", en: "Sir", de: "Master" };
+    const lines = [
+      { lang: "it", text: `Buongiorno, ${t.it}. Sono JARVIS, il sistema operativo di VEYRO Web. Tutti i sistemi sono operativi.` },
+      { lang: "de", text: `Guten Tag, ${t.de}. Ich bin JARVIS. Ich finde neue Kunden, analysiere Websites und bereite jede Nachricht zu Ihrer Freigabe vor.` },
+      { lang: "en", text: `Good evening, ${t.en}. JARVIS is online, and ready to work for you.` },
+    ];
+    try {
+      for (const l of lines) {
+        if (!presenting.current) break;
+        setTranscript("");
+        setAnswer(l.text);
+        console.info("JARVIS_SPEAK", l.lang, Date.now());
+        await speak(l.text);
+        await new Promise((r) => window.setTimeout(r, 450));
+      }
+    } finally {
+      presenting.current = false;
+      console.info("JARVIS_SPEAK_END", Date.now());
+    }
   }
 
   // A conversation typed in the command bar also animates the sphere.
@@ -251,11 +287,12 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
       </div>
       <div className="overlay" style={{ left: "50%", bottom: 84, transform: "translateX(-50%)", width: "min(640px, 90%)", textAlign: "center" }}>
         {transcript && <div className="dim2" style={{ fontFamily: "var(--sans)", fontSize: 13, marginBottom: 6 }}>“{transcript}”</div>}
-        {answer && <div style={{ fontFamily: "var(--sans)", fontSize: 14, color: "var(--fg)", maxHeight: 140, overflow: "auto", marginBottom: 12, whiteSpace: "pre-wrap" }}>{answer}</div>}
+        {answer && <div style={{ fontFamily: "var(--sans)", fontSize: 14, color: "var(--fg)", maxHeight: 140, overflow: "auto", marginBottom: 12, whiteSpace: "pre-wrap" }}><span className="subtitle">{answer}</span></div>}
         <div className="row" style={{ justifyContent: "center", marginBottom: 10 }}>
           <button className="btn primary" onClick={() => (state === "listening" ? recorder.current?.stop() : void listen())}>
             {state === "listening" ? "Fine" : state === "idle" ? "Parla (spazio)" : "Interrompi"}
           </button>
+          {state === "idle" && <button className="btn" onClick={() => void present()}>Presentati</button>}
         </div>
 
         {note && <div className="error" style={{ marginTop: 8 }}>{note}</div>}

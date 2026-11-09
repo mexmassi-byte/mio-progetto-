@@ -8,6 +8,9 @@ import { describeEvent, hhmm, STATUS_LABEL } from "../util";
 
 const CAT_LABEL: Record<string, string> = { tasks: "TASK", research: "RICERCA", leads: "LEAD", chat: "DIALOGO", dev: "SVILUPPO" };
 
+/** Technical events not worth showing in the activity feed. */
+const HIDDEN_EVENTS = new Set(["voice.state", "chat.tool", "chat.finished", "goals.update", "dev.file_written"]);
+
 const ROW_LABEL: Record<string, string> = { ...STATUS_LABEL, user_preference: "preferenze", company: "azienda",
   strategy: "strategia", customer: "clienti", project: "progetti", task: "documenti", decision: "decisioni",
   procedure: "procedure", lesson: "lezioni" };
@@ -108,7 +111,7 @@ export function Overview({ status }: { status: SystemStatus | null }) {
       </div>
 
       {/* top-left: system readout */}
-      <div className="overlay" style={{ left: 22, top: 18, width: 300 }}>
+      <div className="overlay readout" style={{ left: 0, top: 0, padding: "18px 60px 30px 22px", width: 400 }}>
         <div className="h1">Command Center</div>
         <div className="label" style={{ marginBottom: 14 }}>VEYRO WEB · OPERATIONAL INTELLIGENCE</div>
         <div className="kv">
@@ -168,7 +171,7 @@ export function Overview({ status }: { status: SystemStatus | null }) {
         <div className="panel" style={{ flex: 1, overflow: "hidden" }}>
           <span className="label">Eventi</span>
           <div className="feed" style={{ marginTop: 6 }}>
-            {(data?.recent_events ?? []).slice(-14).reverse().map((e) => (
+            {(data?.recent_events ?? []).filter((e) => !HIDDEN_EVENTS.has(e.type)).slice(-14).reverse().map((e) => (
               <div key={e.id} style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 <span className="ts">{hhmm(e.ts)}</span>{describeEvent(e.type, e.payload)}
               </div>

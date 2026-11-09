@@ -81,3 +81,17 @@ def test_status_reports_engine(services):
     v = _engine(services, lambda r: httpx.Response(200))
     st = v.status()["tts"]
     assert st["available"] and st["engine"] == "elevenlabs" and st["chars_budget_month"] == 10000
+
+
+async def test_repeated_sentence_uses_cache(services):
+    calls = []
+
+    def handler(request):
+        calls.append(1)
+        return httpx.Response(200, content=b"mp3-bytes")
+
+    v = _engine(services, handler)
+    first = await v.speak("Buongiorno, Signore.")
+    second = await v.speak("Buongiorno, Signore.")
+    assert first == second and len(calls) == 1
+    assert v.chars_used() == len("Buongiorno, Signore.")

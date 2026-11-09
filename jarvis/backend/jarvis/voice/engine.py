@@ -64,6 +64,15 @@ class VoiceEngine:
     def _month_key(self) -> str:
         return f"elevenlabs_chars_{datetime.now().strftime('%Y-%m')}"
 
+    def _cache_path(self, text: str) -> Path | None:
+        """Cache of ElevenLabs audio by voice + model + text (repeated phrases cost nothing)."""
+        if not self.db:
+            return None
+        import hashlib
+        s = self.settings
+        key = hashlib.sha256(f"{s.elevenlabs_voice_id}|{s.elevenlabs_model}|{text}".encode()).hexdigest()[:32]
+        return s.data_dir / "tts-cache" / f"{key}.mp3"
+
     def chars_used(self) -> int:
         if not self.db:
             return 0
@@ -131,12 +140,22 @@ class VoiceEngine:
             raise VoiceUnavailable("Nothing to say")
         problem = None
         if self._elevenlabs_ready():
+            cached = self._cache_path(text)
+            if cached and cached.exists():  # same sentence already spoken: no credit used
+                self.last_engine = "elevenlabs"
+                return cached.read_bytes(), "audio/mpeg"
             if self.chars_used() + len(text) > self.settings.elevenlabs_monthly_chars:
                 problem = "monthly ElevenLabs budget reached"
             else:
                 try:
                     audio = await self._elevenlabs(text)
                     self._add_chars(len(text))
+                    if cached:
+                        try:
+                            cached.parent.mkdir(parents=True, exist_ok=True)
+                            cached.write_bytes(audio)
+                        except OSError:
+                            pass
                     self.last_engine = "elevenlabs"
                     return audio, "audio/mpeg"
                 except VoiceUnavailable as exc:
