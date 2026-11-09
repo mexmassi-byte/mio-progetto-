@@ -64,6 +64,22 @@ async def _daily_backups(services: Services) -> None:
         await asyncio.sleep(3600)
 
 
+async def _start_webhooks(services: Services):
+    """Separate server exposing only /webhooks/* (for a public tunnel), started
+    when WhatsApp is configured. The dashboard/API stay local-only."""
+    if not services.channels.whatsapp.configured():
+        return None
+    import uvicorn
+    from .integrations.webhooks import create_webhook_app
+    st = services.settings
+    server = uvicorn.Server(uvicorn.Config(create_webhook_app(services), host=st.webhook_host,
+                                           port=st.webhook_port, log_level="warning"))
+    server.install_signal_handlers = lambda: None  # type: ignore[method-assign]
+    asyncio.create_task(server.serve())
+    log.info("WhatsApp webhook server on http://%s:%s/webhooks/whatsapp", st.webhook_host, st.webhook_port)
+    return server
+
+
 def create_app(settings: Settings | None = None, llm: LLMProvider | None = None,
                start_engine: bool | None = None) -> FastAPI:
     settings = settings or get_settings()
@@ -77,17 +93,20 @@ def create_app(settings: Settings | None = None, llm: LLMProvider | None = None,
         if run_engine:
             services.engine.start()
         backups = asyncio.create_task(_daily_backups(services))
+        webhook_server = await _start_webhooks(services)
         try:
             yield
         finally:
             backups.cancel()
+            if webhook_server:
+                webhook_server.should_exit = True
             await services.engine.stop()
             services.db.close()
 
     app = FastAPI(title="JARVIS", version=__version__, lifespan=lifespan,
                   docs_url="/api/docs", openapi_url="/api/openapi.json")
     app.state.services = services
-    app.state.voice = VoiceEngine(settings, services.db, services.audit)
+    app.state.voice = services.voice
     app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins, allow_credentials=False,
                        allow_methods=["*"], allow_headers=["*"])
 

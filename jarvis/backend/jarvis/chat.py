@@ -70,13 +70,13 @@ class ChatService:
         if not conversation_id or not self.s.db.one("SELECT id FROM conversations WHERE id = ?", (conversation_id,)):
             conversation_id = self.create(_title_from(text))["id"]
         yield {"type": "conversation", "conversation_id": conversation_id}
-        self._add(conversation_id, "user", text)
+        self._add(conversation_id, "user", text, {"channel": mode})
         self.s.bus.emit("chat.started", conversation_id=conversation_id)
 
         memories = await self.s.memory.search(text, limit=6)
         mem_text = "\n".join(f"- [{m['category']}/{m['reliability']}] {m['title']}: {m['content'][:400]}"
                              for m in memories)
-        system = chat_system_prompt(self.s.settings, mem_text, self.s.knowledge.all_text(2500), voice=mode == "voice")
+        system = chat_system_prompt(self.s.settings, mem_text, self.s.knowledge.all_text(2500), voice=mode == "voice", channel=mode)
         msgs = [Message("system", system)] + self._history(conversation_id)
         tools = self.s.tools.specs(max_permission=Permission.AUTONOMOUS, names=CHAT_TOOLS)
         tainted = "UNTRUSTED_WEB_CONTENT" in text
@@ -132,10 +132,10 @@ class ChatService:
         yield {"type": "done", "message_id": message_id, "conversation_id": conversation_id,
                "stats": stats, "tools": used_tools}
 
-    async def ask(self, conversation_id: str | None, text: str) -> dict[str, Any]:
+    async def ask(self, conversation_id: str | None, text: str, mode: str = "text") -> dict[str, Any]:
         """Non-streaming helper: returns the final answer."""
         out: dict[str, Any] = {"text": "", "tools": []}
-        async for ev in self.send(conversation_id, text):
+        async for ev in self.send(conversation_id, text, mode):
             if ev["type"] == "conversation":
                 out["conversation_id"] = ev["conversation_id"]
             elif ev["type"] == "token":

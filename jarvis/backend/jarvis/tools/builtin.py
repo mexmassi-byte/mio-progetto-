@@ -113,8 +113,15 @@ def register(reg: ToolRegistry) -> None:
         return {"notified": True}
 
 
-def notify(services: Any, title: str, body: str = "", level: str = "info", mission_id: str | None = None) -> None:
+def notify(services: Any, title: str, body: str = "", level: str = "info", mission_id: str | None = None,
+           call_event: str | None = None, evidence: dict | None = None) -> None:
+    """Dashboard notification, routed also to WhatsApp (results, decisions) and,
+    for verified critical events, to a phone call (see integrations/phone.py)."""
     nid = services.db.insert("notifications", {
         "ts": now_iso(), "level": level, "title": title, "body": body, "mission_id": mission_id, "read_at": None,
     })
     services.bus.emit("notify", id=nid, title=title, body=body, level=level, mission_id=mission_id)
+    channels = getattr(services, "channels", None)
+    if channels is not None:
+        channels.route({"id": nid, "title": title, "body": body, "level": level, "mission_id": mission_id,
+                        "call_event": call_event, "evidence": evidence or {}})

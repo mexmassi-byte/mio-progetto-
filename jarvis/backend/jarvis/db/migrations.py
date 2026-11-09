@@ -285,4 +285,26 @@ MIGRATIONS: list[tuple[int, str]] = [
         ALTER TABLE missions ADD COLUMN goal_id TEXT
         """,
     ),
+    (
+        6,
+        """
+        CREATE TABLE credentials (
+            name TEXT PRIMARY KEY,
+            ciphertext BLOB NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        CREATE TABLE comms_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ts TEXT NOT NULL,
+            channel TEXT NOT NULL,
+            direction TEXT NOT NULL,
+            contact TEXT,
+            kind TEXT NOT NULL,
+            summary TEXT,
+            external_id TEXT,
+            status TEXT
+        );
+        CREATE UNIQUE INDEX idx_comms_external ON comms_log(channel, external_id)
+        """,
+    ),
 ]

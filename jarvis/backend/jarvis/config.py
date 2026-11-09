@@ -104,6 +104,48 @@ class Settings(BaseSettings):
     claude_code_autonomous: bool = False
     claude_code_timeout_s: int = 1800
 
+    # ---------------------------------------------------------- integrations
+    # Secrets (tokens, keys) are stored encrypted in the vault (Settings page);
+    # the values below are only non-secret configuration. The same names in
+    # the environment / .env also work and take precedence over the vault.
+    owner_phone_numbers: list[str] = []      # E.164 without '+', e.g. ["393516842484"]
+    owner_emails: list[str] = []
+
+    # WhatsApp Cloud API (official Meta platform). JARVIS has its own number;
+    # the owners' numbers are the only ones allowed to give it orders.
+    whatsapp_phone_number_id: str | None = None
+    whatsapp_access_token: str | None = None
+    whatsapp_app_secret: str | None = None
+    whatsapp_verify_token: str | None = None
+    whatsapp_api_version: str = "v23.0"
+    whatsapp_graph_url: str = "https://graph.facebook.com"
+    whatsapp_notify_template: str | None = None   # approved template for messages outside 24 h
+    whatsapp_template_language: str = "it"
+
+    # Public webhook server (only /webhooks/*), for a tunnel such as cloudflared.
+    webhook_host: str = "127.0.0.1"
+    webhook_port: int = 8766
+
+    # Google (OAuth 2.0, desktop client)
+    google_client_id: str | None = None
+    google_client_secret: str | None = None
+    google_autonomous_writes: bool = False   # calendar/tasks/docs without asking each time
+
+    # Phone calls (Twilio). Off until the owner enables them explicitly.
+    twilio_account_sid: str | None = None
+    twilio_auth_token: str | None = None
+    twilio_from_number: str | None = None
+    twilio_api_url: str = "https://api.twilio.com"
+    phone_calls_enabled: bool = False
+    phone_max_calls_per_day: int = 3
+    phone_quiet_hours: str = "23-7"          # no calls in this range except critical events
+    phone_min_payment_eur: float = 500.0     # payments below this do not trigger a call
+
+    # Always-on wake phrases (local microphone, nothing leaves the computer).
+    wake_enabled: bool = False
+    wake_sensitivity: float = 0.6            # 0..1, higher = easier to trigger
+    wake_whisper_model: str = "tiny"
+
     backup_keep: int = 14
 
     @property

@@ -12,7 +12,7 @@ def test_health_is_public_everything_else_needs_token(client):
     r = client.get("/api/system/status", headers={"Authorization": "Bearer wrong"})
     assert r.status_code == 401
     st = client.get("/api/system/status").json()
-    assert st["llm"]["provider"] == "fake" and st["schema_version"] == 5
+    assert st["llm"]["provider"] == "fake" and st["schema_version"] == 6
     assert st["voice"]["stt"]["available"] in (True, False)
 
 

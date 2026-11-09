@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from .config import Settings
 from .db.database import Database
@@ -44,6 +44,9 @@ class Services:
     workspaces: "Workspaces" = None  # type: ignore[assignment]
     chat: "ChatService" = None  # type: ignore[assignment]
     goals: "GoalService" = None  # type: ignore[assignment]
+    vault: Any = None
+    channels: Any = None
+    voice: Any = None
 
     def set_llm(self, llm: LLMProvider) -> None:
         """Swap the model at runtime (settings page) without restarting."""
@@ -91,6 +94,12 @@ def build_services(settings: Settings, llm: LLMProvider | None = None) -> Servic
     s.engine = Engine(s)
     s.chat = ChatService(s)
     s.goals = GoalService(s)
+    from .integrations.vault import Vault
+    s.vault = Vault(db, settings.data_dir, use_keyring=settings.llm_provider != "fake")
+    from .voice.engine import VoiceEngine
+    s.voice = VoiceEngine(settings, db, s.audit)
+    from .integrations.channels import Channels
+    s.channels = Channels(s)
     return s
 
 

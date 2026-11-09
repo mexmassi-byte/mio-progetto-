@@ -25,7 +25,12 @@ VOICE_STYLE = ("\nVOICE MODE: your answer will be spoken aloud. Answer in at mos
                "sentences, natural spoken language, no lists, no markdown, no emoji.\n")
 
 
-def chat_system_prompt(s: Settings, memories: str, knowledge: str, voice: bool = False) -> str:
+WHATSAPP_STYLE = ("\nWHATSAPP: the user writes from WhatsApp. Short messages, plain text, *bold* allowed, "
+                  "no tables, no long lists. Answer in the language the user writes in.\n")
+
+
+def chat_system_prompt(s: Settings, memories: str, knowledge: str, voice: bool = False,
+                       channel: str = "text") -> str:
     today = datetime.now().strftime("%A %d %B %Y, %H:%M")
     lang = {"it": "Italian", "de": "German", "en": "English"}.get(s.language, s.language)
     return f"""\
@@ -47,7 +52,9 @@ set_daily_goals: you will then keep working on your own until each target is
 reached. For a single multi-step objective call create_mission. Never try to
 do long work inside the conversation. For quick facts use the other tools.
 
-{POLICY}{VOICE_STYLE if voice else ""}
+{POLICY}{VOICE_STYLE if voice else ""}{WHATSAPP_STYLE if channel == "whatsapp" else ""}
+Always answer in the language of the user's last message (Italian, German or English);
+memory, missions and context are shared across languages and channels.
 Current date/time: {today}
 
 RELEVANT MEMORIES (with reliability label)

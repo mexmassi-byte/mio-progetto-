@@ -71,12 +71,22 @@ class Engine:
         while not self._stop.is_set():
             try:
                 await self.tick()
-            except Exception:  # never let the loop die
+            except Exception as exc:  # never let the loop die
                 log.exception("engine tick failed")
+                self._system_error(f"engine tick: {exc}")
             try:
                 await asyncio.wait_for(self._stop.wait(), timeout=tick)
             except asyncio.TimeoutError:
                 pass
+
+    def _system_error(self, detail: str) -> None:
+        """Internal failures are events; the 3rd within 15 minutes is critical."""
+        self.s.bus.emit("system.error", detail=detail[:300])
+        since = (datetime.now(timezone.utc) - timedelta(minutes=15)).isoformat(timespec="seconds")
+        n = self.s.db.scalar("SELECT COUNT(*) FROM events WHERE type = 'system.error' AND ts >= ?", (since,))
+        if n == 3:
+            notify(self.s, "Guasto tecnico critico", f"{n} errori interni in 15 minuti. Ultimo: {detail[:200]}",
+                   "critical", call_event="critical_failure")
 
     # ----------------------------------------------------------------- tick
     async def tick(self) -> None:
@@ -118,6 +128,7 @@ class Engine:
             raise
         except Exception as exc:  # unexpected bug: fail the mission, keep the engine alive
             log.exception("mission %s crashed", mission_id)
+            self._system_error(f"mission {mission_id}: {exc}")
             self.s.missions.set_status(mission_id, "failed", error=f"internal error: {exc}")
             notify(self.s, "Missione interrotta da un errore interno", str(exc)[:300], "warning", mission_id)
 

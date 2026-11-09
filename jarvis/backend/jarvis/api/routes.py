@@ -518,6 +518,9 @@ async def deal_verify(did: str, payment_reference: str = Body(..., embed=True), 
     except (KeyError, ValueError) as exc:
         raise HTTPException(400, str(exc)) from exc
     s.audit.record("user", "deal:verify_payment", "verified", target=did, reference=payment_reference)
+    from ..tools.builtin import notify
+    notify(s, "Nuovo cliente pagante", f"Pagamento verificato: {deal.get('amount_eur') or '?'} EUR ({deal['title']})",
+           "success", call_event="payment", evidence={"deal_id": did})
     return deal
 
 
