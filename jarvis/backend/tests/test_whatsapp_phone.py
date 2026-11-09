@@ -14,7 +14,7 @@ from jarvis.integrations.phone import Phone
 from jarvis.integrations.webhooks import create_webhook_app
 from jarvis.integrations.whatsapp import WhatsApp, parse_webhook, split_text, verify_signature
 
-OWNER = "393516842484"
+OWNER = "393331234567"
 
 
 def _configure(services):
@@ -46,7 +46,7 @@ def test_signature_and_parsing():
     good = "sha256=" + hmac.new(b"shh", raw, hashlib.sha256).hexdigest()
     assert verify_signature(raw, good, "shh") and not verify_signature(raw, good, "other")
     assert not verify_signature(raw, None, "shh")
-    msgs = parse_webhook(_payload("+39 351 684 2484", "ciao"))
+    msgs = parse_webhook(_payload("+39 333 123 4567", "ciao"))
     assert msgs == [{"id": "wamid.in1", "from": OWNER, "type": "text", "timestamp": "1", "name": "Max",
                      "text": "ciao", "media_id": None, "mime": None, "filename": None}]
     assert len(split_text("a" * 9000)) == 3

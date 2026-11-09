@@ -21,6 +21,7 @@ def _b64(s: str) -> str:
 class FakeGoogle:
     def __init__(self):
         self.calls = []
+        self.sent = []
         self.refreshes = 0
 
     def __call__(self, request: httpx.Request) -> httpx.Response:
@@ -56,6 +57,11 @@ class FakeGoogle:
             decoded = base64.urlsafe_b64decode(raw + "=" * (-len(raw) % 4)).decode()
             assert "To: anna@studiobianchi.it" in decoded and "Gentile Anna" in decoded
             return httpx.Response(200, json={"id": "d1", "message": {"id": "m9"}})
+        if url.endswith("/gmail/v1/users/me/messages/send"):
+            raw = json.loads(request.content)["raw"]
+            decoded = base64.urlsafe_b64decode(raw + "=" * (-len(raw) % 4)).decode()
+            self.sent.append(decoded)
+            return httpx.Response(200, json={"id": "m11"})
         if url.endswith("/drafts/send"):
             return httpx.Response(200, json={"id": "m10", "threadId": "t1"})
         if "/calendar/v3/calendars/primary/events" in url and request.method == "POST":
@@ -159,3 +165,13 @@ def test_classifier_rules():
     c = classify_email(m, set(), owners)
     assert c["importance"] == "high" and c["opportunity"]
     assert classify_email({**m, "from": "max@veyroweb.com"}, set(), owners)["importance"] == "low"
+
+
+async def test_daily_report_email_goes_only_to_the_owner(services, google):
+    g, fake = google
+    assert await services.channels._email_report("Rapporto", "3/3 obiettivi") is False  # not connected yet
+    await _connect(services, g)
+    assert await services.channels._email_report("Rapporto", "3/3 obiettivi") is True
+    assert len(fake.sent) == 1 and "To: max@veyroweb.com" in fake.sent[0] and "3/3 obiettivi" in fake.sent[0]
+    row = services.db.one("SELECT * FROM comms_log WHERE channel = 'email' AND kind = 'report'")
+    assert row["contact"] == "max@veyroweb.com" and row["status"] == "sent"

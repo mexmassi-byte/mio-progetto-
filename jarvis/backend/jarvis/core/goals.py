@@ -217,6 +217,8 @@ class GoalService:
             })
             self.s.bus.emit("goals.report", briefing_id=b["id"], achieved=done, total=len(goals))
             notify(self.s, "Giornata conclusa", report[:900], "success" if done == len(goals) else "decision")
+            if self.s.channels:
+                self.s.channels.email_report(f"Rapporto della giornata {b['day']}", report)
 
     def _update(self, goal_id: str, **fields: Any) -> None:
         fields["updated_at"] = now_iso()

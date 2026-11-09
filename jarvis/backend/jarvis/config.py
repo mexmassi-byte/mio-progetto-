@@ -108,7 +108,7 @@ class Settings(BaseSettings):
     # Secrets (tokens, keys) are stored encrypted in the vault (Settings page);
     # the values below are only non-secret configuration. The same names in
     # the environment / .env also work and take precedence over the vault.
-    owner_phone_numbers: list[str] = []      # E.164 without '+', e.g. ["393516842484"]
+    owner_phone_numbers: list[str] = []      # E.164 without '+', e.g. ["393331234567"]
     owner_emails: list[str] = []
 
     # WhatsApp Cloud API (official Meta platform). JARVIS has its own number;
@@ -129,6 +129,7 @@ class Settings(BaseSettings):
     # Google (OAuth 2.0, desktop client)
     google_client_id: str | None = None
     google_client_secret: str | None = None
+    email_reports: bool = True               # daily report copy to the founders' own Gmail
     google_autonomous_writes: bool = False   # calendar/tasks/docs without asking each time
 
     # Phone calls (Twilio). Off until the owner enables them explicitly.

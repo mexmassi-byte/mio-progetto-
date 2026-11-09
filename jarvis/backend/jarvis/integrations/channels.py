@@ -141,6 +141,39 @@ class Channels:
                     await self.whatsapp.send_document(owner, path, title)
         return {"whatsapp": sent}
 
+    def email_report(self, title: str, body: str) -> None:
+        """Copy of a report to the founders' own Gmail (never to anyone else)."""
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            return
+        task = loop.create_task(self._email_report(title, body))
+        self._tasks.add(task)
+        task.add_done_callback(self._tasks.discard)
+
+    async def _email_report(self, title: str, body: str) -> bool:
+        from .google import GoogleError
+        from .vault import secret
+        if not self.s.settings.email_reports or not self.google.status()["connected"]:
+            return False
+        owners = {e.lower() for e in (secret(self.s, "owner_emails") or [])}
+        account = self.google.status().get("account")
+        if account:
+            owners.add(account.lower())
+        if not owners:
+            return False
+        to = ", ".join(sorted(owners))
+        try:
+            r = await self.google.gmail_send(to, f"JARVIS — {title}", body)
+        except GoogleError as exc:
+            log.warning("Email report failed: %s", exc)
+            return False
+        self.s.db.insert("comms_log", {"ts": now_iso(), "channel": "email", "direction": "out", "contact": to,
+                                       "kind": "report", "summary": title[:200],
+                                       "external_id": r.get("message_id"), "status": "sent"})
+        self.s.audit.record("jarvis", "email:report", "sent", target=to)
+        return True
+
     def status(self) -> dict[str, Any]:
         return {"whatsapp": self.whatsapp.status(), "phone": self.phone.status(), "google": self.google.status(),
                 "primary_conversation": self.primary_conversation()}

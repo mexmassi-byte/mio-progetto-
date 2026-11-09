@@ -1,6 +1,6 @@
 # JARVIS — Stato del lavoro
 
-Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
+Ultimo aggiornamento: 9 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
 
 ## Riepilogo
 
@@ -141,6 +141,31 @@ breve ed etichetta della modalità. Interruttore AUTO/MANUALE nella barra in
 alto; una scelta manuale sospende il cambio automatico per 60 s; minimo 6 s in
 ogni modalità; non cambia mai pagina se sei su Missioni, Vendite, Sviluppo,
 Memoria o Sistema. Provato nel browser con uno scenario completo, senza errori.
+
+## Integrazioni (9 novembre 2026)
+
+Guida: docs/INTEGRATIONS.md. Fatto senza toccare design, animazioni e
+architettura approvati: in più c'è solo la sezione Sistema → Integrazioni e
+l'indicatore MIC nella barra in alto.
+
+- **Cassaforte cifrata** per chiavi e token (Fernet, chiave nel Portachiavi).
+- **WhatsApp (API ufficiale Meta):** JARVIS con un suo numero, il tuo come
+  proprietario. Testo, vocali, documenti, missioni, approvazioni, rapporti.
+  Webhook firmati su un server separato (porta 8766). Il tuo numero personale
+  non viene toccato (la coexistence richiede WhatsApp Business).
+- **Google (OAuth 2.0 + PKCE):** Gmail (triage, opportunità → CRM, bozze, invio
+  con approvazione, email senza risposta), Calendar, Tasks, Drive, Docs,
+  Contatti. Rapporto serale anche via email, solo a voi.
+- **Chiamate Twilio:** solo eventi verificati nei dati, limiti giornalieri,
+  orari di silenzio, attivazione con `CONFERMO`. A una via per ora.
+- **Attivazione vocale** con le 9 frasi in IT/EN/DE, riconoscimento locale a
+  due stadi (Whisper tiny + small): 13/13 corrette, 0 falsi positivi su voce
+  sintetizzata. Saluto nella lingua usata, poi ascolto.
+- **Una conversazione** condivisa tra dashboard, voce e WhatsApp.
+- **118 test automatici** passano.
+
+Da provare con i vostri account: app Meta, progetto Google Cloud, account
+Twilio, microfono del Mac.
 
 ## Cosa NON è ancora verificato
 

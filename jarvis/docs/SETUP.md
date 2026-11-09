@@ -181,6 +181,11 @@ e salva il risultato.
 - Se Claude Code non è installato, JARVIS scrive il codice con il suo modello
   locale. JARVIS non dipende da Claude Code.
 
+### WhatsApp, Gmail/Google, chiamate, attivazione vocale
+
+Guida completa, costi e limiti: **docs/INTEGRATIONS.md**. Si configurano da
+Sistema → Integrazioni; le chiavi vengono cifrate e non vanno mai nel codice.
+
 ### Un secondo computer (co-founder)
 
 JARVIS si installa allo stesso modo sul computer del co-founder: ognuno ha il
@@ -203,6 +208,12 @@ Tutte le opzioni sono variabili `JARVIS_*` (o righe in `jarvis/backend/.env`):
 | `JARVIS_DATA_DIR` | `jarvis/data` | database, memoria, backup, log, workspace |
 | `JARVIS_ENGINE_MAX_PARALLEL_MISSIONS` | `1` | missioni in parallelo |
 | `JARVIS_DEFAULT_MISSION_MAX_STEPS` | `40` | budget passi per missione |
+| `JARVIS_WEBHOOK_PORT` | `8766` | server separato solo per i webhook WhatsApp |
+| `JARVIS_WHATSAPP_NOTIFY_TEMPLATE` | — | template Meta per scrivere fuori dalla finestra di 24 h |
+| `JARVIS_EMAIL_REPORTS` | `true` | rapporto serale anche via Gmail, solo a voi |
+| `JARVIS_GOOGLE_AUTONOMOUS_WRITES` | `false` | eventi/attività/documenti senza chiedere |
+| `JARVIS_PHONE_MAX_CALLS_PER_DAY` | `3` | limite chiamate di emergenza |
+| `JARVIS_PHONE_QUIET_HOURS` | `23-7` | niente chiamate (salvo guasti e sicurezza) |
 
 ## 7. Dati e backup
 
