@@ -142,6 +142,18 @@ alto; una scelta manuale sospende il cambio automatico per 60 s; minimo 6 s in
 ogni modalità; non cambia mai pagina se sei su Missioni, Vendite, Sviluppo,
 Memoria o Sistema. Provato nel browser con uno scenario completo, senza errori.
 
+## Traguardo: animazione "missione compiuta"
+
+Quando una missione viene **verificata** come riuscita (non basta "completata
+senza verifica"), la dashboard si oscura e parte una sequenza di 10 secondi
+nello stesso stile a particelle: una galassia collassa in un nucleo, esplode in
+due onde d'urto e i frammenti si ricompongono nella scritta MISSIONE COMPIUTA,
+con due orbite e polvere in profondità. Sotto compaiono i numeri veri della
+missione (verifica, durata, passi riusciti); suono sintetizzato e Brian dice
+"Missione compiuta, Signore." Esc o clic per chiudere; "Rivedi il traguardo"
+in Missioni la riproduce. Con "riduci movimento" attivo parte direttamente
+dalla scritta.
+
 ## Integrazioni (9 novembre 2026)
 
 Guida: docs/INTEGRATIONS.md. Fatto senza toccare design, animazioni e
