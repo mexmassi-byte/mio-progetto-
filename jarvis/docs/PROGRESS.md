@@ -87,6 +87,17 @@ Ultimo aggiornamento: 8 novembre 2026. Branch: `claude/upbeat-rubin-co25tq`.
 11. Sicurezza: il token passava nell'URL del WebSocket e finiva nei log. Ora
     viene inviato come primo messaggio.
 
+## Riepilogo parlato sui dati
+
+Sul Command Center JARVIS legge ad alta voce i numeri reali degli ultimi 7
+giorni confrontati con i 7 precedenti (nuovi lead, qualificati, siti
+analizzati, bozze, missioni, clienti con pagamento verificato, fatturato
+verificato, approvazioni in attesa), con sottotitolo. I numeri e le frasi sono
+calcolati dal codice, mai dal modello. Parte da solo quando JARVIS passa ai
+dati per dei risultati (al massimo ogni 10 minuti) o con "Ascolta il
+riepilogo"; in chat: "com'è andata questa settimana?". Provato nel browser con
+la voce di Brian.
+
 ## Obiettivi del giorno (lavoro continuo)
 
 Il briefing del mattino ("oggi trova 10 dentisti a Monaco e 5 avvocati a

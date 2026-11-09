@@ -122,6 +122,10 @@ function Shell() {
       if (location.hash !== `#${p}`) history.replaceState(null, "", `#${p}`);
       setPage(p);
       setFading(false);
+      // Arriving on the data screen because of results: JARVIS explains them aloud.
+      if (p === "overview" && reason && /risultati|dati/.test(reason)) {
+        window.setTimeout(() => window.dispatchEvent(new CustomEvent("jarvis:summary", { detail: { auto: true } })), 900);
+      }
       if (visualToVisual) {
         const id = Date.now();
         setBanner({ text: `${MODE_NAME[p as VisualMode]}${reason ? ` · ${reason}` : ""}`, id });

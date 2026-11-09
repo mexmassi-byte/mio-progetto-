@@ -67,6 +67,21 @@ def register(reg: ToolRegistry) -> None:
 
 def register_goals(reg: ToolRegistry) -> None:
     @reg.tool(
+        "business_summary",
+        "Real business numbers for the last 7 days compared with the 7 days before (new leads, qualified "
+        "leads, audits, drafts, missions, customers with verified payment, verified revenue). Use it when "
+        "the user asks how things are going, and quote the numbers exactly.",
+        {"type": "object", "properties": {"language": {"type": "string", "enum": ["it", "de", "en"], "default": "it"}}},
+        category="sales", plannable=False,
+    )
+    async def business_summary(ctx: ToolContext, language: str = "it") -> dict:
+        from ..core.report import spoken_summary, weekly_numbers
+        st = ctx.services.settings
+        title = {"it": st.title_it, "de": st.title_de, "en": st.title_en}[language]
+        numbers = weekly_numbers(ctx.services.db)
+        return {"numbers": numbers, "summary": spoken_summary(numbers, language, title)}
+
+    @reg.tool(
         "set_daily_goals",
         "Set the user's objectives for the day (e.g. 'find 10 dentists in Munich and audit 3 websites'). "
         "JARVIS then works on its own all day, launching and retrying missions until each target is "

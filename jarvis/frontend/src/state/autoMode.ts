@@ -18,7 +18,7 @@ const TALK_TAIL_MS = 4_000;
 const RECENT_WORK_MS = 20_000;
 
 /** Chat tools whose answer is data the user wants to look at. */
-const DATA_TOOLS = new Set(["crm_list_leads", "mission_status", "sales_audit_url"]);
+const DATA_TOOLS = new Set(["crm_list_leads", "mission_status", "sales_audit_url", "business_summary"]);
 
 export type Kind = "talk" | "work" | "data";
 export interface Target { mode: VisualMode; kind: Kind; reason: string }

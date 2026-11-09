@@ -15,7 +15,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from .services import Services
 
 CHAT_TOOLS = [
-    "memory_search", "memory_save", "knowledge_read", "create_mission", "mission_status", "set_daily_goals",
+    "memory_search", "memory_save", "knowledge_read", "create_mission", "mission_status", "set_daily_goals", "business_summary",
     "crm_list_leads", "sales_audit_url", "fetch_page", "web_search", "request_action",
     "dev_list_files", "dev_read_file",
 ]

@@ -145,6 +145,16 @@ async def dashboard(hours: int = Query(48, ge=6, le=24 * 30), s: Services = Depe
     }
 
 
+@api.get("/summary")
+async def spoken_business_summary(lang: str | None = None, s: Services = Depends(require_token)) -> dict:
+    """What JARVIS says when it shows the data: real numbers, phrased in code."""
+    from ..core.report import spoken_summary, weekly_numbers
+    lang = lang if lang in ("it", "de", "en") else s.settings.language
+    title = {"it": s.settings.title_it, "de": s.settings.title_de, "en": s.settings.title_en}.get(lang, "")
+    numbers = weekly_numbers(s.db)
+    return {"lang": lang, "text": spoken_summary(numbers, lang, title), "numbers": numbers}
+
+
 # ======================================================================= chat
 @api.get("/conversations")
 async def conversations(s: Services = Depends(require_token)) -> list:

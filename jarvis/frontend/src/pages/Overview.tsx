@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { api } from "../api/client";
+import { speakText, stopSpeaking } from "../state/speech";
 import type { Dashboard, SystemStatus } from "../api/types";
 import { DotBars } from "../components/DotBars";
 import { Visual } from "../components/Visual";
@@ -39,11 +41,47 @@ function TinyTable({ title, rows }: { title: string; rows: Record<string, number
 export function Overview({ status }: { status: SystemStatus | null }) {
   const { data, error } = usePoll<Dashboard>("/dashboard?hours=48", 30000, ["task.", "research.", "lead.", "mission.", "chat.finished"]);
   const sceneRef = useRef<DataLandscape | null>(null);
+  const [speaking, setSpeaking] = useState<string | null>(null);
+
+  /** JARVIS reads the real numbers aloud (computed by the backend, never by the model). */
+  async function explain(auto = false) {
+    if (auto) {
+      let last = 0;
+      try {
+        last = Number(localStorage.getItem("jarvis.lastSummary") || 0);
+      } catch {
+        /* ignore */
+      }
+      if (Date.now() - last < 10 * 60_000) return; // automatic summary at most every 10 minutes
+    }
+    try {
+      localStorage.setItem("jarvis.lastSummary", String(Date.now()));
+    } catch {
+      /* ignore */
+    }
+    try {
+      const r = await api.get<{ text: string; lang: string }>(`/summary?lang=${status?.settings.language ?? "it"}`);
+      setSpeaking(r.text);
+      await speakText(r.text, r.lang);
+    } finally {
+      setSpeaking(null);
+    }
+  }
+
+  useEffect(() => {
+    const onSummary = (e: Event) => void explain(!!(e as CustomEvent).detail?.auto);
+    window.addEventListener("jarvis:summary", onSummary);
+    return () => {
+      window.removeEventListener("jarvis:summary", onSummary);
+      stopSpeaking();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status?.settings.language]);
   const labelsRef = useRef<HTMLDivElement>(null);
 
   // Adaptive window: start shortly before the first activity (at least 12 h),
   // so recent work spreads across the terrain instead of one edge.
-  const window = useMemo(() => {
+  const span = useMemo(() => {
     if (!data) return null;
     const first = data.activity.findIndex((a) => a.total > 0);
     const start = first < 0 ? 0 : Math.max(0, Math.min(first - 2, data.activity.length - 12));
@@ -51,11 +89,11 @@ export function Overview({ status }: { status: SystemStatus | null }) {
   }, [data]);
 
   const series: Series | null = useMemo(() => {
-    if (!window) return null;
+    if (!span) return null;
     const s = {} as Series;
-    for (const c of CATEGORIES) s[c] = window.map((a) => a[c]);
+    for (const c of CATEGORIES) s[c] = span.map((a) => a[c]);
     return s;
-  }, [window]);
+  }, [span]);
 
   useEffect(() => {
     if (series && sceneRef.current) sceneRef.current.setData(series);
@@ -105,7 +143,7 @@ export function Overview({ status }: { status: SystemStatus | null }) {
         {[0, 0.5, 1].map((u) => (
           <span key={u} data-u={u} data-v="1.02"
             style={{ position: "absolute", left: 0, top: 0, fontSize: 9, color: "var(--fg-3)", marginLeft: -14 }}>
-            {u === 1 ? "ORA" : `-${Math.round((window?.length ?? 48) * (1 - u))}H`}
+            {u === 1 ? "ORA" : `-${Math.round((span?.length ?? 48) * (1 - u))}H`}
           </span>
         ))}
       </div>
@@ -113,7 +151,10 @@ export function Overview({ status }: { status: SystemStatus | null }) {
       {/* top-left: system readout */}
       <div className="overlay readout" style={{ left: 0, top: 0, padding: "18px 60px 30px 22px", width: 400 }}>
         <div className="h1">Command Center</div>
-        <div className="label" style={{ marginBottom: 14 }}>VEYRO WEB · OPERATIONAL INTELLIGENCE</div>
+        <div className="label" style={{ marginBottom: 10 }}>VEYRO WEB · OPERATIONAL INTELLIGENCE</div>
+        <button className="btn" style={{ marginBottom: 14 }} onClick={() => (speaking ? stopSpeaking() : void explain())}>
+          {speaking ? "■ Interrompi" : "▶ Ascolta il riepilogo"}
+        </button>
         <div className="kv">
           <span>Eventi 48h</span><span className="num">{total48}</span>
           <span>Passi completati</span><span className="num">{tasksOk}{tasksFail ? ` · falliti ${tasksFail}` : ""}</span>
@@ -136,8 +177,8 @@ export function Overview({ status }: { status: SystemStatus | null }) {
       {data && (
         <div className="overlay" style={{ left: 380, right: 400, top: 22, display: "flex", gap: 26, fontSize: 9, letterSpacing: ".1em", color: "var(--fg-3)", whiteSpace: "nowrap", overflow: "hidden" }}>
           <span>EVT·TOT <b className="num" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{data.events_total}</b></span>
-          <span>FINESTRA <b className="num" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{window?.length ?? 0}H</b></span>
-          <span>PICCO/H <b className="num" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{Math.max(0, ...(window ?? []).map((a) => a.total))}</b></span>
+          <span>FINESTRA <b className="num" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{span?.length ?? 0}H</b></span>
+          <span>PICCO/H <b className="num" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{Math.max(0, ...(span ?? []).map((a) => a.total))}</b></span>
           <span>APPROV <b className="num" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{data.approvals_pending}</b></span>
           <span>TICK <b className="num" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{data.engine.last_tick ? data.engine.last_tick.slice(11, 19) : "—"}</b></span>
         </div>
@@ -186,6 +227,13 @@ export function Overview({ status }: { status: SystemStatus | null }) {
           <div className="dim" style={{ marginTop: 6, fontFamily: "var(--sans)", fontSize: 12 }}>
             Il paesaggio si forma con il lavoro reale di JARVIS: ogni rilievo è un'ora di attività di una categoria.
           </div>
+        </div>
+      )}
+
+      {speaking && (
+        <div className="overlay" style={{ left: "50%", bottom: 182, transform: "translateX(-50%)", width: "min(760px, 80%)", textAlign: "center" }}>
+          <div className="label" style={{ marginBottom: 6, color: "var(--fg)" }}><span className="dot on" />JARVIS · riepilogo</div>
+          <span className="subtitle" style={{ fontFamily: "var(--sans)", fontSize: 14, color: "var(--fg)", lineHeight: 1.6 }}>{speaking}</span>
         </div>
       )}
 
