@@ -155,6 +155,151 @@ async def spoken_business_summary(lang: str | None = None, s: Services = Depends
     return {"lang": lang, "text": spoken_summary(numbers, lang, title), "numbers": numbers}
 
 
+# ============================================================== integrations
+SECRET_NAMES = {
+    "whatsapp_phone_number_id", "whatsapp_access_token", "whatsapp_app_secret", "whatsapp_verify_token",
+    "owner_phone_numbers", "owner_emails", "google_client_id", "google_client_secret",
+    "twilio_account_sid", "twilio_auth_token", "twilio_from_number", "elevenlabs_api_key",
+}
+
+
+@api.get("/integrations")
+async def integrations(request: Request, s: Services = Depends(require_token)) -> dict:
+    wake = getattr(request.app.state, "wake", None)
+    return {**s.channels.status(), "vault": sorted(n for n in s.vault.names() if n in SECRET_NAMES),
+            "wake": wake.status() if wake else {"available": False},
+            "webhook": {"host": s.settings.webhook_host, "port": s.settings.webhook_port,
+                        "path": "/webhooks/whatsapp"}}
+
+
+class CredentialIn(BaseModel):
+    name: str
+    value: Any
+
+
+@api.post("/integrations/credentials")
+async def credential_set(body: CredentialIn, s: Services = Depends(require_token)) -> dict:
+    """Store a secret encrypted. The value is never sent back to the browser."""
+    if body.name not in SECRET_NAMES:
+        raise HTTPException(400, "Unknown credential name")
+    value = body.value
+    if body.name in ("owner_phone_numbers", "owner_emails"):
+        items = value if isinstance(value, list) else str(value).replace(";", ",").split(",")
+        value = [str(x).strip() for x in items if str(x).strip()]
+    if body.name == "owner_phone_numbers":
+        from ..integrations.whatsapp import digits
+        value = [("39" + digits(v)) if len(digits(v)) == 10 and digits(v).startswith("3") else digits(v)
+                 for v in value]  # Italian mobile without country code -> +39
+    s.vault.set(body.name, value)
+    s.audit.record("user", "credentials:set", "stored", target=body.name)
+    return {"ok": True, "name": body.name}
+
+
+@api.delete("/integrations/credentials/{name}")
+async def credential_delete(name: str, s: Services = Depends(require_token)) -> dict:
+    if name not in SECRET_NAMES:
+        raise HTTPException(400, "Unknown credential name")
+    s.vault.delete(name)
+    s.audit.record("user", "credentials:delete", "deleted", target=name)
+    return {"ok": True}
+
+
+@api.post("/integrations/whatsapp/verify-token")
+async def whatsapp_verify_token(s: Services = Depends(require_token)) -> dict:
+    """Generate the verify token to paste in Meta's webhook settings (shown once)."""
+    import secrets as _secrets
+    token = _secrets.token_urlsafe(24)
+    s.vault.set("whatsapp_verify_token", token)
+    return {"verify_token": token}
+
+
+@api.post("/integrations/whatsapp/test")
+async def whatsapp_test(s: Services = Depends(require_token)) -> dict:
+    from ..integrations.whatsapp import WhatsAppError
+    wa = s.channels.whatsapp
+    if not wa.configured() or not wa.owners():
+        raise HTTPException(400, "WhatsApp or the owner number is not configured")
+    try:
+        sent = await wa.notify_owners("JARVIS è collegato a WhatsApp. Scrivimi qui quando vuoi.")
+    except WhatsAppError as exc:
+        raise HTTPException(502, str(exc)) from exc
+    if not sent:
+        return {"ok": False, "note": "Prima scrivi tu un messaggio al numero di JARVIS (si apre la finestra di 24 ore), "
+                                     "oppure configura un template approvato."}
+    return {"ok": True, "sent_to": sent}
+
+
+@api.get("/integrations/google/connect")
+async def google_connect(s: Services = Depends(require_token)) -> dict:
+    from ..integrations.google import SCOPES, GoogleError
+    try:
+        return {"url": s.channels.google.auth_url(), "scopes": SCOPES}
+    except GoogleError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
+
+@public.get("/integrations/google/callback", include_in_schema=False)
+async def google_callback(request: Request, code: str = "", state: str = "", error: str = "") -> Response:
+    """Browser redirect from Google (local only). Protected by the single-use state."""
+    from ..integrations.google import GoogleError
+    s: Services = request.app.state.services
+    if error:
+        html = f"<h2>Collegamento annullato</h2><p>{error}</p>"
+    else:
+        try:
+            info = await s.channels.google.finish(code, state)
+            html = f"<h2>Google collegato</h2><p>Account: {info['email']}</p><p>Puoi chiudere questa pagina.</p>"
+        except GoogleError as exc:
+            html = f"<h2>Collegamento non riuscito</h2><p>{exc}</p>"
+    page = ("<!doctype html><meta charset=utf-8><title>JARVIS</title><body style='background:#000;color:#e9ecf1;"
+            f"font-family:monospace;padding:40px'>{html}</body>")
+    return Response(page, media_type="text/html")
+
+
+@api.post("/integrations/google/disconnect")
+async def google_disconnect(s: Services = Depends(require_token)) -> dict:
+    s.channels.google.disconnect()
+    return {"ok": True}
+
+
+class PhoneEnable(BaseModel):
+    enabled: bool
+    confirmation: str | None = None
+
+
+@api.post("/integrations/phone/enable")
+async def phone_enable(body: PhoneEnable, s: Services = Depends(require_token)) -> dict:
+    """Paid calls need explicit authorization: the confirmation phrase."""
+    from ..security.permissions import EXPLICIT_CONFIRMATION_PHRASE
+    if body.enabled and body.confirmation != EXPLICIT_CONFIRMATION_PHRASE:
+        raise HTTPException(403, f"Per attivare le chiamate a pagamento scrivi {EXPLICIT_CONFIRMATION_PHRASE}")
+    s.vault.set("phone_calls_enabled", body.enabled)
+    s.audit.record("user", "phone:enable" if body.enabled else "phone:disable", "authorized" if body.enabled else "off",
+                   permission="explicit")
+    return s.channels.phone.status()
+
+
+@api.post("/integrations/phone/test")
+async def phone_test(body: PhoneEnable, s: Services = Depends(require_token)) -> dict:
+    from ..security.permissions import EXPLICIT_CONFIRMATION_PHRASE
+    if body.confirmation != EXPLICIT_CONFIRMATION_PHRASE:
+        raise HTTPException(403, f"La chiamata di prova costa qualche centesimo: scrivi {EXPLICIT_CONFIRMATION_PHRASE}")
+    if not s.channels.phone.configured():
+        raise HTTPException(400, "Twilio o il numero del proprietario non sono configurati")
+    return await s.channels.phone.call("Chiamata di prova. Le chiamate di emergenza funzionano.",
+                                       external_id=f"test:{now_iso()}")
+
+
+@api.get("/integrations/log")
+async def comms_log(limit: int = 100, s: Services = Depends(require_token)) -> list:
+    return s.db.query("SELECT * FROM comms_log ORDER BY id DESC LIMIT ?", (min(limit, 500),))
+
+
+@api.get("/conversations/primary")
+async def primary_conversation(s: Services = Depends(require_token)) -> dict:
+    return {"conversation_id": s.channels.primary_conversation()}
+
+
 # ======================================================================= chat
 @api.get("/conversations")
 async def conversations(s: Services = Depends(require_token)) -> list:
@@ -184,7 +329,7 @@ async def delete_conversation(cid: str, s: Services = Depends(require_token)) ->
     return {"ok": True}
 
 
-class ChatIn(BaseModel):
+class ChatIn(BaseModel):  # noqa: D101
     text: str = Field(min_length=1, max_length=20000)
     conversation_id: str | None = None
     mode: str = Field("text", pattern="^(text|voice)$")

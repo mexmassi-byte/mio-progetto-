@@ -18,10 +18,15 @@ CHAT_TOOLS = [
     "memory_search", "memory_save", "knowledge_read", "create_mission", "mission_status", "set_daily_goals", "business_summary",
     "crm_list_leads", "sales_audit_url", "fetch_page", "web_search", "request_action",
     "dev_list_files", "dev_read_file",
+    # Google / WhatsApp (write tools appear only when the owner made them autonomous)
+    "gmail_search", "gmail_read", "gmail_triage", "gmail_followups", "gmail_draft", "email_owner",
+    "calendar_list", "calendar_create", "tasks_list", "tasks_create", "drive_search", "drive_read",
+    "docs_create", "contacts_search", "whatsapp_to_owner",
 ]
 MAX_TOOL_ROUNDS = 4
 # Tools whose output is internet content (untrusted).
-UNTRUSTED_TOOLS = {"web_search", "fetch_page", "sales_audit_url"}
+UNTRUSTED_TOOLS = {"web_search", "fetch_page", "sales_audit_url", "gmail_search", "gmail_read", "gmail_triage",
+                   "gmail_followups", "drive_search", "drive_read"}
 # Tools a web page must never be able to trigger: after untrusted content was
 # read in the same turn they are refused, whatever the model decides.
 TAINT_BLOCKED = {"request_action", "create_mission", "set_daily_goals"}

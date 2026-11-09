@@ -78,6 +78,12 @@ def build_services(settings: Settings, llm: LLMProvider | None = None) -> Servic
     tools = ToolRegistry()
     for module in (builtin, web, sales_tools, dev_tools, chat_tools):
         module.register(tools)
+    from .integrations import tools as integration_tools
+    integration_tools.register(tools)
+    if settings.google_autonomous_writes:  # the owner chose: calendar/tasks/docs without asking each time
+        from .security.permissions import Permission as _P
+        for name in integration_tools.GOOGLE_WRITE_TOOLS:
+            tools.get(name).permission = _P.AUTONOMOUS
     if settings.claude_code_autonomous:  # the user chose to let JARVIS use Claude Code freely
         from .security.permissions import Permission
         tools.get("dev_claude_code").permission = Permission.AUTONOMOUS

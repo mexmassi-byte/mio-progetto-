@@ -29,8 +29,10 @@ class Channels:
     def __init__(self, services: Any):
         self.s = services
         self.whatsapp = WhatsApp(services)
+        from .google import Google
         from .phone import Phone
         self.phone = Phone(services)
+        self.google = Google(services)
         self._tasks: set[asyncio.Task] = set()
 
     # ------------------------------------------------- shared conversation
@@ -140,5 +142,5 @@ class Channels:
         return {"whatsapp": sent}
 
     def status(self) -> dict[str, Any]:
-        return {"whatsapp": self.whatsapp.status(), "phone": self.phone.status(),
+        return {"whatsapp": self.whatsapp.status(), "phone": self.phone.status(), "google": self.google.status(),
                 "primary_conversation": self.primary_conversation()}
