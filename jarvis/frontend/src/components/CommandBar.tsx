@@ -8,34 +8,31 @@ export interface ChatMsg {
   error?: boolean;
 }
 
-const CONV_KEY = "jarvis.conversation";
-
-function savedConversation(): string | null {
-  try {
-    return localStorage.getItem(CONV_KEY);
-  } catch {
-    return null;
-  }
-}
-
 /** Global "talk to JARVIS" bar, present on every page. */
 export function CommandBar({ onThinking, placeholder }: { onThinking?: (busy: boolean) => void; placeholder?: string }) {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
-  const [conv, setConv] = useState<string | null>(savedConversation());
+  const [conv, setConv] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
   const abort = useRef<AbortController | null>(null);
+  const fromStream = useRef(false);
+
+  // The dashboard, voice and WhatsApp share one conversation (and its context).
+  useEffect(() => {
+    api.get<{ conversation_id: string }>("/conversations/primary").then((r) => setConv(r.conversation_id))
+      .catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    if (!conv) return;
+    if (!conv || fromStream.current) return void (fromStream.current = false);
     api.get<{ role: string; content: string; meta: any }[]>(`/conversations/${conv}/messages`)
       .then((rows) => setMsgs(rows.filter((r) => r.role === "user" || r.role === "assistant").slice(-30)
         .map((r) => ({ role: r.role as ChatMsg["role"], content: r.content, error: r.meta?.error }))))
-      .catch(() => setConv(null));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      .catch(() => setMsgs([]));
+  }, [conv]);
 
   useEffect(() => {
     box.current?.scrollTo({ top: box.current.scrollHeight });
@@ -64,13 +61,12 @@ export function CommandBar({ onThinking, placeholder }: { onThinking?: (busy: bo
     try {
       await streamChat(q, conv, (ev) => {
         if (ev.type === "conversation") {
-          setConv(ev.conversation_id);
-          try {
-            localStorage.setItem(CONV_KEY, ev.conversation_id);
-          } catch {
-            /* ignore */
+          if (ev.conversation_id !== conv) {
+            fromStream.current = true;
+            setConv(ev.conversation_id);
           }
-        } else if (ev.type === "token") update((l) => ({ ...l, content: l.content + ev.text }));
+        }
+        else if (ev.type === "token") update((l) => ({ ...l, content: l.content + ev.text }));
         else if (ev.type === "tool") {
           update((l) => {
             const tools = [...(l.tools ?? [])];
@@ -92,11 +88,6 @@ export function CommandBar({ onThinking, placeholder }: { onThinking?: (busy: bo
   function newConversation() {
     setConv(null);
     setMsgs([]);
-    try {
-      localStorage.removeItem(CONV_KEY);
-    } catch {
-      /* ignore */
-    }
   }
 
   return (

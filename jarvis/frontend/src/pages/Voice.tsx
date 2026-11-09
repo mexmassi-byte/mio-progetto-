@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, streamChat, synthesize, uploadAudio } from "../api/client";
+import { takeWake } from "../state/wake";
 import type { SystemStatus } from "../api/types";
 import { Visual } from "../components/Visual";
 import { events, useEventListener } from "../state/events";
@@ -223,6 +224,58 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
       });
     } else setState("idle");
   }
+
+  // Shared conversation with WhatsApp and the dashboard.
+  useEffect(() => {
+    api.get<{ conversation_id: string }>("/conversations/primary")
+      .then((r) => { if (!conv.current) conv.current = r.conversation_id; }).catch(() => undefined);
+  }, []);
+
+  /** Subtle two-tone activation sound. */
+  function chime() {
+    try {
+      const c = ctx();
+      [880, 1320].forEach((f, i) => {
+        const o = c.createOscillator();
+        const g = c.createGain();
+        o.frequency.value = f;
+        const t = c.currentTime + i * 0.12;
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.12, t + 0.02);
+        g.gain.linearRampToValueAtTime(0, t + 0.11);
+        o.connect(g).connect(c.destination);
+        o.start(t);
+        o.stop(t + 0.12);
+      });
+    } catch {
+      /* audio unavailable */
+    }
+  }
+
+  // Activation phrase heard (by the always-on listener): greet, then listen.
+  // The handler is refreshed every render so it sees the current voice status.
+  const onWake = useRef<() => void>(() => undefined);
+  onWake.current = async () => {
+    const w = takeWake();
+    if (!w || stateRef.current !== "idle") return;
+    chime();
+    await new Promise((r) => window.setTimeout(r, 300));
+    if (w.greeting) {
+      setTranscript("");
+      setAnswer(w.greeting);
+      await speak(w.greeting);
+    }
+    void listen();
+  };
+  useEffect(() => {
+    const handler = () => onWake.current();
+    window.addEventListener("jarvis:wake", handler);
+    const t = window.setTimeout(handler, 400); // activation that arrived while this screen was loading
+    return () => {
+      window.removeEventListener("jarvis:wake", handler);
+      window.clearTimeout(t);
+    };
+  }, []);
 
   const presenting = useRef(false);
   /** JARVIS introduces himself in the three languages (voice test). */

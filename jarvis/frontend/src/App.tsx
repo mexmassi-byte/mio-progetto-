@@ -2,6 +2,8 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { api, getToken, setToken } from "./api/client";
 import type { JEvent, SystemStatus } from "./api/types";
 import { CommandBar } from "./components/CommandBar";
+import { MicIndicator } from "./components/MicIndicator";
+import { announceWake } from "./state/wake";
 import { Nav, PageId } from "./components/Nav";
 import { DevPage } from "./pages/Dev";
 import { MemoryPage } from "./pages/Memory";
@@ -94,6 +96,13 @@ function Shell() {
     };
   }, []);
 
+  // Activation phrase heard: the voice screen opens from any page and greets.
+  useEventListener(["voice.wake"], (e: JEvent) => {
+    auto.current?.manual();
+    if (pageRef.current !== "voice") switchTo("voice", "attivazione vocale");
+    announceWake({ lang: e.payload.lang, greeting: e.payload.greeting });
+  });
+
   useEventListener(["notify"], (e: JEvent) => {
     const toast = { id: e.id, title: e.payload.title, body: e.payload.body ?? "", level: e.payload.level ?? "info" };
     setToasts((ts) => [...ts.slice(-3), toast]);
@@ -169,6 +178,7 @@ function Shell() {
           <span>APPROVAZIONI <b className="num">{counts.approvals_pending ?? 0}</b></span>
           <span>LEAD <b className="num">{counts.leads ?? 0}</b></span>
           <span className="grow" />
+          <MicIndicator />
           <button className="modebtn" onClick={() => { const on = !autoOn; auto.current?.setEnabled(on); setAutoOn(on); }}
             title="Cambio automatico tra Command Center, Ricerca e Voce in base a cosa fa JARVIS">
             MODALITÀ <b>{autoOn ? "AUTO" : "MANUALE"}</b>

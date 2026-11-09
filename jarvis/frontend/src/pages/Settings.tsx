@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api, setToken } from "../api/client";
 import type { SystemStatus } from "../api/types";
 import { usePoll } from "../state/events";
+import { Integrations } from "../components/Integrations";
 
 export function SettingsPage({ status }: { status: SystemStatus | null }) {
   const { data: models } = usePoll<{ models: { name: string; size_gb?: number; parameters?: string; quantization?: string }[]; current: string; error?: string }>("/system/models", 60000);
@@ -92,6 +93,8 @@ export function SettingsPage({ status }: { status: SystemStatus | null }) {
           </div>
         </div>
       </div>
+
+      <Integrations />
 
       <div className="h2">Permessi degli strumenti</div>
       <table className="t">
