@@ -4,6 +4,7 @@ import type { JEvent, SystemStatus } from "./api/types";
 import { CommandBar } from "./components/CommandBar";
 import { MicIndicator } from "./components/MicIndicator";
 import { announceWake } from "./state/wake";
+import { CelebrationHost } from "./components/Celebration";
 import { Nav, PageId } from "./components/Nav";
 import { DevPage } from "./pages/Dev";
 import { MemoryPage } from "./pages/Memory";
@@ -103,6 +104,11 @@ function Shell() {
     announceWake({ lang: e.payload.lang, greeting: e.payload.greeting });
   });
 
+  // A mission verified as accomplished: the full-screen sequence.
+  useEventListener(["mission.completed"], (e: JEvent) => {
+    window.dispatchEvent(new CustomEvent("jarvis:celebrate", { detail: { missionId: e.payload.mission_id } }));
+  });
+
   useEventListener(["notify"], (e: JEvent) => {
     const toast = { id: e.id, title: e.payload.title, body: e.payload.body ?? "", level: e.payload.level ?? "info" };
     setToasts((ts) => [...ts.slice(-3), toast]);
@@ -197,6 +203,7 @@ function Shell() {
         </div>
         {banner && <div key={banner.id} className="mode-banner" role="status">{banner.text}</div>}
         <CommandBar />
+        <CelebrationHost title={status?.settings.titles?.it ?? "Signore"} />
         <div className="toasts" aria-live="polite">
           {toasts.map((t) => (
             <div key={t.id} className="toast" role="status">

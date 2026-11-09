@@ -84,6 +84,8 @@ export class Stage {
   private composer: EffectComposer | null = null;
   private bloomPass: UnrealBloomPass | null = null;
   fps = 0;
+  /** Fixed quality (no automatic downgrade): used for frame-exact capture. */
+  fixed = false;
 
   constructor(private canvas: HTMLCanvasElement, fov = 40) {
     if (!webglAvailable()) throw new WebGLUnavailable("WebGL non disponibile");
@@ -117,6 +119,10 @@ export class Stage {
     this.composer.addPass(this.bloomPass);
     this.composer.addPass(new OutputPass());
     this.resize();
+  }
+
+  setBloomStrength(v: number) {
+    if (this.bloomPass) this.bloomPass.strength = v;
   }
 
   get bloomEnabled(): boolean {
@@ -155,7 +161,7 @@ export class Stage {
   private loop = () => {
     this.raf = requestAnimationFrame(this.loop);
     const now = performance.now();
-    if (this.minFrameMs && now - this.lastRender < this.minFrameMs) return;
+    if (this.minFrameMs && !this.fixed && now - this.lastRender < this.minFrameMs) return;
     this.lastRender = now;
     const dt = Math.min(0.1, (now - this.last) / 1000);
     this.last = now;
@@ -169,6 +175,7 @@ export class Stage {
   };
 
   private adapt(dt: number) {
+    if (this.fixed) return;
     this.frameTimes.push(dt);
     if (this.frameTimes.length < 90) return;
     const avg = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;

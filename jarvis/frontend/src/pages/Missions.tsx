@@ -128,6 +128,7 @@ function MissionDetail({ id, onChange }: { id: string; onChange: () => void }) {
       </div>
       <div className="row" style={{ margin: "12px 0" }}>
         {active && <button className="btn danger" onClick={() => act("cancel")}>Annulla</button>}
+        {m.status === "completed" && <button className="btn ghost" onClick={() => window.dispatchEvent(new CustomEvent("jarvis:celebrate", { detail: { missionId: m.id } }))}>Rivedi il traguardo</button>}
         {m.status === "blocked" && <button className="btn" onClick={() => act("resume", { extra_steps: 20 })}>Riprendi (+20 passi)</button>}
       </div>
       <div className="h2">Passi</div>
