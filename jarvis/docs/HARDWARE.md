@@ -46,7 +46,9 @@ JARVIS_TTS_PROVIDER=elevenlabs
 JARVIS_ELEVENLABS_API_KEY=...   # voce Brian; riserva locale: Piper
 ```
 
-## Da installare (in attesa di conferma)
+## Installazione
+
+Un solo comando: `jarvis/scripts/mac-setup.sh` (vedi docs/SETUP.md).
 
 Python 3.12 (python.org), Node.js 22 LTS (nodejs.org), app Ollama, codice
 JARVIS come ZIP da GitHub (evita gli strumenti Apple), poi i modelli.

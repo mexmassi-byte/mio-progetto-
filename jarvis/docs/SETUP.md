@@ -13,6 +13,24 @@ Gli unici download grandi sono i modelli AI, e li scegli tu.
 | Ollama | ultima | https://ollama.com/download |
 | Docker Desktop | facoltativo, per la ricerca web | https://www.docker.com/products/docker-desktop/ |
 
+## Mac (Apple Silicon): un solo comando
+
+Apri **Terminale** (Spotlight: Cmd+Spazio → "Terminale"), incolla questa riga
+e premi Invio:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mexmassi-byte/mio-progetto-/claude/upbeat-rubin-co25tq/jarvis/scripts/mac-setup.sh | bash
+```
+
+Installa da solo, solo se mancano: Python 3.12 e Node.js 22 (installatori
+ufficiali, chiede la password del Mac), Ollama, il codice in `~/JARVIS`, il
+modello `qwen3:4b` e la configurazione per 8 GB (docs/HARDWARE.md). Chiede la
+chiave ElevenLabs (facoltativa) e crea l'icona **JARVIS** sulla Scrivania.
+Non usa Homebrew né gli strumenti di sviluppo Apple. Rilanciato, aggiorna
+JARVIS senza toccare dati e chiavi. Registro: `~/JARVIS-install.log`.
+
+Le sezioni seguenti descrivono l'installazione manuale (Windows, Linux).
+
 ## 2. Scarica il codice e installa
 
 ```bash
