@@ -67,6 +67,7 @@ export function CommandBar({ onThinking, placeholder }: { onThinking?: (busy: bo
           }
         }
         else if (ev.type === "token") update((l) => ({ ...l, content: l.content + ev.text }));
+        else if (ev.type === "reset") update((l) => ({ ...l, content: ev.text }));
         else if (ev.type === "tool") {
           update((l) => {
             const tools = [...(l.tools ?? [])];

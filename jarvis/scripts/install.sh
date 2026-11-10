@@ -25,6 +25,6 @@ echo
 echo "Done. Next steps:"
 echo "  1. Install Ollama: https://ollama.com/download"
 echo "  2. Download the model chosen for your PC (see docs/SETUP.md), e.g.:"
-echo "       ollama pull qwen3:4b        # ~2.5 GB (Mac 8 GB: docs/HARDWARE.md)"
+echo "       ollama pull qwen3:4b-instruct-2507-q4_K_M  # ~2.5 GB (Mac 8 GB)"
 echo "       ollama pull nomic-embed-text # ~0.3 GB (memory search)"
 echo "  3. Start JARVIS:  bash scripts/start.sh"

@@ -128,3 +128,27 @@ async def test_jarvis_cannot_mark_verified_and_dedups(services):
     assert c["reliability"] == "estimate"
     d = await mem.create("company", "Sede", "Genova", "verified", actor="user")
     assert d["reliability"] == "verified"
+
+
+def test_reasoning_is_never_part_of_the_answer():
+    from jarvis.llm.base import strip_thinking, visible_text
+    assert strip_thinking("<think>devo rispondere in italiano</think>Buongiorno, Signore.") == "Buongiorno, Signore."
+    # Thinking models (Qwen3-*-thinking-2507) emit only the closing tag.
+    assert strip_thinking("L'utente ha chiesto… quindi rispondo in italiano.</think>\n\nBuongiorno.") == "Buongiorno."
+    assert visible_text("Ciao <think>sto pens") == "Ciao "
+
+
+async def test_chat_stream_replaces_reasoning_that_leaked(services, llm):
+    llm.queue("L'utente ha chiesto di presentarmi, quindi devo rispondere in italiano.</think> Sono JARVIS, Signore.")
+    events = [ev async for ev in services.chat.send(None, "Presentati", "voice")]
+    shown = ""
+    for ev in events:
+        if ev["type"] == "token":
+            shown += ev["text"]
+        elif ev["type"] == "reset":
+            shown = ev["text"]
+    assert shown.strip() == "Sono JARVIS, Signore."
+    assert any(ev["type"] == "reset" for ev in events)
+    assert events[-1]["type"] == "done" and events[-1]["text"] == "Sono JARVIS, Signore."
+    conv = events[0]["conversation_id"]
+    assert services.chat.messages(conv)[-1]["content"] == "Sono JARVIS, Signore."

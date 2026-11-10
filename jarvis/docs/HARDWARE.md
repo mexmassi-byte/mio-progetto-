@@ -36,7 +36,7 @@ OLLAMA_MAX_LOADED_MODELS=2
 `jarvis/backend/.env`:
 
 ```
-JARVIS_LLM_MODEL=qwen3:4b
+JARVIS_LLM_MODEL=qwen3:4b-instruct-2507-q4_K_M
 JARVIS_LLM_CONTEXT_TOKENS=8192
 JARVIS_LLM_THINK=false
 JARVIS_LLM_MAX_TOKENS=1200
@@ -59,3 +59,12 @@ Totale su disco: ~5 GB.
 - `jarvis eval qwen3:4b`: punteggio (soglia per l'autonomia: 8/10).
 - Tempo della prima risposta e token al secondo.
 - Pressione di memoria con JARVIS + interfaccia aperti.
+
+## Nota (10 novembre 2026): quale qwen3:4b
+
+Su Ollama il nome `qwen3:4b` oggi indica **Qwen3-4B-Thinking-2507**: ragiona
+sempre ad alta voce e ignora l'interruttore `think`. Sul Mac il ragionamento
+finiva nella risposta e veniva letto dalla voce. JARVIS usa
+**`qwen3:4b-instruct-2507-q4_K_M`** (stessa dimensione, 2,5 GB, nessun
+ragionamento, risposte più rapide). In più JARVIS toglie sempre dalla risposta
+qualsiasi ragionamento del modello, anche se arriva senza il tag di apertura.

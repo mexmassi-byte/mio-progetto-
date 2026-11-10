@@ -24,7 +24,7 @@ curl -fsSL https://raw.githubusercontent.com/mexmassi-byte/mio-progetto-/claude/
 
 Installa da solo, solo se mancano: Python 3.12 e Node.js 22 (installatori
 ufficiali, chiede la password del Mac), Ollama, il codice in `~/JARVIS`, il
-modello `qwen3:4b` e la configurazione per 8 GB (docs/HARDWARE.md). Chiede la
+modello `qwen3:4b-instruct-2507` (la versione che risponde senza "ragionare ad alta voce") e la configurazione per 8 GB (docs/HARDWARE.md). Chiede la
 chiave ElevenLabs (facoltativa), crea l'icona **JARVIS** sulla Scrivania e
 la aggiunge agli elementi login (JARVIS parte all'accensione del Mac).
 Non usa Homebrew né gli strumenti di sviluppo Apple. Rilanciato, aggiorna

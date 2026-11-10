@@ -63,7 +63,8 @@ export type ChatEvent =
   | { type: "token"; text: string }
   | { type: "thinking"; text: string }
   | { type: "tool"; name: string; status: "running" | "done"; ok?: boolean; args?: unknown; result?: unknown }
-  | { type: "done"; message_id: number; conversation_id: string; stats: Record<string, unknown> }
+  | { type: "reset"; text: string }
+  | { type: "done"; message_id: number; conversation_id: string; stats: Record<string, unknown>; text?: string }
   | { type: "error"; error: string };
 
 /** Stream a chat answer (Server-Sent Events over fetch). */

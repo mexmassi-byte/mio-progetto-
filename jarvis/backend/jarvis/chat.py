@@ -6,7 +6,7 @@ import json
 from typing import TYPE_CHECKING, Any, AsyncIterator
 
 from .db.database import dumps, loads, new_id, now_iso
-from .llm.base import LLMError, LLMUnavailable, Message, ToolCall, strip_thinking
+from .llm.base import LLMError, LLMUnavailable, Message, ToolCall, strip_thinking, visible_text
 from .prompts import chat_system_prompt
 from .security.permissions import Permission
 from .tools.registry import ToolContext, ToolError
@@ -92,11 +92,18 @@ class ChatService:
             for _round in range(MAX_TOOL_ROUNDS + 1):
                 calls: list[ToolCall] = []
                 chunk_text = []
+                sent = ""  # what the user has seen of this round (reasoning never shown)
                 offer_tools = tools if _round < MAX_TOOL_ROUNDS else None
                 async for chunk in self.s.llm.stream_chat(msgs, tools=offer_tools):
                     if chunk.text:
                         chunk_text.append(chunk.text)
-                        yield {"type": "token", "text": chunk.text}
+                        visible = visible_text("".join(chunk_text))
+                        if visible.startswith(sent):
+                            if len(visible) > len(sent):
+                                yield {"type": "token", "text": visible[len(sent):]}
+                        else:  # reasoning turned out to be reasoning: replace what was shown
+                            yield {"type": "reset", "text": visible}
+                        sent = visible
                     if chunk.thinking:
                         yield {"type": "thinking", "text": chunk.thinking}
                     calls.extend(chunk.tool_calls)
@@ -135,7 +142,7 @@ class ChatService:
                                 "memories": [m["id"] for m in memories]})
         self.s.bus.emit("chat.finished", conversation_id=conversation_id, tools=len(used_tools))
         yield {"type": "done", "message_id": message_id, "conversation_id": conversation_id,
-               "stats": stats, "tools": used_tools}
+               "stats": stats, "tools": used_tools, "text": answer}
 
     async def ask(self, conversation_id: str | None, text: str, mode: str = "text") -> dict[str, Any]:
         """Non-streaming helper: returns the final answer."""
@@ -145,10 +152,13 @@ class ChatService:
                 out["conversation_id"] = ev["conversation_id"]
             elif ev["type"] == "token":
                 out["text"] += ev["text"]
+            elif ev["type"] == "reset":
+                out["text"] = ev["text"]
             elif ev["type"] == "error":
                 out["error"] = ev["error"]
             elif ev["type"] == "done":
                 out["tools"] = ev["tools"]
+                out["text"] = ev.get("text", out["text"])
         out["text"] = strip_thinking(out["text"])
         return out
 

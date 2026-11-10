@@ -136,8 +136,23 @@ class LLMProvider(ABC):
 _THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
 
 
+def visible_text(text: str) -> str:
+    """The part of a (possibly partial) answer meant for the user.
+
+    Removes <think>…</think> blocks, an unfinished <think> at the end, and the
+    reasoning of "thinking" models that emit only the closing </think> tag
+    (e.g. Qwen3-*-thinking-2507, which ignore the think switch)."""
+    t = _THINK_RE.sub("", text)
+    if "</think>" in t:
+        t = t.rsplit("</think>", 1)[1]
+    i = t.find("<think>")
+    if i >= 0:
+        t = t[:i]
+    return t.lstrip()
+
+
 def strip_thinking(text: str) -> str:
-    return _THINK_RE.sub("", text).strip()
+    return visible_text(text).strip()
 
 
 def extract_json(text: str) -> Any:

@@ -15,7 +15,10 @@ ZIP_URL="https://codeload.github.com/mexmassi-byte/mio-progetto-/zip/refs/heads/
 PY_URL="https://www.python.org/ftp/python/3.12.10/python-3.12.10-macos11.pkg"
 NODE_DIR="https://nodejs.org/dist/latest-v22.x"
 OLLAMA_URL="https://ollama.com/download/Ollama-darwin.zip"
-MODEL="qwen3:4b"
+# "qwen3:4b" on Ollama is now the *thinking* 2507 model (it always reasons out
+# loud and ignores the think switch): JARVIS uses the instruct one, same size.
+MODEL="qwen3:4b-instruct-2507-q4_K_M"
+OLD_MODEL="qwen3:4b"
 EMBED="nomic-embed-text"
 
 HOME_DIR="$HOME/JARVIS"
@@ -123,6 +126,8 @@ ok "codice aggiornato"
 # ------------------------------------------------------------------ installazione
 say "Installazione di JARVIS (qualche minuto)"
 cd "$HOME_DIR/jarvis"
+# Se JARVIS è acceso, lo spengo per aggiornarlo (si riapre alla fine).
+pkill -f "$HOME_DIR/jarvis/backend/.venv/bin/jarvis" 2>/dev/null && ok "JARVIS spento per l'aggiornamento" || true
 bash scripts/install.sh
 say "Voce e attivazione vocale (riconoscimento locale)"
 backend/.venv/bin/pip install -q -e "backend[wake]"
@@ -163,6 +168,11 @@ EOF
 else
   ok "configurazione esistente conservata"
 fi
+# Modello: dalla versione "thinking" alla "instruct" (installazioni precedenti).
+if grep -q "^JARVIS_LLM_MODEL=$OLD_MODEL\$" "$ENV_FILE"; then
+  sed -i '' "s/^JARVIS_LLM_MODEL=$OLD_MODEL\$/JARVIS_LLM_MODEL=$MODEL/" "$ENV_FILE"
+  ok "modello aggiornato a $MODEL"
+fi
 # Attivazione vocale accesa di default (si spegne o si silenzia dalla dashboard).
 grep -q "^JARVIS_WAKE_ENABLED=" "$ENV_FILE" || echo "JARVIS_WAKE_ENABLED=true" >> "$ENV_FILE"
 
@@ -171,6 +181,9 @@ say "Modello AI $MODEL (~2,5 GB, solo la prima volta)"
 OLLAMA_CLI="$OLLAMA_APP/Contents/Resources/ollama"
 "$OLLAMA_CLI" pull "$MODEL"
 "$OLLAMA_CLI" pull "$EMBED"
+if "$OLLAMA_CLI" list | awk '{print $1}' | grep -qx "$OLD_MODEL"; then
+  "$OLLAMA_CLI" rm "$OLD_MODEL" >/dev/null && ok "rimossa la versione \"thinking\" del modello (2,5 GB liberati)"
+fi
 ok "modelli pronti"
 
 # ------------------------------------------------------------------ avvio rapido
@@ -198,14 +211,22 @@ exec .venv/bin/jarvis
 EOF
 chmod +x "$LAUNCHER"
 ok "icona JARVIS creata sulla Scrivania"
-# Avvio automatico all'accesso al Mac (si toglie da Impostazioni di Sistema →
-# Generali → Elementi login). macOS può chiedere di consentire il controllo di
-# "System Events": serve solo per aggiungere l'elemento.
-if osascript -e "tell application \"System Events\" to if not (exists login item \"JARVIS.command\") then make login item at end with properties {path:\"$LAUNCHER\", hidden:true}" >/dev/null 2>&1; then
-  ok "JARVIS partirà da solo quando accendi il Mac"
-else
-  echo "  (avvio automatico non aggiunto: puoi farlo da Impostazioni di Sistema → Generali → Elementi login)"
-fi
+# Avvio automatico all'accesso al Mac: un LaunchAgent che apre l'icona JARVIS
+# (si toglie da Impostazioni di Sistema → Generali → Elementi login).
+AGENT="$HOME/Library/LaunchAgents/com.veyroweb.jarvis.plist"
+mkdir -p "$HOME/Library/LaunchAgents"
+cat > "$AGENT" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.veyroweb.jarvis</string>
+  <key>ProgramArguments</key><array><string>/usr/bin/open</string><string>$LAUNCHER</string></array>
+  <key>RunAtLoad</key><true/>
+</dict>
+</plist>
+PLIST
+plutil -lint "$AGENT" >/dev/null && ok "JARVIS partirà da solo quando accendi il Mac"
 
 say "Fatto"
 echo "  JARVIS è installato in $HOME_DIR"

@@ -158,8 +158,8 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
     try {
       await streamChat(text, conv.current, (ev) => {
         if (ev.type === "conversation") conv.current = ev.conversation_id;
-        if (ev.type === "token") {
-          full += ev.text;
+        if (ev.type === "token" || ev.type === "reset") {
+          full = ev.type === "reset" ? ev.text : full + ev.text;
           setAnswer(full);
         }
         if (ev.type === "error") setNote(ev.error);
