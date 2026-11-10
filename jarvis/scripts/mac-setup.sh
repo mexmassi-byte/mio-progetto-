@@ -126,6 +126,9 @@ cd "$HOME_DIR/jarvis"
 bash scripts/install.sh
 say "Voce e attivazione vocale (riconoscimento locale)"
 backend/.venv/bin/pip install -q -e "backend[wake]"
+# Scarica subito il riconoscimento locale (tiny ~75 MB + small ~460 MB), così
+# "JARVIS, wake up" funziona dal primo avvio.
+backend/.venv/bin/python -c "from faster_whisper import WhisperModel; WhisperModel('tiny', device='cpu', compute_type='int8'); WhisperModel('small', device='cpu', compute_type='int8')"
 ok "pronto"
 
 # ------------------------------------------------------------------ configurazione
@@ -160,6 +163,8 @@ EOF
 else
   ok "configurazione esistente conservata"
 fi
+# Attivazione vocale accesa di default (si spegne o si silenzia dalla dashboard).
+grep -q "^JARVIS_WAKE_ENABLED=" "$ENV_FILE" || echo "JARVIS_WAKE_ENABLED=true" >> "$ENV_FILE"
 
 # ------------------------------------------------------------------ modelli
 say "Modello AI $MODEL (~2,5 GB, solo la prima volta)"
@@ -197,5 +202,7 @@ ok "icona JARVIS creata sulla Scrivania"
 say "Fatto"
 echo "  JARVIS è installato in $HOME_DIR"
 echo "  Per avviarlo: doppio clic su «JARVIS» sulla Scrivania."
+echo "  Al primo avvio macOS chiede il microfono per il Terminale: premi «Consenti»."
+echo "  Poi di': «JARVIS, wake up.»"
 echo "  Avvio ora la prima volta…"
 open "$LAUNCHER"

@@ -241,7 +241,7 @@ jarvis/backend/.venv/bin/pip install -e "jarvis/backend[wake]"
 
 Al primo avvio scarica i modelli di riconoscimento locale `tiny` (~75 MB,
 ascolto continuo) e `small` (~460 MB, conferma). Poi Sistema → Integrazioni →
-Attivazione vocale → **Attiva**. macOS chiede il permesso del microfono per il
+Attivazione vocale → **Attiva** (con `scripts/mac-setup.sh` è già attiva e i modelli sono già scaricati). macOS chiede il permesso del microfono per il
 Terminale: accettalo (Impostazioni di Sistema → Privacy e sicurezza →
 Microfono).
 
