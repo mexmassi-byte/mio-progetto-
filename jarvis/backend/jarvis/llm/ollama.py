@@ -29,6 +29,7 @@ class OllamaProvider(LLMProvider):
         self.base_url = base_url.rstrip("/")
         self.timeout = httpx.Timeout(timeout_s, connect=5.0)
         self.context_tokens = context_tokens
+        self.keep_alive: str | None = None
 
     async def stream_chat(
         self,
@@ -44,6 +45,8 @@ class OllamaProvider(LLMProvider):
             "options": {"temperature": self.temperature, "num_ctx": self.context_tokens,
                         "num_predict": self.max_tokens},
         }
+        if self.keep_alive:
+            body["keep_alive"] = self.keep_alive
         if tools:
             body["tools"] = [t.as_openai() for t in tools]
         if json_schema is not None:
@@ -144,7 +147,8 @@ class OllamaProvider(LLMProvider):
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 resp = await client.post(
-                    f"{self.base_url}/api/embed", json={"model": self.embed_model, "input": texts}
+                    f"{self.base_url}/api/embed", json={"model": self.embed_model, "input": texts,
+                                                       **({"keep_alive": self.keep_alive} if self.keep_alive else {})}
                 )
             if resp.status_code >= 400:
                 return None

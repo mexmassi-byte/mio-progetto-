@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     # Hard cap on generated tokens per answer: a degenerate model that loops
     # must not generate forever (seen with very small models).
     llm_max_tokens: int = 1500
+    # Keep the model in memory between messages (Ollama unloads it after 5
+    # minutes by default, and reloading costs seconds on every first message).
+    llm_keep_alive: str = "2h"
 
     # User identity used in prompts.
     user_name: str = "Massimiliano"

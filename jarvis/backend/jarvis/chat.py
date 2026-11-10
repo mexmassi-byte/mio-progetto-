@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import TYPE_CHECKING, Any, AsyncIterator
 
 from .db.database import dumps, loads, new_id, now_iso
 from .llm.base import LLMError, LLMUnavailable, Message, ToolCall, strip_thinking, visible_text
-from .prompts import chat_system_prompt
+from .prompts import chat_system_prompt, turn_context
 from .security.permissions import Permission
 from .tools.registry import ToolContext, ToolError
+
+log = logging.getLogger("jarvis.chat")
 
 if TYPE_CHECKING:  # pragma: no cover
     from .services import Services
@@ -23,6 +26,9 @@ CHAT_TOOLS = [
     "calendar_list", "calendar_create", "tasks_list", "tasks_create", "drive_search", "drive_read",
     "docs_create", "contacts_search", "whatsapp_to_owner",
 ]
+GOOGLE_CHAT_TOOLS = {"gmail_search", "gmail_read", "gmail_triage", "gmail_followups", "gmail_draft", "email_owner",
+                     "calendar_list", "calendar_create", "tasks_list", "tasks_create", "drive_search", "drive_read",
+                     "docs_create", "contacts_search"}
 MAX_TOOL_ROUNDS = 4
 # Tools whose output is internet content (untrusted).
 UNTRUSTED_TOOLS = {"web_search", "fetch_page", "sales_audit_url", "gmail_search", "gmail_read", "gmail_triage",
@@ -81,9 +87,11 @@ class ChatService:
         memories = await self.s.memory.search(text, limit=6)
         mem_text = "\n".join(f"- [{m['category']}/{m['reliability']}] {m['title']}: {m['content'][:400]}"
                              for m in memories)
-        system = chat_system_prompt(self.s.settings, mem_text, self.s.knowledge.all_text(2500), voice=mode == "voice", channel=mode)
-        msgs = [Message("system", system)] + self._history(conversation_id)
-        tools = self.s.tools.specs(max_permission=Permission.AUTONOMOUS, names=CHAT_TOOLS)
+        msgs = [Message("system", self.system_prompt())] + self._history(conversation_id)
+        # The context travels with the current message, so everything before it
+        # stays identical and the model can reuse what it already read.
+        msgs[-1] = Message("user", turn_context(mem_text, voice=mode == "voice", channel=mode) + msgs[-1].content)
+        tools = self.chat_tools()
         tainted = "UNTRUSTED_WEB_CONTENT" in text
         used_tools: list[dict[str, Any]] = []
         answer = ""
@@ -182,19 +190,52 @@ class ChatService:
             return {"error": f"{type(exc).__name__}: {exc}"}
         return result if isinstance(result, dict) else {"result": result}
 
+    async def warm_up(self) -> bool:
+        """Load the model and let it read instructions and tools once, at start:
+        the first real question then starts from the cached part."""
+        if self.s.llm.name != "ollama":
+            return False
+        msgs = [Message("system", self.system_prompt()), Message("user", turn_context("") + "ok")]
+        try:
+            async for _chunk in self.s.llm.stream_chat(msgs, tools=self.chat_tools()):
+                break  # the first token means the prompt has been processed
+            return True
+        except Exception as exc:  # the model may still be downloading: not fatal
+            log.info("warm-up skipped: %s", exc)
+            return False
+
+    def system_prompt(self) -> str:
+        return chat_system_prompt(self.s.settings, self.s.knowledge.all_text(2500))
+
+    def chat_tools(self) -> list:
+        """Tools offered in chat: integrations only once they are connected
+        (fewer tools = shorter prompt = faster answers)."""
+        names = list(CHAT_TOOLS)
+        ch = getattr(self.s, "channels", None)
+        if not (ch and ch.google.connected()):
+            names = [n for n in names if n not in GOOGLE_CHAT_TOOLS]
+        if not (ch and ch.whatsapp.configured()):
+            names = [n for n in names if n != "whatsapp_to_owner"]
+        return self.s.tools.specs(max_permission=Permission.AUTONOMOUS, names=names)
+
     def _history(self, conversation_id: str) -> list[Message]:
         rows = self.s.db.query(
-            "SELECT role, content FROM messages WHERE conversation_id = ? ORDER BY id DESC LIMIT 40",
-            (conversation_id,))
-        out: list[Message] = []
-        total = 0
-        for r in rows:
-            total += len(r["content"])
-            if total > HISTORY_CHARS and out:
+            "SELECT role, content FROM (SELECT id, role, content FROM messages WHERE conversation_id = ? "
+            "AND role IN ('user', 'assistant') ORDER BY id DESC LIMIT 200) ORDER BY id", (conversation_id,))
+        if not rows:
+            return []
+        # Oldest message that fits; the start then moves in steps of 8 messages,
+        # so the beginning of the conversation stays the same between turns.
+        start, total = len(rows) - 1, len(rows[-1]["content"])
+        for i in range(len(rows) - 2, -1, -1):
+            total += len(rows[i]["content"])
+            if total > HISTORY_CHARS:
                 break
-            if r["role"] in ("user", "assistant"):
-                out.append(Message(r["role"], r["content"]))
-        return list(reversed(out))
+            start = i
+        start = max(start, len(rows) - 40)
+        if start > 0:
+            start = min(len(rows) - 1, (start + 7) // 8 * 8)
+        return [Message(r["role"], r["content"]) for r in rows[start:]]
 
 
 def _title_from(text: str) -> str:

@@ -29,9 +29,12 @@ WHATSAPP_STYLE = ("\nWHATSAPP: the user writes from WhatsApp. Short messages, pl
                   "no tables, no long lists. Answer in the language the user writes in.\n")
 
 
-def chat_system_prompt(s: Settings, memories: str, knowledge: str, voice: bool = False,
-                       channel: str = "text") -> str:
-    today = datetime.now().strftime("%A %d %B %Y, %H:%M")
+def chat_system_prompt(s: Settings, knowledge: str, *_unused: object) -> str:
+    """The part of the prompt that never changes between messages.
+
+    Keeping it identical lets Ollama reuse its cache (the model does not
+    re-read instructions and tools at every message): date/time, memories and
+    channel style travel with the user's message instead (turn_context)."""
     lang = {"it": "Italian", "de": "German", "en": "English"}.get(s.language, s.language)
     return f"""\
 You are JARVIS, the AI operating system and digital employee of {s.company_name},
@@ -52,17 +55,23 @@ set_daily_goals: you will then keep working on your own until each target is
 reached. For a single multi-step objective call create_mission. Never try to
 do long work inside the conversation. For quick facts use the other tools.
 
-{POLICY}{VOICE_STYLE if voice else ""}{WHATSAPP_STYLE if channel == "whatsapp" else ""}
+{POLICY}
 Always answer in the language of the user's last message (Italian, German or English);
 memory, missions and context are shared across languages and channels.
-Current date/time: {today}
-
-RELEVANT MEMORIES (with reliability label)
-{memories or "(none)"}
+Each user message starts with a [CONTEXT] block (date/time, relevant memories,
+channel): use it, never repeat it, and answer only the text after [/CONTEXT].
 
 COMPANY KNOWLEDGE FILES (provided by the user)
 {knowledge or "(none)"}
 """
+
+
+def turn_context(memories: str, voice: bool = False, channel: str = "text") -> str:
+    today = datetime.now().strftime("%A %d %B %Y, %H:%M")
+    style = (VOICE_STYLE if voice else "") + (WHATSAPP_STYLE if channel == "whatsapp" else "")
+    return (f"[CONTEXT]\nDate/time: {today}\n"
+            f"Relevant memories (with reliability label):\n{memories or '(none)'}\n"
+            f"{style.strip()}\n[/CONTEXT]\n\n")
 
 
 PLANNER_PROMPT = """\

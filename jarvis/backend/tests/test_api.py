@@ -126,5 +126,5 @@ def test_actions_blocked_after_reading_web_content(client, monkeypatch):
 
 def test_jarvis_addresses_founders_with_titles(settings):
     from jarvis.prompts import chat_system_prompt
-    p = chat_system_prompt(settings, "", "")
+    p = chat_system_prompt(settings, "")
     assert '"Signore" in Italian' in p and '"Sir" in English' in p and '"Master" in German' in p

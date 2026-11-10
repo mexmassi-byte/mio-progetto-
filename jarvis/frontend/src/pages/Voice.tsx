@@ -140,6 +140,7 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
   }
 
   function interrupt() {
+    turn.current++; // stops the sentences still queued
     presenting.current = false;
     abort.current?.abort();
     player.current?.pause();
@@ -150,29 +151,117 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
     setState("idle");
   }
 
+  /** Each answer is a "turn": interrupting or asking again stops the old one. */
+  const turn = useRef(0);
+
   async function ask(text: string) {
+    const my = ++turn.current;
+    const alive = () => turn.current === my;
     setState("thinking");
     setAnswer("");
     let full = "";
+    let cut = 0; // characters already sent to the voice
+    // JARVIS starts talking at the first complete sentence, while the rest is
+    // still being written: one sentence is synthesized while the previous plays.
+    let synth: Promise<unknown> = Promise.resolve();
+    let playing: Promise<void> = Promise.resolve();
+    const enqueue = (sentence: string) => {
+      const clean = sentence.replace(/[*#`_>]/g, "").trim();
+      if (!clean) return;
+      if (!ttsOk) {
+        playing = playing.then(() => (alive() ? speakSystem(clean) : undefined));
+        return;
+      }
+      const clip = synth.then(() => synthesize(clean)).catch((err) => {
+        setNote(`Sintesi vocale non riuscita: ${(err as Error).message}`);
+        return null;
+      });
+      synth = clip;
+      playing = playing.then(async () => {
+        const blob = await clip;
+        if (!alive()) return;
+        if (blob) await playBlob(blob);
+        else await speakSystem(clean);
+      });
+    };
+    const flush = (final: boolean) => {
+      const rest = full.slice(cut);
+      let end = final ? rest.length : -1;
+      if (!final) {
+        const min = cut === 0 ? 12 : 60; // short first sentence = fast start; then fewer, longer pieces
+        for (const m of rest.matchAll(/[.!?…](?=\s)/g)) if ((m.index ?? 0) + 1 >= min) end = (m.index ?? 0) + 1;
+      }
+      if (end > 0) {
+        enqueue(rest.slice(0, end));
+        cut += end;
+      }
+    };
     abort.current = new AbortController();
     try {
       await streamChat(text, conv.current, (ev) => {
         if (ev.type === "conversation") conv.current = ev.conversation_id;
         if (ev.type === "token" || ev.type === "reset") {
           full = ev.type === "reset" ? ev.text : full + ev.text;
+          if (ev.type === "reset") cut = Math.min(cut, full.length);
           setAnswer(full);
+          flush(false);
         }
         if (ev.type === "error") setNote(ev.error);
       }, abort.current.signal, "voice");
     } catch {
+      if (alive()) setState("idle");
+      return;
+    }
+    if (!alive()) return;
+    flush(true);
+    if (!full.trim()) {
       setState("idle");
       return;
     }
-    if (stateRef.current !== "thinking" || !full.trim()) {
-      setState("idle");
-      return;
-    }
-    await speak(full);
+    await playing;
+    if (alive()) setState("idle");
+  }
+
+  /** Play one synthesized clip (measured amplitude drives the sphere). */
+  async function playBlob(blob: Blob): Promise<void> {
+    const url = URL.createObjectURL(blob);
+    const el = new Audio(url);
+    player.current = el;
+    const c = ctx();
+    const src = c.createMediaElementSource(el);
+    const an = c.createAnalyser();
+    an.fftSize = 2048;
+    src.connect(an);
+    an.connect(c.destination);
+    analyser.current = an;
+    setAmplitudeSource("tts");
+    setState("speaking");
+    await new Promise<void>((resolve) => {
+      const done = () => {
+        URL.revokeObjectURL(url);
+        analyser.current = null;
+        setAmplitudeSource("none");
+        resolve();
+      };
+      el.onended = done;
+      el.onpause = () => { if (!el.ended) done(); };
+      el.play().catch(done);
+    });
+  }
+
+  /** The operating system's voice: its audio cannot be measured, so the
+   *  sphere shows the speaking state without fake amplitude. */
+  function speakSystem(clean: string): Promise<void> {
+    if (!("speechSynthesis" in window)) return Promise.resolve();
+    const u = new SpeechSynthesisUtterance(clean);
+    u.lang = "it-IT";
+    setAmplitudeSource("none");
+    setState("speaking");
+    return new Promise<void>((resolve) => {
+      u.onend = () => resolve();
+      u.onerror = () => resolve();
+      window.speechSynthesis.speak(u);
+    });
   }
 
   /** Speak and resolve when playback has finished. */
@@ -180,49 +269,15 @@ export function VoicePage({ status }: { status: SystemStatus | null }) {
     const clean = text.replace(/[*#`_>]/g, "").slice(0, 1500);
     if (ttsOk) {
       try {
-        const wav = await synthesize(clean);
-        const url = URL.createObjectURL(wav);
-        const el = new Audio(url);
-        player.current = el;
-        const c = ctx();
-        const src = c.createMediaElementSource(el);
-        const an = c.createAnalyser();
-        an.fftSize = 2048;
-        src.connect(an);
-        an.connect(c.destination);
-        analyser.current = an;
-        setAmplitudeSource("tts");
-        setState("speaking");
-        await new Promise<void>((resolve) => {
-          const done = () => {
-            URL.revokeObjectURL(url);
-            analyser.current = null;
-            setAmplitudeSource("none");
-            setState("idle");
-            resolve();
-          };
-          el.onended = done;
-          el.onpause = () => { if (!el.ended) done(); };
-          el.play().catch(done);
-        });
+        await playBlob(await synthesize(clean));
+        setState("idle");
         return;
       } catch (err) {
         setNote(`Sintesi vocale locale non riuscita: ${(err as Error).message}`);
       }
     }
-    // Fallback: the operating system's voice. Its audio cannot be measured,
-    // so the sphere shows the speaking state without fake amplitude.
-    if ("speechSynthesis" in window) {
-      const u = new SpeechSynthesisUtterance(clean);
-      u.lang = "it-IT";
-      setAmplitudeSource("none");
-      setState("speaking");
-      await new Promise<void>((resolve) => {
-        u.onend = () => { setState("idle"); resolve(); };
-        u.onerror = () => { setState("idle"); resolve(); };
-        window.speechSynthesis.speak(u);
-      });
-    } else setState("idle");
+    await speakSystem(clean);
+    setState("idle");
   }
 
   // Shared conversation with WhatsApp and the dashboard.

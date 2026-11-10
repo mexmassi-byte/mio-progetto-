@@ -68,3 +68,14 @@ finiva nella risposta e veniva letto dalla voce. JARVIS usa
 **`qwen3:4b-instruct-2507-q4_K_M`** (stessa dimensione, 2,5 GB, nessun
 ragionamento, risposte più rapide). In più JARVIS toglie sempre dalla risposta
 qualsiasi ragionamento del modello, anche se arriva senza il tag di apertura.
+
+## Velocità (10 novembre 2026)
+
+- Il testo fisso (istruzioni + strumenti, ~2.500 token) resta identico tra un
+  messaggio e l'altro: Ollama lo legge una volta e lo riusa. Data/ora, memorie
+  e stile del canale viaggiano con il messaggio. JARVIS lo fa leggere al
+  modello già all'accensione (riscaldamento), così anche la prima domanda è rapida.
+- Gli strumenti Gmail/Google e WhatsApp entrano nel prompt solo dopo il
+  collegamento (prima erano 26 strumenti, ora 14).
+- Il modello resta in memoria 2 ore (`JARVIS_LLM_KEEP_ALIVE`, prima 5 minuti).
+- Voce: JARVIS inizia a parlare alla prima frase completa, mentre scrive il resto.

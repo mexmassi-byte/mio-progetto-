@@ -152,3 +152,27 @@ async def test_chat_stream_replaces_reasoning_that_leaked(services, llm):
     assert events[-1]["type"] == "done" and events[-1]["text"] == "Sono JARVIS, Signore."
     conv = events[0]["conversation_id"]
     assert services.chat.messages(conv)[-1]["content"] == "Sono JARVIS, Signore."
+
+
+async def test_prompt_prefix_stays_identical_between_messages(services, llm):
+    """Ollama reuses its cache only if the start of the prompt does not change."""
+    sent = []
+    orig = llm.stream_chat
+
+    async def spy(messages, tools=None, **kw):
+        sent.append(([m.content for m in messages], [t.name for t in tools or []]))
+        async for c in orig(messages, tools=tools, **kw):
+            yield c
+
+    llm.stream_chat = spy
+    conv = None
+    for q in ["Ciao", "Quanti lead ho?", "E le missioni?"]:
+        llm.queue(f"Risposta a {q}")
+        r = await services.chat.ask(conv, q)
+        conv = r["conversation_id"]
+    (m1, t1), (m2, t2), (m3, t3) = sent
+    assert m1[0] == m2[0] == m3[0]                       # system prompt never changes
+    assert t1 == t2 == t3 and "gmail_search" not in t1    # Google tools only once connected
+    assert m3[1:3] == m2[1:3] and m2[1].endswith("Ciao")  # old turns are sent the same way
+    assert m3[-1].startswith("[CONTEXT]") and m3[-1].endswith("E le missioni?")
+    assert services.chat.messages(conv)[-2]["content"] == "E le missioni?"  # stored without context

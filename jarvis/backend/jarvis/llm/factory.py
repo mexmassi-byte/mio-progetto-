@@ -16,6 +16,7 @@ def build_provider(settings: Settings, model: str | None = None) -> LLMProvider:
             settings.llm_temperature, settings.llm_timeout_s, settings.llm_context_tokens,
             settings.llm_think,
         )
+        provider.keep_alive = settings.llm_keep_alive
     elif kind in ("openai", "openai-compatible", "lmstudio", "llamacpp"):
         provider = OpenAICompatProvider(
             settings.llm_base_url, model, settings.llm_embed_model,

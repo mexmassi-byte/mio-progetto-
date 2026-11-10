@@ -93,6 +93,7 @@ def create_app(settings: Settings | None = None, llm: LLMProvider | None = None,
         if run_engine:
             services.engine.start()
         backups = asyncio.create_task(_daily_backups(services))
+        app.state.warm_up = asyncio.create_task(services.chat.warm_up())  # first answer without the wait
         webhook_server = await _start_webhooks(services)
         await app.state.wake.apply()
         try:
