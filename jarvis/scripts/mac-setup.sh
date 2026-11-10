@@ -198,6 +198,14 @@ exec .venv/bin/jarvis
 EOF
 chmod +x "$LAUNCHER"
 ok "icona JARVIS creata sulla Scrivania"
+# Avvio automatico all'accesso al Mac (si toglie da Impostazioni di Sistema →
+# Generali → Elementi login). macOS può chiedere di consentire il controllo di
+# "System Events": serve solo per aggiungere l'elemento.
+if osascript -e "tell application \"System Events\" to if not (exists login item \"JARVIS.command\") then make login item at end with properties {path:\"$LAUNCHER\", hidden:true}" >/dev/null 2>&1; then
+  ok "JARVIS partirà da solo quando accendi il Mac"
+else
+  echo "  (avvio automatico non aggiunto: puoi farlo da Impostazioni di Sistema → Generali → Elementi login)"
+fi
 
 say "Fatto"
 echo "  JARVIS è installato in $HOME_DIR"
