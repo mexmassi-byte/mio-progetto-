@@ -5,6 +5,7 @@ import { CommandBar } from "./components/CommandBar";
 import { MicIndicator } from "./components/MicIndicator";
 import { announceWake } from "./state/wake";
 import { CelebrationHost } from "./components/Celebration";
+import { setModelBusy } from "./visuals/stage";
 import { Nav, PageId } from "./components/Nav";
 import { DevPage } from "./pages/Dev";
 import { MemoryPage } from "./pages/Memory";
@@ -103,6 +104,16 @@ function Shell() {
     if (pageRef.current !== "voice") switchTo("voice", "attivazione vocale");
     announceWake({ lang: e.payload.lang, greeting: e.payload.greeting });
   });
+
+  // Give the GPU to the AI model while it answers or works on a mission.
+  const chatting = useRef(0);
+  useEventListener(["chat.started", "chat.finished"], (e: JEvent) => {
+    chatting.current = Math.max(0, chatting.current + (e.type === "chat.started" ? 1 : -1));
+    setModelBusy(chatting.current > 0 || (status?.counts?.missions_active ?? 0) > 0);
+  });
+  useEffect(() => {
+    setModelBusy(chatting.current > 0 || (status?.counts?.missions_active ?? 0) > 0);
+  }, [status?.counts?.missions_active]);
 
   // A mission verified as accomplished: the full-screen sequence.
   useEventListener(["mission.completed"], (e: JEvent) => {

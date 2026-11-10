@@ -10,6 +10,13 @@ export type Quality = "low" | "medium" | "high";
 
 export class WebGLUnavailable extends Error {}
 
+// While the local AI model is working, the animations run at 20 fps: the model
+// uses the same GPU, and on an 8 GB Mac every frame drawn slows the answer.
+let yieldToModel = false;
+export function setModelBusy(busy: boolean): void {
+  yieldToModel = busy;
+}
+
 export function webglAvailable(): boolean {
   try {
     const c = document.createElement("canvas");
@@ -162,6 +169,7 @@ export class Stage {
     this.raf = requestAnimationFrame(this.loop);
     const now = performance.now();
     if (this.minFrameMs && !this.fixed && now - this.lastRender < this.minFrameMs) return;
+    if (yieldToModel && !this.fixed && now - this.lastRender < 50) return;
     this.lastRender = now;
     const dt = Math.min(0.1, (now - this.last) / 1000);
     this.last = now;
@@ -175,7 +183,7 @@ export class Stage {
   };
 
   private adapt(dt: number) {
-    if (this.fixed) return;
+    if (this.fixed || yieldToModel) return; // a deliberate 20 fps is not "too slow"
     this.frameTimes.push(dt);
     if (this.frameTimes.length < 90) return;
     const avg = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;
