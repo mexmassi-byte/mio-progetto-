@@ -14,9 +14,11 @@ gleitet, Hover‑Effekte auslöst und gleichmäßig nach unten scrollt.
 
 ## Ergebnis
 
+![Standbild aus dem Video](output/poster.jpg)
+
 | Datei | Inhalt |
 | --- | --- |
-| `output/GTA-VI-MacBook-Showcase.mp4` | finales Video, H.264, 60 fps, ~50 s |
+| `output/GTA-VI-MacBook-Showcase.mp4` | finales Video: 2560 × 1440, 60 fps, 50 s, H.264 High (BT.709) |
 | `site/` | die Landingpage (läuft auch ganz normal im Browser) |
 | `scene/` | Three.js‑Szene: MacBook Pro, Tisch, Licht, Kamera |
 | `render/` | deterministischer Frame‑Renderer + ffmpeg‑Encoding |
