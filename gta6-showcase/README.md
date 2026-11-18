@@ -18,7 +18,7 @@ gleitet, Hover‑Effekte auslöst und gleichmäßig nach unten scrollt.
 
 | Datei | Inhalt |
 | --- | --- |
-| `output/GTA-VI-MacBook-Showcase.mp4` | finales Video: 2560 × 1440, 60 fps, 50 s, H.264 High (BT.709) |
+| `output/GTA-VI-MacBook-Showcase.mp4` | finales Video: 2560 × 1440, 60 fps, 50 s, H.264 High (BT.709) + Original‑Soundtrack (AAC 192 kbit/s, −14,5 LUFS) |
 | `site/` | die Landingpage (läuft auch ganz normal im Browser) |
 | `scene/` | Three.js‑Szene: MacBook Pro, Tisch, Licht, Kamera |
 | `render/` | deterministischer Frame‑Renderer + ffmpeg‑Encoding |
@@ -42,6 +42,25 @@ mit 1512 × 906 CSS‑px gezeigt, wie Safari im Vollbild auf einem MacBook Pro 1
 Alle Animationen sind reine Funktionen von *(Zeit, Scrollposition, Zeiger)*.
 Im normalen Browser laufen sie in Echtzeit; mit `?rec` wird die Seite vom Renderer
 Frame für Frame gesteuert, deshalb gibt es im Video keinerlei Ruckler oder Drops.
+
+## Soundtrack
+
+Eigens komponiert und vollständig per Code synthetisiert (`render/music.py`, keine Samples,
+keine bestehende Musik): nächtlicher Synthwave in d‑Moll, ca. 98,6 BPM – das Tempo ist so
+gewählt, dass genau 14 Takte zwischen Scroll‑Start und Finale liegen.
+
+| Zeit | Bild | Ton |
+| --- | --- | --- |
+| 0 – 1,7 s | MacBook im Dunkeln | tiefer Drone, Nachtluft |
+| 1,7 s | Display wacht auf | weicher Swell + gläserner Glocken‑Akkord |
+| 10,35 s | Scrollen beginnt | Reverse‑Swell, Beat, Bass und Arpeggio setzen ein |
+| ab 29,8 s | Charaktere, Trailer | Lead‑Melodie, offene Hi‑Hats |
+| 39,6 – 44,4 s | Editions → Finale | Riser, Snare‑Wirbel, kurze Atempause |
+| 44,43 s | „11.19.2026“ rollt ein | Impact (Sub‑Boom, Crash) + breiter Dm9‑Akkord |
+| 48,35 – 50 s | Ausblende | Ton blendet synchron aus |
+
+Mix: Sidechain‑Pumpen, Ping‑Pong‑Delays, Hall und Gated‑Plate (80er‑Snare), Master‑EQ
+und Glue‑Kompression; zweistufig auf −14,5 LUFS normalisiert (True Peak −1,9 dBFS).
 
 ### Inhaltliche Quellen (Stand 18. November 2026)
 
@@ -74,7 +93,10 @@ npm run serve                   # http://127.0.0.1:4173/site/  (Landingpage live
 # Video rendern (Playwright/Chromium nötig, CPU‑Rendering via SwiftShader)
 node render/render.mjs --out /tmp/frames --w 2560 --h 1440        # alle 3000 Frames
 node render/render.mjs --out /tmp/stills --stills 5,17,34,46      # einzelne Standbilder
-render/encode.sh /tmp/frames output/GTA-VI-MacBook-Showcase.mp4 18
+render/encode.sh /tmp/frames /tmp/video.mp4 18
+python3 render/music.py /tmp/score.wav                             # benötigt numpy + scipy
+ffmpeg -i /tmp/video.mp4 -i /tmp/score.wav -map 0:v -map 1:a -c:v copy \
+  -af loudnorm=I=-14.5:TP=-1.5 -c:a aac -b:a 192k -shortest output/GTA-VI-MacBook-Showcase.mp4
 ```
 
 * `render/timeline.mjs` – Kamera (Weitwinkel → sanfter Zoom → Rückzug), Display‑Wake,
