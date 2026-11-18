@@ -69,9 +69,9 @@ const K = [
   { t: 6.0, az: 27, el: 8, d: 0.74, tg: LHI, fov: 40, roll: -3, mv: 0.62, e: 'ioq', drift: { az: -2 } },
   { t: 6.5, az: -22, el: 14, d: 0.56, tg: sp(-0.12, 0.04), fov: 38, roll: 4, mv: 0.5, e: 'ioq', drift: { az: 3, d: -0.04 } },
   { t: 7.5, az: 24, el: 22, d: 0.6, tg: sp(0.06, 0), fov: 38, roll: -5, mv: 0.55, e: 'ioq', drift: { az: -3, d: -0.04 } },
-  { t: 8.5, az: -8, el: 46, d: 0.66, tg: [0, 0.07, -0.05], fov: 40, roll: -8, mv: 0.55, e: 'ioq', drift: { az: 3, d: -0.03 } },
+  { t: 8.5, az: -10, el: 34, d: 0.6, tg: sp(0, 0.0), fov: 38, roll: -7, mv: 0.55, e: 'ioq', drift: { az: 3, d: -0.03 } },
   { t: 9.5, az: 16, el: 16, d: 0.5, tg: sp(0.1, 0.03), fov: 38, roll: 3, mv: 0.55, e: 'ioq', drift: { az: -3, d: -0.04 } },
-  { t: 10.5, az: -34, el: 20, d: 0.92, tg: LHI, fov: 40, roll: -4, mv: 0.55, e: 'ioq', drift: { az: 4, d: -0.03 } },
+  { t: 10.5, az: -30, el: 17, d: 0.74, tg: sp(0, -0.08), fov: 40, roll: -4, mv: 0.55, e: 'ioq', drift: { az: 4, d: -0.03 } },
   { t: 11.5, az: 4, el: 18, d: 0.5, tg: sp(0, 0.06), fov: 38, roll: 0, mv: 0.55, e: 'ioq', drift: { az: -2, d: -0.05 } },
   { t: 12.5, az: 6, el: 19, d: 0.44, tg: PLAY, fov: 38, roll: 1, mv: 0.55, e: 'ioq' },
   { t: 14.0, az: 3, el: 19, d: 0.36, tg: PLAY, fov: 37, roll: 0, mv: 1.5, e: 'io' },
@@ -174,7 +174,7 @@ export const FILM_SHAPES = {
   hex: { id: SH.HEX, p: [0.288, 0, 0, 0] },
   tri: { id: SH.TRI, p: [0.272, 0, 0, 0] },
   diamond: { id: SH.DIAMOND, p: [0.255, 0.44, 0, 0] },
-  vi: { id: SH.VI, p: [0.36, 0, 0, 0] },
+  vi: { id: SH.VI, p: [0.3, 0, 0, 0] },
 };
 // cam: [az0, az1, el0, el1, d0, d1, roll0, roll1]
 export const SHOTS = [
@@ -183,7 +183,7 @@ export const SHOTS = [
   { t0: 20.0, t1: 22.0, clip: 'port', off: 0.0, shape: 'hex', cam: [-22, -7, 7, 0, 2.4, 2.0, -4, 1] },
   { t0: 22.0, t1: 24.0, clip: 'boule', off: 0.2, shape: 'diamond', cam: [14, -5, -6, 2, 2.6, 2.05, 4, -2] },
   { t0: 24.0, t1: 24.5, clip: 'bridge', off: 0.4, shape: 'tri', cam: [-18, -8, 4, 0, 2.5, 2.15, -5, 0] },
-  { t0: 24.5, t1: 25.0, clip: 'drive', off: 1.6, shape: 'circle', cam: [18, 8, -3, 0, 2.5, 2.15, 4, 0] },
+  { t0: 24.5, t1: 25.0, clip: 'drive', off: 1.0, shape: 'circle', cam: [18, 8, -3, 0, 2.5, 2.15, 4, 0] },
   { t0: 25.0, t1: 25.5, clip: 'tower', off: 0.6, shape: 'hex', cam: [-16, -6, 5, 1, 2.5, 2.15, -4, 0] },
   { t0: 25.5, t1: 26.0, clip: 'lights', off: 0.6, shape: 'pill', cam: [16, 6, -4, 0, 2.6, 2.2, 4, 0] },
   { t0: 26.0, t1: 26.25, clip: 'city', off: 0.4, shape: 'diamond', cam: [-12, -6, 3, 0, 2.4, 2.2, -3, 0] },
@@ -193,7 +193,7 @@ export const SHOTS = [
   { t0: 27.0, t1: 27.25, clip: 'bridge', off: 1.6, shape: 'pill', cam: [-10, -5, 2, 0, 2.4, 2.2, -2, 0] },
   { t0: 27.25, t1: 27.5, clip: 'tower', off: 1.6, shape: 'diamond', cam: [10, 5, -2, 0, 2.4, 2.2, 2, 0] },
   { t0: 27.5, t1: 28.0, clip: 'lights', off: 1.7, shape: 'circle', cam: [0, 0, 0, 0, 2.3, 2.3, 0, 0], collapse: true },
-  { t0: 28.0, t1: 32.0, clip: 'lights', off: 0.0, shape: 'vi', cam: [-9, 7, 4, -1, 2.0, 2.45, -2, 1], finale: true },
+  { t0: 28.0, t1: 32.0, clip: 'city', off: 0.0, shape: 'vi', cam: [-9, 6, 4, -1, 2.15, 2.5, -2, 1], finale: true },
 ];
 export function filmShot(t) {
   let i = 0;

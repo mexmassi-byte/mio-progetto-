@@ -19,6 +19,7 @@ gleitet, Hover‑Effekte auslöst und gleichmäßig nach unten scrollt.
 | Datei | Inhalt |
 | --- | --- |
 | `output/GTA-VI-MacBook-Showcase.mp4` | finales Video: 2560 × 1440, 60 fps, 50 s, H.264 High (BT.709) + Original‑Soundtrack (AAC 192 kbit/s, −14,5 LUFS) |
+| `output/GTA-VI-Launch-Film-9x16.mp4` | Motion Graphic für TikTok / Reels / Shorts: 1080 × 1920, 60 fps, 32 s, H.264 + Original‑Soundtrack (−14 LUFS) |
 | `site/` | die Landingpage (läuft auch ganz normal im Browser) |
 | `scene/` | Three.js‑Szene: MacBook Pro, Tisch, Licht, Kamera |
 | `render/` | deterministischer Frame‑Renderer + ffmpeg‑Encoding |
@@ -61,6 +62,39 @@ gewählt, dass genau 14 Takte zwischen Scroll‑Start und Finale liegen.
 
 Mix: Sidechain‑Pumpen, Ping‑Pong‑Delays, Hall und Gated‑Plate (80er‑Snare), Master‑EQ
 und Glue‑Kompression; zweistufig auf −14,5 LUFS normalisiert (True Peak −1,9 dBFS).
+
+## Motion Graphic „VI — Launch Film“ (9:16)
+
+Vertikaler 32‑Sekunden‑Schnitt für TikTok, Reels und Shorts – Caption: *„Our way to celebrate the
+launch of GTA VI“*. 120 BPM, jede Bewegung sitzt auf dem Beat (1 Takt = 2 s):
+
+| Zeit | Bild | Ton |
+| --- | --- | --- |
+| 0 – 4 s | goldene Glow‑Formen morphen im Beat: Kreis → Sechseck → Dreieck → Raute → **VI**, kinetische Caption | jede Form ein Ton (D5 F5 A5 C6), Akkord‑Hit auf dem VI |
+| 4 – 6 s | das VI wird zum Rahmen des Displays, die Kamera fährt zurück, das MacBook geht an | Downlifter, gläserner Glocken‑Akkord |
+| 6 – 12,5 s | Tour durch die ganze Website: pro Beat‑Paar ein Scroll‑Whip + eine 3D‑Kamerafahrt, Kapitel 01–07 | Four‑on‑the‑floor, ein Whoosh landet auf jedem Scroll |
+| 12,5 – 16 s | der Cursor klickt auf „Launch Trailer“, das Video startet in der Karte, die Kamera taucht ins Display | Filter schließt sich, Klick, Riser, ein Beat Stille |
+| 16 – 28 s | echte Nacht‑Footage in morphenden Glow‑Formen (Pille, Kreis, Sechseck, Raute, Dreieck), Fakten als Typo | Drop, Lead‑Melodie, ein Hit pro Schnitt, Build mit Snare‑Roll |
+| 28 – 32 s | VI‑Monogramm (Didone‑Konstruktion) mit Stadt‑Footage, Caption, 11.19.2026, Plattformen | Finale‑Hit, Glocken, Ausklang – endet schwarz und loopt |
+
+Technik: `scene/mg.js` (Three.js: das MacBook aus `scene/macbook.js`, Formen als Signed‑Distance‑Fields
+mit Glow, Footage‑Compositing, Echo‑Ebenen für die Tiefe), `render/mg_timeline.mjs` (Choreografie als
+reine Funktionen der Zeit), `render/render_mg.mjs` (deterministisch, adaptive Bewegungsunschärfe mit
+bis zu 6 Subframes bei 180°‑Shutter), `render/music_mg.py` (Score, prozedural).
+
+**Footage** – lizenzfrei, keine Rockstar‑Trailer, kein Gameplay, keine offiziellen Logos:
+
+* Pexels (Pexels License): Videos [6345205](https://www.pexels.com/video/6345205/), [19109600](https://www.pexels.com/video/19109600/),
+  [19109604](https://www.pexels.com/video/19109604/), [8576666](https://www.pexels.com/video/8576666/), [40183132](https://www.pexels.com/video/40183132/)
+* Mixkit (Mixkit Stock Video Free License): Clips 42042, 12028, 42034
+
+```bash
+render/get_footage.sh /tmp/footage && render/prep_footage.sh /tmp/footage   # -> footage/ (git-ignoriert)
+node render/render_mg.mjs --out /tmp/mg --stills 2.6,14.6,21,29.6          # Standbilder
+node render/render_mg.mjs --out /tmp/mg                                     # alle 1920 Frames
+BLOOM=0.18 VIGNETTE=0.45 render/encode.sh /tmp/mg /tmp/mg.mp4 18 0 0
+python3 render/music_mg.py /tmp/score_mg.wav
+```
 
 ### Inhaltliche Quellen (Stand 18. November 2026)
 

@@ -4,8 +4,10 @@
 # dark gradients), fade in/out, BT.709 colour, H.264 High profile.
 #
 #   render/encode.sh <frames_dir> <out.mp4> [crf=17] [start_frame=0] [fades=1]
+#   env: BLOOM=0.24 (bloom opacity), VIGNETTE=0.56 (vignette angle)
 set -euo pipefail
 IN="$1"; OUT="$2"; CRF="${3:-17}"; START="${4:-0}"; FADES="${5:-1}"
+BLOOM="${BLOOM:-0.24}"; VIGNETTE="${VIGNETTE:-0.56}"
 FPS=60
 FIRST=$(printf "%s/f_%05d.png" "$IN" "$START")
 read -r W H < <(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0:s=x "$FIRST" | tr 'x' ' ')
@@ -24,8 +26,8 @@ ffmpeg -y -hide_banner -loglevel warning -stats \
        lutrgb=r='clip((val-118)*1.7,0,255)':g='clip((val-118)*1.7,0,255)':b='clip((val-118)*1.7,0,255)',
        gblur=sigma=9:steps=3,
        scale=${W}:${H}:flags=bicubic[bloom];
-    [base][bloom]blend=all_mode=screen:all_opacity=0.24,
-       vignette=angle=0.56:mode=forward:eval=init${FADE},
+    [base][bloom]blend=all_mode=screen:all_opacity=${BLOOM},
+       vignette=angle=${VIGNETTE}:mode=forward:eval=init${FADE},
        scale=out_color_matrix=bt709:out_range=tv,format=yuv420p,
        noise=c0s=3:c0f=t+u[v]" \
   -map "[v]" -r $FPS \

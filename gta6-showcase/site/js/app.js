@@ -9,6 +9,8 @@
   'use strict';
 
   const REC = new URLSearchParams(location.search).has('rec');
+  // record mode only: play the page's own animations faster (the motion-graphic cut dwells ~0.5 s per section)
+  const TEMPO = REC ? Number(new URLSearchParams(location.search).get('tempo') || 1) : 1;
   const root = document.documentElement;
   if (REC) root.classList.add('rec');
   root.style.overflowAnchor = 'none';
@@ -202,7 +204,7 @@
 
     // intro animations
     for (const it of intros) {
-      const p = it.ease(clamp((t - it.delay) / it.dur, 0, 1));
+      const p = it.ease(clamp((t * TEMPO - it.delay) / it.dur, 0, 1));
       setVar(it.el, '--p', p, C(it.el), 'p');
     }
 
@@ -212,11 +214,11 @@
       if (r.words) {
         const st = r.stagger || 0.045;
         r.words.forEach((w, i) => {
-          const p = r.start === null ? 0 : r.ease(clamp((t - r.start - r.delay - i * st) / r.dur, 0, 1));
+          const p = r.start === null ? 0 : r.ease(clamp(((t - r.start) * TEMPO - r.delay - i * st) / r.dur, 0, 1));
           setVar(w, '--p', p, C(w), 'p');
         });
       } else {
-        const p = r.start === null ? 0 : r.ease(clamp((t - r.start - r.delay) / r.dur, 0, 1));
+        const p = r.start === null ? 0 : r.ease(clamp(((t - r.start) * TEMPO - r.delay) / r.dur, 0, 1));
         setVar(r.el, '--p', p, C(r.el), 'p');
       }
     }
@@ -238,7 +240,7 @@
     // timeline fill: plays once (time-based) when the timeline comes into view
     {
       if (S.tlStart == null && S.tlTop < scroll + vh * 0.82) S.tlStart = t;
-      const prog = S.tlStart == null ? 0 : clamp((t - S.tlStart - 0.25) / 2.6, 0, 1);
+      const prog = S.tlStart == null ? 0 : clamp(((t - S.tlStart) * TEMPO - 0.25) / 2.6, 0, 1);
       const f = E.inOutCubic(prog);
       setVar(tlFill, '--tl', f, C(tlFill), 'tl');
       tlNodes.forEach((n, i) => {
@@ -306,11 +308,11 @@
     // one idle sweep on the hero CTA after the intro
     const hp = document.getElementById('heroPreorder');
     const hpH = hovers.find((x) => x.el === hp);
-    if (hpH && hpH.sweepStart < 0 && t > 3.1) hpH.sweepStart = 3.1;
+    if (hpH && hpH.sweepStart < 0 && t * TEMPO > 3.1) hpH.sweepStart = 3.1 / TEMPO;
 
     // hero art
     if (hero && scroll < S.heroH + 50) {
-      hero.draw(t, { intro: clamp(t / 4.2, 0, 1), fade: clamp(t / 1.5, 0, 1), scroll, dpr: REC ? 2 : S.dpr });
+      hero.draw(t, { intro: clamp((t * TEMPO) / 4.2, 0, 1), fade: clamp((t * TEMPO) / 1.5, 0, 1), scroll, dpr: REC ? 2 : S.dpr });
     }
 
     // simulated cursor
