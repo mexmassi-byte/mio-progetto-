@@ -433,8 +433,8 @@ html.rec { scroll-behavior: auto; }
   display: grid; place-items: center;
   background: rgba(255,255,255, calc(0.1 + var(--h, 0) * 0.08)); border: 1px solid rgba(255,255,255,.28);
   -webkit-backdrop-filter: blur(18px) saturate(160%); backdrop-filter: blur(18px) saturate(160%);
-  transform: scale(calc(1 + var(--h, 0) * 0.08));
-  box-shadow: 0 20px 60px -10px rgba(0,0,0,.6);
+  transform: scale(calc((1 + var(--h, 0) * 0.08) * (1 - var(--press, 0) * 0.1)));
+  box-shadow: 0 20px 60px -10px rgba(0,0,0,.6), 0 0 calc(var(--press, 0) * 60px) calc(var(--press, 0) * 6px) rgba(239,211,152, calc(var(--press, 0) * 0.55));
 }
 .ff-play::before, .ff-play::after { content: ''; position: absolute; inset: -14px; border-radius: 50%; border: 1px solid rgba(255,255,255, calc(0.35 * (1 - var(--ring, 0)))); transform: scale(calc(0.85 + var(--ring, 0) * 0.5)); }
 .ff-play::after { transform: scale(calc(0.85 + var(--ring2, 0) * 0.5)); border-color: rgba(255,255,255, calc(0.35 * (1 - var(--ring2, 0)))); }

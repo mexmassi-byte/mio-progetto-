@@ -101,7 +101,7 @@
   const S = {
     t: 0, lastT: null, dt: 1 / 60,
     scroll: 0, vw: innerWidth, vh: innerHeight,
-    mx: -9999, my: -9999, cursorA: 0,
+    mx: -9999, my: -9999, cursorA: 0, press: 0,
     dpr: Math.min(2, window.devicePixelRatio || 1),
   };
   const docTop = (el) => { const r = el.getBoundingClientRect(); return r.top + (REC ? S.scroll : window.scrollY); };
@@ -295,6 +295,7 @@
       h.h += ((on ? 1 : 0) - h.h) * (1 - Math.exp(-dt / tau));
       if (Math.abs(h.h) < 0.0005) h.h = 0;
       setVar(h.el, '--h', h.h, C(h.el), 'h');
+      setVar(h.el, '--press', on ? S.press : 0, C(h.el), 'press');
       if (h.spot && (on || h.h > 0.001)) {
         if (on) { const rr = h.el.getBoundingClientRect(); h.mx = S.mx - rr.left; h.my = S.my - rr.top; }
         setVar(h.el, '--mx', h.mx, C(h.el), 'mx');
@@ -403,7 +404,7 @@
       window.scrollTo(0, yi);
       const frac = (yd - yi).toFixed(2);
       if (frac !== S.frac) { S.frac = frac; for (const el of scrollers) el.style.transform = `translate3d(0, ${-frac}px, 0)`; }
-      S.mx = s.mx; S.my = s.my; S.cursorA = s.cursor;
+      S.mx = s.mx; S.my = s.my; S.cursorA = s.cursor; S.press = s.press || 0;
       update();
       return window.scrollY;
     },
