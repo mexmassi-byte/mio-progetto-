@@ -326,6 +326,7 @@
   const ARROW = '<svg viewBox="0 0 32 32"><path d="M1.2 1.2 L1.2 22.6 L6.3 17.7 L9.6 25.4 L13.2 23.9 L9.9 16.3 L16.9 16.3 Z" fill="#000" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>';
   const HAND = '<svg viewBox="0 0 32 32" style="transform:translate(-7px,-1px)"><path d="M9.3 2.1c1.2 0 2 .9 2 2.1v7.6c.2-.6.9-1 1.6-1 1 0 1.7.7 1.8 1.6.3-.5.9-.8 1.5-.8 1 0 1.7.7 1.8 1.7.3-.4.8-.6 1.3-.6 1.1 0 1.9.9 1.9 2v5.6c0 4.2-2.6 7.3-6.9 7.3h-1.8c-2.4 0-4-.9-5.3-2.7l-4.1-5.8c-.6-.9-.4-2 .4-2.6.8-.6 1.9-.5 2.6.3l1.1 1.3V4.2c0-1.2.9-2.1 2-2.1z" fill="#fff" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/><path d="M13 18.2v4.4M15.7 18.2v4.4M18.4 18.2v4.4" stroke="#000" stroke-width="1.1" stroke-linecap="round"/></svg>';
   const cursor = document.getElementById('rec-cursor');
+  const scrollers = [...document.querySelectorAll('body > section, body > footer')];
 
   /* --------------------------------------------------------------- boot */
   let resolveReady;
@@ -352,6 +353,8 @@
       };
       requestAnimationFrame(loop);
     } else {
+      for (const el of scrollers) { el.style.willChange = 'transform'; el.style.transform = 'translate3d(0, 0px, 0)'; }
+      S.frac = '0.00';
       update();
     }
     resolveReady();
@@ -392,7 +395,14 @@
       S.dt = S.lastT == null ? 1 / 60 : clamp(s.t - S.lastT, 0, 0.1);
       S.lastT = s.t; S.t = s.t;
       S.scroll = s.scroll;
-      window.scrollTo(0, s.scroll);
+      // Retina-accurate scrolling: Chromium snaps scroll offsets to whole CSS px, a real
+      // MacBook scrolls in device pixels (0.5 CSS px at 2x). Scroll natively by the integer
+      // part and move the page content by the remaining half pixel (fixed nav/cursor stay put).
+      const yd = Math.round(s.scroll * 2) / 2;
+      const yi = Math.floor(yd);
+      window.scrollTo(0, yi);
+      const frac = (yd - yi).toFixed(2);
+      if (frac !== S.frac) { S.frac = frac; for (const el of scrollers) el.style.transform = `translate3d(0, ${-frac}px, 0)`; }
       S.mx = s.mx; S.my = s.my; S.cursorA = s.cursor;
       update();
       return window.scrollY;

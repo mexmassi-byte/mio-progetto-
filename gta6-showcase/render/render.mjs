@@ -50,12 +50,18 @@ const cdpSite = await site.context().newCDPSession(site);
 const cdpScene = await scene.context().newCDPSession(scene);
 log(`ready: ${W}x${H}, screen texture ${SW}px, doc ${info.docH}px, ${TOTAL} frames`);
 
+let siteScrollY = 0;
 async function stepSite(ts) {
   const c = plan.cursor(ts);
-  await site.evaluate((s) => window.__rec.step(s), { t: ts, scroll: plan.scroll(ts), mx: c.x, my: c.y, cursor: c.a });
+  siteScrollY = await site.evaluate((s) => window.__rec.step(s), { t: ts, scroll: plan.scroll(ts), mx: c.x, my: c.y, cursor: c.a });
 }
 async function captureSite() {
-  const r = await cdpSite.send('Page.captureScreenshot', { format: 'jpeg', quality: 96, optimizeForSpeed: true });
+  // Raw CDP captures at CSS size unless a scaled clip is given; the clip is in document
+  // coordinates, so it has to follow the scroll position. Result: 3024 x 1812 (Retina).
+  const r = await cdpSite.send('Page.captureScreenshot', {
+    format: 'jpeg', quality: 96, optimizeForSpeed: true,
+    clip: { x: 0, y: siteScrollY, width: 1512, height: 906, scale: 2 },
+  });
   return r.data;
 }
 async function renderScene(t, b64) {
