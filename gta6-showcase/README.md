@@ -34,6 +34,9 @@ gleitet, Hover‑Effekte auslöst und gleichmäßig nach unten scrollt.
 * **Animationen:** Masken‑Reveals Wort für Wort, Buchstaben‑Einblendung, Gold‑Shine,
   Hover‑Lift, Gold‑Rahmen, Play‑Ringe, Timeline‑Fill, Datum‑„Odometer“.
 
+Die Seite ist responsiv (Desktop, Tablet, Smartphone); im Video wird die Desktop‑Ansicht
+mit 1512 × 906 CSS‑px gezeigt, wie Safari im Vollbild auf einem MacBook Pro 14″.
+
 Alle Animationen sind reine Funktionen von *(Zeit, Scrollposition, Zeiger)*.
 Im normalen Browser laufen sie in Echtzeit; mit `?rec` wird die Seite vom Renderer
 Frame für Frame gesteuert, deshalb gibt es im Video keinerlei Ruckler oder Drops.
@@ -76,6 +79,8 @@ render/encode.sh /tmp/frames output/GTA-VI-MacBook-Showcase.mp4 18
   Tastaturbeleuchtung; wird von Node *und* Browser genutzt.
 * `render/plan.mjs` – Scroll‑Kurve (monotone kubische Interpolation, nie rückwärts)
   und Cursor‑Weg, aus dem gemessenen Layout der Seite berechnet.
+* Die Webseite wird in voller Retina‑Auflösung (3024 × 1812) erfasst und scrollt in
+  Geräte‑Pixel‑Schritten (0,5 CSS‑px) – exakt wie ein echtes Retina‑Display, ohne Ruckler.
 * `scene/scene.js` – prozedurales MacBook Pro 14″ (Space Gray, Tastatur mit
   Hintergrundbeleuchtung, Trackpad, Lautsprechergitter, Notch, Glas), Walnuss‑Tisch mit
   eingebackener Tiefenunschärfe, Studio‑Licht, Display‑Licht in den Farben der Seite.
