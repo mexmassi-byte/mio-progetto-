@@ -338,14 +338,14 @@ const filmEchoes = [
 
 function filmShapeAt(t) {
   const { shot, index, prev } = TL.filmShot(t);
-  const A = FILM_SHAPES[prev ? prev.shape : shot.shape], B = FILM_SHAPES[shot.shape];
+  const A = FILM_SHAPES[prev && !shot.finale ? prev.shape : shot.shape], B = FILM_SHAPES[shot.shape];
   const len = shot.t1 - shot.t0;
   const md = shot.finale ? 0.5 : len <= 0.3 ? 0.13 : 0.22;
   const m = index === 0 ? 1 : E.out3(clamp((t - shot.t0) / md, 0, 1));
   const twist = shot.finale ? 0 : (index % 2 ? 0.5 : -0.5);
   let scale = 1;
   if (shot.collapse) scale = 1 - 0.988 * E.in(clamp((t - shot.t0) / (len - 0.06), 0, 1));
-  if (shot.finale) scale = 1 + 0.12 * (1 - E.out(clamp((t - shot.t0) / 0.9, 0, 1)));
+  if (shot.finale) scale = 0.03 + 0.97 * E.out(clamp((t - shot.t0) / 0.6, 0, 1));   // the VI bursts out of the point of light
   return { shot, index, A, B, m, rot: (1 - m) * twist, scale };
 }
 function filmIntensity(t, shot) {
@@ -370,8 +370,10 @@ async function renderFilm(t) {
   film.camera.rotateZ(cam.roll * DEG);
   const I = filmIntensity(t, shot);
   const fill = shot.finale ? smoothstep(28.05, 28.7, t) : shot.collapse ? 1 - smoothstep(27.6, 27.9, t) : 1;
+  // on the finale hit only the line flares, not the wide halo (keeps the black clean)
+  const halo = shot.finale ? 0.32 * Math.min(1, 1.6 / I) : 0.32;
   setShape(cardMat, st.A, st.B, st.m, {
-    uRot: st.rot, uScale: st.scale, uColor: GOLD, uIntensity: I, uStrokePx: 1.6, uGlowPx: 10, uHalo: 0.32,
+    uRot: st.rot, uScale: st.scale, uColor: GOLD, uIntensity: I, uStrokePx: 1.6, uGlowPx: 10, uHalo: halo,
   });
   cardMat.uniforms.uFill.value = fill;
   cardMat.uniforms.uFlash.value = shot.finale ? 0 : 0.22 * Math.exp(-(t - shot.t0) / 0.05);
@@ -553,7 +555,7 @@ function overlays(t) {
   const c = octx;
   // dive flash into the film, and the finale hit
   let f = t < TL.T_FILM ? Math.pow(smoothstep(15.3, 16.0, t), 2.2) : Math.exp(-(t - TL.T_FILM) / 0.17);
-  if (t >= TL.T_FINALE) f = Math.max(f, 0.55 * Math.exp(-(t - TL.T_FINALE) / 0.22));
+  if (t >= TL.T_FINALE) f = Math.max(f, 0.3 * Math.exp(-(t - TL.T_FINALE) / 0.12));
   if (f > 0.002) {
     c.save();
     c.globalCompositeOperation = 'lighter';
