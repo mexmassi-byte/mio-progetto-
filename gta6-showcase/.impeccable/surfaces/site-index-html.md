@@ -26,4 +26,6 @@ FIRST VIEWPORT: Pink stucco ground. "Vice City" at display size top-left and "is
 
 FORM: Ocean Drive Art Deco hotel facades with vertical neon name signs, candidate 4 of 7 on the ordered list; raised by teletext (one rigid bay grid), risograph and Game Boy (four inks only), industrial quote grammar (literal sign names), pickling brine calendar (scroll runs from dusk to night). Composition dealt by tasteskill: the pinned poster, seed 905506009. seed:dde3b29bf7d3eb8b
 
+SIGN EXCEPTION (films): the films stage is the page's one horizontal run, a pinned track of cards that slides sideways. A vertical blade there would stand against the direction the section moves, so its name is the same lit-tube device set horizontally: "The films" in the tube cut, dark body and azure stroke, like every sign. Every other section keeps a vertical name sign (LEONIDA, PLACES, JASON, LUCIA, DATES, OUT NOW).
+
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

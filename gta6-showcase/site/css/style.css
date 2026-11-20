@@ -249,9 +249,9 @@ html[data-lights='on'] .sign-svg .l { --on: 1; }
 @media (prefers-reduced-motion: reduce) {
   html:not(.rec) { transition: --k 300ms ease; }
   .films { height: auto; }
-  .films__stage { position: relative; height: auto; overflow: visible; padding: 120px 0 80px; }
-  .films__ground { height: 100%; }
-  .films__title { position: relative; top: 0; left: auto; margin: 0 var(--margin); padding-bottom: 32px; }
+  .films__stage { position: relative; height: auto; overflow: visible; padding: 0 0 80px; }
+  .films__ground { position: sticky; inset: auto; top: 0; height: 100svh; margin-bottom: -100svh; }
+  .films__title { position: relative; top: 0; left: auto; margin: 0 var(--margin); padding: 120px 0 32px; }
   .films__track { position: relative; top: 0; translate: none; transform: none !important; flex-direction: column; gap: 28px; padding: 0 var(--margin); }
   .film { width: 100%; max-width: 960px; height: auto; grid-template-rows: auto auto; }
   .film__media, .film__date { aspect-ratio: 16 / 9; height: auto; }
@@ -265,9 +265,9 @@ html.rec *, html.rec *::before, html.rec *::after { transition: none !important;
   .places__text { grid-column: 7 / span 6; }
   .duo__row { grid-template-columns: 1fr; }
   .films { height: auto; }
-  .films__stage { position: relative; height: auto; overflow: visible; padding: 120px 0 80px; }
-  .films__ground { height: 100%; }
-  .films__title { position: relative; top: 0; left: auto; margin: 0 var(--margin); padding-bottom: 32px; }
+  .films__stage { position: relative; height: auto; overflow: visible; padding: 0 0 80px; }
+  .films__ground { position: sticky; inset: auto; top: 0; height: 100svh; margin-bottom: -100svh; }
+  .films__title { position: relative; top: 0; left: auto; margin: 0 var(--margin); padding: 120px 0 32px; }
   .films__track { position: relative; top: 0; translate: none; transform: none !important; flex-direction: column; gap: 28px; padding: 0 var(--margin); }
   .film { width: 100%; height: auto; grid-template-rows: auto auto; }
   .film__media { aspect-ratio: 16 / 9; height: auto; }
@@ -304,9 +304,9 @@ html.rec *, html.rec *::before, html.rec *::after { transition: none !important;
   .duo__row { grid-template-columns: 1fr; }
   .facade { min-height: 0; padding: 40px var(--margin); }
   .films { height: auto; }
-  .films__stage { position: relative; height: auto; overflow: visible; padding: 96px 0 64px; }
-  .films__ground { height: 100%; }
-  .films__title { position: relative; top: 0; padding-bottom: 24px; }
+  .films__stage { position: relative; height: auto; overflow: visible; padding: 0 0 64px; }
+  .films__ground { position: sticky; inset: auto; top: 0; height: 100svh; margin-bottom: -100svh; }
+  .films__title { position: relative; top: 0; padding: 96px 0 24px; }
   .films__track { position: relative; top: 0; translate: none; transform: none !important; flex-direction: column; gap: 24px; padding: 0 var(--margin); }
   .film { width: 100%; height: auto; grid-template-rows: auto auto; }
   .film__media { aspect-ratio: 4 / 3; height: auto; }

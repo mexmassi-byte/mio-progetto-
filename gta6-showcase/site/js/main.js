@@ -107,7 +107,7 @@
   player.addEventListener('close', () => playerVideo.pause());
 
   /* ---------------------------------------------------------- live loop */
-  const S = { t: 0, scroll: 0, frac: '0.00', lights: 0, lightsAt: null, reveal: new Map() };
+  const S = { t: 0, tl: 0, scroll: 0, frac: '0.00', lights: 0, lightsAt: null, reveal: new Map() };
   if (!REC) {
     measure();
     let ticking = false;
@@ -148,12 +148,15 @@
 
   function update() {
     const { t } = S;
-    // load sequence (settled by 1.2 s)
-    setStyle(heroA, smooth(0, 0.25, t), (1 - expoOut(clamp(t / 0.9, 0, 1))) * 22);
-    setStyle(heroB, smooth(0.09, 0.34, t), (1 - expoOut(clamp((t - 0.09) / 0.9, 0, 1))) * 22);
-    const op = inOut(clamp((t - 0.12) / 1.2, 0, 1));
-    reel.style.clipPath = op >= 1 ? '' : `inset(${(50 * (1 - op)).toFixed(2)}% 0 ${(50 * (1 - op)).toFixed(2)}% 0)`;
-    setStyle(lede, quintOut(clamp((t - 0.38) / 0.7, 0, 1)), 0);
+    // load sequence (settled by 1.2 s), on its own clock
+    {
+      const t = S.tl;
+      setStyle(heroA, smooth(0, 0.25, t), (1 - expoOut(clamp(t / 0.9, 0, 1))) * 22);
+      setStyle(heroB, smooth(0.09, 0.34, t), (1 - expoOut(clamp((t - 0.09) / 0.9, 0, 1))) * 22);
+      const op = inOut(clamp((t - 0.12) / 1.2, 0, 1));
+      reel.style.clipPath = op >= 1 ? '' : `inset(${(50 * (1 - op)).toFixed(2)}% 0 ${(50 * (1 - op)).toFixed(2)}% 0)`;
+      setStyle(lede, quintOut(clamp((t - 0.38) / 0.7, 0, 1)), 0);
+    }
     // reveals: fire once when the top passes 88% of the screen
     for (const el of reveals) {
       if (!S.reveal.has(el) && el.getBoundingClientRect().top < M.vh * 0.88) S.reveal.set(el, t);
@@ -199,9 +202,9 @@
         },
       };
     },
-    // s: { t, scroll, lights (0..1), lightsAt / lightsOffAt (s or null), press: css selector or null }
+    // s: { t, tLoad (load-sequence clock, defaults to t), scroll, lights (0..1), lightsAt / lightsOffAt (s or null), press: css selector or null }
     async step(s) {
-      S.t = s.t; S.scroll = s.scroll; S.lights = s.lights ?? 0; S.lightsAt = s.lightsAt ?? null; S.lightsOffAt = s.lightsOffAt ?? null;
+      S.t = s.t; S.tl = s.tLoad ?? s.t; S.scroll = s.scroll; S.lights = s.lights ?? 0; S.lightsAt = s.lightsAt ?? null; S.lightsOffAt = s.lightsOffAt ?? null;
       // device-pixel scrolling: native scroll to the whole pixel, the rest as a sub-pixel shift
       const yd = Math.round(s.scroll * 3) / 3, yi = Math.floor(yd), frac = (yd - yi).toFixed(2);
       window.scrollTo(0, yi);
