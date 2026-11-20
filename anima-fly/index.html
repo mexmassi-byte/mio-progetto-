@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ANIMA FLY · Private aviation, on your schedule</title>
+  <meta name="description" content="ANIMA FLY: private jet charter without the terminal. Your car to the airstair, your cabin, above the weather, anywhere by tonight. A design concept.">
+  <meta name="theme-color" content="#0b0d18">
+  <link rel="preload" href="assets/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/instrument-serif-latin-400-italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/hero/f_0001.webp" as="image">
+  <link rel="stylesheet" href="css/style.css">
+  <script>document.documentElement.classList.add('js'); if (/[?&]rec\b/.test(location.search)) document.documentElement.classList.add('rec');</script>
+</head>
+<body>
+  <a class="skip" href="#plan">Skip to planning a flight</a>
+
+  <header class="bar" data-bar>
+    <a class="brand" href="#top" aria-label="ANIMA FLY, back to the top">
+      <svg class="brand__mark" viewBox="0 0 28 20" aria-hidden="true"><path d="M1.5 18.5 14 1.5l12.5 17M7.2 11.8h13.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      <span class="brand__name">Anima Fly</span>
+    </a>
+    <nav class="bar__nav" aria-label="Main">
+      <a href="#fleet">Fleet</a>
+      <a href="#details">Experience</a>
+      <a href="#runways">Destinations</a>
+      <a href="#card">Jet Card</a>
+    </nav>
+    <p class="bar__live"><span class="dot" aria-hidden="true"></span>24/7 concierge</p>
+    <a class="pill pill--sm" href="#plan">Plan a flight</a>
+  </header>
+
+  <main id="top">
+    <!-- 1 · the flight: the owner's film scrubs with the scroll -->
+    <section class="flight" data-flight aria-label="The flight, from the apron to the island">
+      <div class="flight__stage">
+        <canvas class="flight__canvas" data-canvas aria-hidden="true"></canvas>
+        <div class="flight__shade" aria-hidden="true"></div>
+
+        <div class="chap chap--hero" data-chap="0">
+          <h1 class="statement">
+            <span class="statement__a">Leave the terminal</span>
+            <span class="statement__b">to everyone else.</span>
+          </h1>
+          <p class="chap__text">No security lines, no gate changes, no layovers. Arrive fifteen minutes before take-off and walk straight to your aircraft.</p>
+          <div class="chap__actions">
+            <a class="pill" href="#plan">Get an instant quote</a>
+            <a class="cue" href="#plan" data-cue>Scroll to board</a>
+          </div>
+        </div>
+        <div class="chap chap--low" data-chap="1" aria-hidden="true">
+          <p class="statement statement--sm"><span class="statement__a">The car stops</span><span class="statement__b">at the airstair.</span></p>
+          <p class="chap__text">Your driver pulls onto the apron. Bags go in the hold, you go up six steps.</p>
+        </div>
+        <div class="chap chap--low" data-chap="2" aria-hidden="true">
+          <p class="statement statement--sm"><span class="statement__a">Step aboard</span><span class="statement__b">it's yours tonight.</span></p>
+          <p class="chap__text">Leather, walnut and quiet. Nobody else on the manifest unless you put them there.</p>
+        </div>
+        <div class="chap chap--right" data-chap="3" aria-hidden="true">
+          <p class="statement statement--sm"><span class="statement__a">The menu</span><span class="statement__b">is yours to write.</span></p>
+          <p class="chap__text">Name the dinner, the wine and the playlist. The crew has it on board before you are.</p>
+        </div>
+        <div class="chap chap--low" data-chap="4" aria-hidden="true">
+          <p class="statement statement--sm"><span class="statement__a">Wheels up</span><span class="statement__b">while others queue.</span></p>
+          <p class="chap__text">No slot to wait for at the gate. When you are seated, the captain calls for take-off.</p>
+        </div>
+        <div class="chap chap--mid" data-chap="5" aria-hidden="true">
+          <p class="statement statement--sm"><span class="statement__a">Above the weather</span><span class="statement__b">and still early.</span></p>
+        </div>
+        <div class="chap chap--center" data-chap="6" aria-hidden="true">
+          <p class="statement"><span class="statement__a">Anywhere</span><span class="statement__b">by tonight.</span></p>
+          <a class="pill pill--ghost" href="#plan">Plan your first flight</a>
+        </div>
+
+        <div class="hud" aria-hidden="true">
+          <dl class="hud__row">
+            <div><dt>GS</dt><dd data-gs>0 kt</dd></div>
+            <div><dt>HDG</dt><dd data-hdg>274°</dd></div>
+            <div><dt>ETE</dt><dd data-ete>02:18</dd></div>
+          </dl>
+          <div class="hud__alt">
+            <span class="hud__label">Altitude</span>
+            <span class="hud__num"><span data-alt>0</span><small>ft</small></span>
+          </div>
+          <div class="hud__track"><span data-progress></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- the route: one gold line threads the page from here to the last call -->
+    <div class="route-wrap" data-route-wrap>
+      <svg class="route" data-route aria-hidden="true"><path class="route__line" data-route-path d="M0 0"/><path class="route__done" data-route-done d="M0 0"/><g class="route__tip" data-route-tip><path d="M-7 -4 L3 0 L-7 4 L-4.5 0 Z"/></g></svg>
+
+      <!-- 2 · plan a flight -->
+      <section id="plan" class="plan" aria-labelledby="plan-title">
+        <div class="plan__copy">
+          <h2 id="plan-title" class="statement statement--sm"><span class="statement__a">Name the place</span><span class="statement__b">we'll find the runway.</span></h2>
+          <p class="body">Tell us where and when. A flight specialist replies with the right aircraft, the closest airfield and one fixed price.</p>
+        </div>
+        <form class="book" data-book data-ui novalidate>
+          <div class="book__tabs" role="radiogroup" aria-label="Trip type">
+            <label><input type="radio" name="trip" value="oneway" checked><span>One way</span></label>
+            <label><input type="radio" name="trip" value="round"><span>Round trip</span></label>
+            <label><input type="radio" name="trip" value="multi"><span>Multi-leg</span></label>
+          </div>
+          <div class="book__route">
+            <label class="field">
+              <span class="field__label">From</span>
+              <input name="from" type="text" autocomplete="off" placeholder="Departure airport or city" required>
+            </label>
+            <button class="swap" type="button" data-swap aria-label="Swap departure and destination">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h12m0 0-3.5-3.5M19 7l-3.5 3.5M17 17H5m0 0 3.5-3.5M5 17l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <label class="field">
+              <span class="field__label">To</span>
+              <input name="to" type="text" autocomplete="off" placeholder="Anywhere" required>
+            </label>
+          </div>
+          <div class="book__when">
+            <label class="field">
+              <span class="field__label">Departure</span>
+              <input name="date" type="datetime-local" required>
+            </label>
+            <div class="field field--stepper">
+              <span class="field__label" id="pax-label">Passengers</span>
+              <div class="stepper" role="group" aria-labelledby="pax-label">
+                <button type="button" data-pax="-1" aria-label="One passenger fewer"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+                <output data-pax-out aria-live="polite">4 guests</output>
+                <button type="button" data-pax="1" aria-label="One passenger more"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+              </div>
+            </div>
+          </div>
+          <button class="pill pill--wide" type="submit">Get an instant quote</button>
+          <p class="book__note" data-book-note aria-live="polite">No account needed. Reply by phone or email, your choice.</p>
+        </form>
+      </section>
+
+      <!-- 3 · time returned -->
+      <section class="time" aria-labelledby="time-title">
+        <h2 id="time-title" class="statement statement--sm"><span class="statement__a">Get back</span><span class="statement__b">an hour and forty minutes.</span></h2>
+        <p class="body">Front door to take-off on a typical domestic departure. The airline asks you to arrive two hours early; we ask for fifteen minutes.</p>
+        <div class="race" data-race>
+          <div class="race__row">
+            <p class="race__name">Commercial</p>
+            <ol class="race__bar race__bar--slow">
+              <li style="--w:30">Drive and park</li>
+              <li style="--w:25">Check-in and bags</li>
+              <li style="--w:30">Security</li>
+              <li style="--w:45">Gate and boarding</li>
+              <li style="--w:20">Taxi and queue</li>
+            </ol>
+            <p class="race__total"><span>2 h 30</span></p>
+          </div>
+          <div class="race__row">
+            <p class="race__name">Anima Fly</p>
+            <ol class="race__bar race__bar--fast">
+              <li style="--w:30">Drive to the aircraft</li>
+              <li style="--w:15">Board</li>
+              <li style="--w:5">Take off</li>
+            </ol>
+            <p class="race__total"><span>50 min</span></p>
+          </div>
+          <p class="race__note">Illustrative minutes for a domestic departure. Drive times are the same on both rows.</p>
+        </div>
+      </section>
+
+      <!-- 4 · the fleet -->
+      <section id="fleet" class="fleet" data-fleet aria-labelledby="fleet-title">
+        <div class="fleet__stage">
+          <div class="fleet__head">
+            <h2 id="fleet-title" class="statement statement--sm"><span class="statement__a">Four cabins</span><span class="statement__b">one standard.</span></h2>
+            <!-- taste-skill-ignore: the carousel position, which jet of four is in view -->
+            <p class="fleet__count" aria-hidden="true"><span data-fleet-count>01</span> / 04</p> <!-- taste-skill-ignore: carousel position -->
+          </div>
+          <div class="fleet__track" data-fleet-track>
+            <article class="jet">
+              <p class="jet__word" aria-hidden="true">Light</p>
+              <img class="jet__img" src="assets/img/fleet-light.jpg" alt="A light business jet seen head-on on a runway" width="1800" height="1350" loading="lazy" decoding="async">
+              <div class="jet__info">
+                <h3 class="jet__name">Light jet</h3>
+                <p class="jet__use">City pairs and weekend hops.</p>
+                <dl class="jet__specs"><div><dt>Seats</dt><dd>5–7</dd></div><div><dt>Range</dt><dd>~2,000 nm</dd></div><div><dt>Cruise</dt><dd>~420 kt</dd></div></dl>
+              </div>
+            </article>
+            <article class="jet">
+              <p class="jet__word" aria-hidden="true">Midsize</p>
+              <img class="jet__img" src="assets/img/fleet-midsize.jpg" alt="A midsize business jet with its airstair down on the apron" width="1800" height="1194" loading="lazy" decoding="async">
+              <div class="jet__info">
+                <h3 class="jet__name">Midsize</h3>
+                <p class="jet__use">A stand-up cabin for longer days.</p>
+                <dl class="jet__specs"><div><dt>Seats</dt><dd>7–9</dd></div><div><dt>Range</dt><dd>~2,500 nm</dd></div><div><dt>Cruise</dt><dd>~450 kt</dd></div></dl>
+              </div>
+            </article>
+            <article class="jet">
+              <p class="jet__word" aria-hidden="true">Super-mid</p>
+              <img class="jet__img" src="assets/img/fleet-super.jpg" alt="A large business jet in flight above the clouds" width="1800" height="1200" loading="lazy" decoding="async">
+              <div class="jet__info">
+                <h3 class="jet__name">Super-midsize</h3>
+                <p class="jet__use">Coast to coast without a stop.</p>
+                <dl class="jet__specs"><div><dt>Seats</dt><dd>8–10</dd></div><div><dt>Range</dt><dd>~3,200 nm</dd></div><div><dt>Cruise</dt><dd>~470 kt</dd></div></dl>
+              </div>
+            </article>
+            <article class="jet">
+              <p class="jet__word" aria-hidden="true">Heavy</p>
+              <img class="jet__img" src="assets/img/fleet-heavy.jpg" alt="A long-range business jet inside a hangar" width="1800" height="1200" loading="lazy" decoding="async">
+              <div class="jet__info">
+                <h3 class="jet__name">Heavy</h3>
+                <p class="jet__use">Oceans, a bedroom, a full galley.</p>
+                <dl class="jet__specs"><div><dt>Seats</dt><dd>12–16</dd></div><div><dt>Range</dt><dd>6,000+ nm</dd></div><div><dt>Cruise</dt><dd>~490 kt</dd></div></dl>
+              </div>
+            </article>
+          </div>
+          <p class="fleet__note">Typical figures for each class. The aircraft is confirmed with your quote.</p>
+        </div>
+      </section>
+
+      <!-- 5 · the details: a light hall, three framed views -->
+      <section id="details" class="details" aria-labelledby="details-title">
+        <div class="details__copy">
+          <h2 id="details-title" class="statement statement--sm"><span class="statement__a">Nothing to ask for</span><span class="statement__b">it's already on board.</span></h2>
+          <p class="body">The pillow you like, your coffee order, the newspaper in your language, a car waiting at the other end. We keep the notes so you never repeat them.</p>
+        </div>
+        <div class="hall" data-hall>
+          <figure class="frame frame--a" style="--i:0"><span class="frame__wire" aria-hidden="true"></span><img src="assets/img/seat.jpg" alt="A leather cabin seat beside the oval windows" width="1400" height="2100" loading="lazy" decoding="async"></figure>
+          <figure class="frame frame--b" style="--i:1"><span class="frame__wire" aria-hidden="true"></span><img src="assets/img/window-ocean.jpg" alt="Turquoise reef water seen through an aircraft window" width="1400" height="1867" loading="lazy" decoding="async"></figure>
+          <figure class="frame frame--c" style="--i:2"><span class="frame__wire" aria-hidden="true"></span><img src="assets/img/champagne.jpg" alt="A glass of champagne on a cabin side table" width="1800" height="3200" loading="lazy" decoding="async"></figure>
+        </div>
+      </section>
+
+      <!-- 6 · runways -->
+      <section id="runways" class="runways" aria-labelledby="runways-title">
+        <div class="runways__copy">
+          <h2 id="runways-title" class="statement statement--sm"><span class="statement__a">Smaller airports</span><span class="statement__b">closer to the door.</span></h2>
+          <p class="body">Private jets use airfields airlines never reach: the one by the ski lift, the one by the marina. Fewer people, shorter drives.</p>
+        </div>
+        <figure class="map" data-map>
+          <svg class="map__svg" viewBox="20 10 600 340" role="img" aria-labelledby="map-cap">
+            <g class="map__arcs" fill="none">
+              <path d="M230 82 Q228 63 243 51" style="--d:0"/>
+              <path d="M230 82 Q193 95 186 134" style="--d:1"/>
+              <path d="M230 82 Q269 146 235 213" style="--d:2"/>
+              <path d="M230 82 Q92 130 60 272" style="--d:3"/>
+              <path d="M230 82 Q467 101 575 314" style="--d:4"/>
+            </g>
+            <g class="map__pins">
+              <circle cx="230" cy="82" r="5.5" class="map__home"/>
+              <circle cx="243" cy="51" r="3.5"/><circle cx="186" cy="134" r="3.5"/><circle cx="235" cy="213" r="3.5"/><circle cx="60" cy="272" r="3.5"/><circle cx="575" cy="314" r="3.5"/>
+            </g>
+            <g class="map__labels">
+              <text x="216" y="70" text-anchor="end">Milan Linate</text>
+              <text x="254" y="42">Engadin <tspan>35 min</tspan></text>
+              <text x="176" y="139" text-anchor="end">Nice <tspan>50 min</tspan></text>
+              <text x="247" y="218">Olbia <tspan>1 h 05</tspan></text>
+              <text x="60" y="296" text-anchor="middle">Ibiza <tspan>1 h 50</tspan></text>
+              <text x="562" y="318" text-anchor="end">Mykonos <tspan>2 h 30</tspan></text>
+            </g>
+          </svg>
+          <figcaption id="map-cap">Typical flight times from Milan Linate on a midsize jet. Positions to scale, north up.</figcaption>
+        </figure>
+      </section>
+
+      <!-- 7 · the card -->
+      <section id="card" class="card" aria-labelledby="card-title">
+        <div class="metal" aria-hidden="true" data-metal>
+          <div class="metal__face">
+            <svg class="metal__mark" viewBox="0 0 28 20"><path d="M1.5 18.5 14 1.5l12.5 17M7.2 11.8h13.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            <p class="metal__brand">Anima Fly</p>
+            <p class="metal__chip"></p>
+            <p class="metal__hours">50 hours</p>
+            <p class="metal__kind">Jet Card</p>
+          </div>
+        </div>
+        <div class="card__copy">
+          <h2 id="card-title" class="statement statement--sm"><span class="statement__a">One card</span><span class="statement__b">one rate, every hour.</span></h2>
+          <p class="body">Buy 25, 50 or 100 hours. The hourly rate is fixed for a year, an aircraft is guaranteed with 24 hours' notice, and there are no blackout dates.</p>
+          <a class="pill" href="#plan">Ask for the card terms</a>
+        </div>
+      </section>
+      <div class="ticker" aria-hidden="true"><p data-ticker>Fixed hourly rate · Guaranteed aircraft · 24-hour notice · No blackout dates · Catering on request · Pets welcome on board · Fixed hourly rate · Guaranteed aircraft · 24-hour notice · No blackout dates · Catering on request · Pets welcome on board ·&nbsp;</p></div>
+
+      <!-- 8 · last call -->
+      <section class="last" aria-labelledby="last-title">
+        <img class="last__sky" src="assets/img/clouds-night.jpg" alt="" width="1472" height="800" loading="lazy" decoding="async">
+        <div class="last__copy">
+          <h2 id="last-title" class="statement"><span class="statement__a">Say when</span><span class="statement__b">we'll be on the runway.</span></h2>
+          <a class="pill" href="#plan" data-last-pill>Plan a flight</a>
+          <p class="last__small">A specialist answers day and night.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="foot__top">
+      <a class="brand" href="#top" aria-label="ANIMA FLY, back to the top">
+        <svg class="brand__mark" viewBox="0 0 28 20" aria-hidden="true"><path d="M1.5 18.5 14 1.5l12.5 17M7.2 11.8h13.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span class="brand__name">Anima Fly</span>
+      </a>
+      <nav class="foot__nav" aria-label="Footer">
+        <a href="#fleet">Fleet</a><a href="#details">Experience</a><a href="#runways">Destinations</a><a href="#card">Jet Card</a><a href="#plan">Plan a flight</a>
+      </nav>
+    </div>
+    <p class="foot__legal">ANIMA FLY is a design concept: no flights are sold or operated through this site. Aircraft figures are typical for each class. Flight film supplied by the owner. Photographs from Pexels (Pexels License): <a href="https://www.pexels.com/photo/20562278/">cabin</a>, <a href="https://www.pexels.com/photo/35026952/">champagne</a>, <a href="https://www.pexels.com/photo/20584536/">seat</a>, <a href="https://www.pexels.com/photo/31378163/">window</a>, <a href="https://www.pexels.com/photo/7739666/">light jet</a>, <a href="https://www.pexels.com/photo/15953920/">midsize</a>, <a href="https://www.pexels.com/photo/11935301/">super-midsize</a>, <a href="https://www.pexels.com/photo/20640898/">heavy</a>.</p>
+  </footer>
+
+  <script src="js/main.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "note": "No direction was dealt for this page: the owner supplied the comp (a reel of a reference site) and asked for it as close as possible. These rules are allowed because the comp does exactly this; each has its reason.",
+  "allow": ["headline-lines", "mixed-font-headline", "numbering", "micro-label", "pinned-over-picture", "no-footage", "edge-text", "side-scroll", "shadow"],
+  "reasons": {
+    "headline-lines": "The comp's statements are a heavy caps title over two lines answered by one italic serif line (STOP LOSING / DAYS / to the airport.). Kept as the comp sets them.",
+    "mixed-font-headline": "The caps grotesque + italic serif answer is the comp's typographic signature.",
+    "numbering": "01 / 04 is the fleet carousel's position, the only numbering on the page.",
+    "micro-label": "Instrument labels (GS, HDG, ETE, ALTITUDE) and form field labels, as in the comp's HUD and booking card.",
+    "pinned-over-picture": "The hero is a pinned film with words on it: the comp's whole first act. Text sits on scrims and changes with each chapter.",
+    "no-footage": "The hero is the owner's film, drawn frame by frame on a canvas as the page scrolls.",
+    "edge-text": "The fleet is a carousel: the next aircraft is cut by the screen edge on purpose, as in the comp.",
+    "side-scroll": "On phones the fleet is a swipe row with snap points.",
+    "shadow": "The framed prints in the light hall hang off the wall and cast a shadow on it, as in the comp."
+  }
+}
