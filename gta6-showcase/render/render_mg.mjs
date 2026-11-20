@@ -38,7 +38,7 @@ const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 // website page (record mode, Retina)
 const site = await browser.newPage({ viewport: { width: 1512, height: 906 }, deviceScaleFactor: 2 });
 site.on('pageerror', (e) => log('site error:', e.message));
-await site.goto(`${base}/site/index.html?rec&tempo=${Number(args.tempo || 2.2)}`);
+await site.goto(`${base}/site-v1/index.html?rec&tempo=${Number(args.tempo || 2.2)}`);
 await site.evaluate(() => window.__rec.ready);
 const info = await site.evaluate(() => window.__rec.info());
 const plan = TL.buildPlan(info);

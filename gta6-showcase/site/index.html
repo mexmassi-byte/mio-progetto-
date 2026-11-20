@@ -1,394 +1,261 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-lights="off">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#050506">
-  <title>Grand Theft Auto VI — Concept</title>
-  <meta name="description" content="Unofficial luxury concept landing page for Grand Theft Auto VI. Coming November 19, 2026 to PlayStation 5 and Xbox Series X|S.">
-  <link rel="preload" href="assets/fonts/inter-latin-standard-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/fonts/bodoni-moda-latin-standard-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/fonts/bodoni-moda-latin-standard-italic.woff2" as="font" type="font/woff2" crossorigin>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Vice City After Dark — a fan page for Grand Theft Auto VI</title>
+  <meta name="description" content="A fan-made welcome to Leonida: Grand Theft Auto VI is out now on PlayStation 5 and Xbox Series X|S. Unofficial, not affiliated with Rockstar Games.">
+  <meta name="theme-color" content="#f4bcc8">
+  <link rel="preload" href="assets/fonts/big-shoulders-display-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/style.css">
+  <script>document.documentElement.classList.add('js'); if (new URLSearchParams(location.search).has('rec')) document.documentElement.classList.add('rec');</script>
 </head>
 <body>
+  <a class="skip" href="#leonida">Skip to the page</a>
 
-<div id="progress"><span></span></div>
-
-<!-- ============================== NAV ============================== -->
-<header class="nav" id="nav" data-intro="0.55" data-intro-dur="1.2">
-  <a class="brand" href="#overview" data-hover>
-    <span class="brand-mark">VI</span>
-    <span class="brand-sep"></span>
-    <span class="brand-name">Grand Theft Auto</span>
-  </a>
-  <nav class="nav-links" aria-label="Primary">
-    <a class="nav-link" href="#overview" data-hover>Overview</a>
-    <a class="nav-link" href="#editions" data-hover>Pre-Order</a>
-    <a class="nav-link" href="#media" data-hover>Cinematic Media</a>
-    <a class="nav-link" href="#editions" data-hover>Editions</a>
-  </nav>
-  <div class="nav-right">
-    <span class="nav-date"><i class="pulse"></i>Nov 19, 2026</span>
-    <a class="nav-btn" href="#editions" data-hover>Pre-Order</a>
-  </div>
-</header>
-
-<!-- ============================== HERO ============================== -->
-<section class="hero" id="overview">
-  <canvas class="hero-art" id="heroArt" aria-label="Vice City skyline at night, animated artwork"></canvas>
-  <div class="hero-shade"></div>
-  <div class="container hero-inner">
-    <div class="hero-copy">
-      <p class="eyebrow" data-intro="0.95" data-intro-dur="1.1">Vice City, USA.</p>
-      <h1 class="hero-title" aria-label="Grand Theft Auto VI">
-        <span class="ht-top" data-chars="1.05">Grand Theft Auto</span>
-        <span class="ht-vi"><span class="ht-vi-text" data-intro="1.25" data-intro-dur="1.5" data-ease="expo">VI</span></span>
-      </h1>
-      <p class="hero-sub" data-split-intro="1.75">The darkest side of the sunniest place in America.</p>
-      <div class="hero-meta" data-intro="2.05" data-intro-dur="1.1">
-        <b>Coming November 19, 2026</b><i></i><span>PlayStation 5</span><i></i><span>Xbox Series X|S</span>
-      </div>
-      <div class="hero-ctas" data-intro="2.25" data-intro-dur="1.2">
-        <a class="btn btn-gold" id="heroPreorder" href="#editions" data-hover data-sweep><span>Pre-Order Now</span></a>
-        <a class="btn btn-glass" href="#media" data-hover><span class="play-ico"></span><span>Watch the Launch Trailer</span></a>
-      </div>
+  <header class="bar">
+    <a class="bar__mark" href="#top">Vice City After Dark</a>
+    <nav class="bar__nav" aria-label="Sections">
+      <a href="#leonida">Leonida</a>
+      <a href="#duo">The duo</a>
+      <a href="#films">The films</a>
+    </nav>
+    <div class="bar__end">
+      <button class="lights" type="button" aria-pressed="false" data-lights-toggle>
+        <span class="lights__switch" aria-hidden="true"><span class="lights__knob"></span></span>
+        <span class="lights__text"><span class="lights__label">Lights</span> <span class="lights__clock" data-clock>in Vice City</span></span>
+      </button>
+      <a class="btn" href="#films" data-open-film>Watch the fan film</a>
     </div>
-  </div>
-  <aside class="hero-card glass" data-intro="2.55" data-intro-dur="1.3">
-    <div class="hc-top"><span class="hc-label">Pre-Load</span><span class="hc-live"><i></i>Live</span></div>
-    <p class="hc-title">Pre-load is now available</p>
-    <p class="hc-text">Digital pre-orders on PlayStation 5 and Xbox Series X|S can pre-load ahead of launch.</p>
-    <div class="hc-bar"><span></span></div>
-    <div class="hc-foot"><span>Since Nov 10</span><span>Launch Nov 19</span></div>
-  </aside>
-  <div class="scroll-cue" data-intro="2.9" data-intro-dur="1"><span>Scroll</span><i></i></div>
-</section>
+  </header>
 
-<!-- ============================== STATEMENT ============================== -->
-<section class="statement" id="story">
-  <div class="statement-bg" aria-hidden="true">Leonida</div>
-  <div class="container">
-    <p class="eyebrow" data-reveal="fade">01 — The Story</p>
-    <p class="statement-text" id="statement"><span class="g">Jason and Lucia</span> have always known the deck is stacked against them. But when an easy score goes wrong, they find themselves on <span class="g">the darkest side of the sunniest place in America.</span></p>
-    <div class="statement-sign" data-reveal>
-      <span class="rule"></span>
-      <span class="sig">Vice City, USA.</span>
-      <span>A criminal conspiracy stretching across the state of Leonida.</span>
-    </div>
-  </div>
-</section>
-
-<!-- ============================== FEATURES ============================== -->
-<section class="features" id="features">
-  <div class="container">
-    <div class="sec-head">
-      <div>
-        <p class="eyebrow" data-reveal="fade">02 — Key Features</p>
-        <h2 class="h2" data-split>The biggest, most immersive <span class="serif-i">evolution</span> of the series yet.</h2>
-      </div>
-      <p class="lede" data-reveal data-delay="0.2">Grand Theft Auto VI heads to the state of Leonida, home to the <strong>neon-soaked streets of Vice City</strong> and beyond.</p>
-    </div>
-
-    <div class="bento">
-      <article class="card card-xl" data-reveal-card data-hover data-spot>
-        <div class="card-art"><canvas data-art="leonida-wide"></canvas></div>
-        <div class="card-in">
-          <span class="card-label">Open World</span>
-          <h3 class="card-title">The State of Leonida.</h3>
-          <p class="card-text">Home to the neon-soaked streets of Vice City and beyond — tour a few of the must-see destinations across the sunshine state.</p>
-          <div class="place-chips"><span>Vice City</span><span>Leonida Keys</span><span>Grassrivers</span><span>Port Gellhorn</span><span>Ambrosia</span><span>Mount Kalaga</span></div>
-        </div>
-      </article>
-
-      <article class="card" data-reveal-card data-delay="0.08" data-hover data-spot>
-        <div class="card-in">
-          <span class="card-label">Dual Protagonists</span>
-          <div class="mono-jl gold-text">J<i>&amp;</i>L</div>
-          <h3 class="card-title">Jason Duval &amp; Lucia Caminos</h3>
-          <p class="card-text">Forced to rely on each other more than ever if they want to make it out alive.</p>
-        </div>
-      </article>
-
-      <article class="card" data-reveal-card data-delay="0.16" data-hover data-spot>
-        <div class="card-in">
-          <span class="card-label">Next-Gen Fidelity</span>
-          <div class="card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v6M20 9.5l-5.5 3M17.5 19l-4-4.5M6.5 19l4-4.5M4 9.5l5.5 3"/><circle cx="12" cy="12" r="2.4"/></svg></div>
-          <h3 class="card-title">Captured in-game.</h3>
-          <p class="card-text"><em>An Extended Look</em> was captured entirely from in-game footage on PlayStation 5.</p>
-        </div>
-      </article>
-
-      <article class="card" data-reveal-card data-hover data-spot>
-        <div class="card-in">
-          <span class="card-label">Original Score</span>
-          <div class="eq" aria-hidden="true"></div>
-          <h3 class="card-title">Music by Justice.</h3>
-          <p class="card-text">Featuring the new single “Flower in a Hurricane” feat. Tame Impala, SZA and King Gizzard &amp; The Lizard Wizard.</p>
-        </div>
-      </article>
-
-      <article class="card" data-reveal-card data-delay="0.08" data-hover data-spot>
-        <div class="card-in">
-          <span class="card-label">Platforms</span>
-          <h3 class="card-title">November 19, 2026.</h3>
-          <div class="platforms">
-            <span>PlayStation 5 <small>Plays best on</small></span>
-            <span>Xbox Series X|S <small>Day one</small></span>
+  <main id="top">
+    <!-- 1 · hero: one sentence split by a frame; the reel passes through it -->
+    <section class="hero" aria-labelledby="hero-title" data-ink-day="night">
+      <div class="hero__stage">
+        <h1 id="hero-title" class="hero__title"><span class="hero__a">Vice City</span> <span class="hero__b">is open.</span></h1>
+        <div class="reel" data-reel>
+          <div class="reel__track" data-reel-track>
+            <figure class="reel__frame reel__frame--switch">
+              <img class="day" src="assets/img/colony-hotel-day.jpg" width="1920" height="2891" alt="The Colony Hotel on Ocean Drive, Miami Beach, by day: white Art Deco facade with its tall vertical name sign unlit." fetchpriority="high">
+              <img class="night" src="assets/img/colony-hotel-night.jpg" width="1920" height="1440" alt="The Colony Hotel at night, its vertical name sign lit in blue neon." decoding="async">
+            </figure>
+            <figure class="reel__frame">
+              <video data-loop muted loop playsinline preload="metadata" poster="assets/video/miami-bay-night.jpg" aria-label="Miami's skyline at night, seen across the bay.">
+                <source src="assets/video/miami-bay-night.webm" type="video/webm">
+                <source src="assets/video/miami-bay-night.mp4" type="video/mp4">
+              </video>
+            </figure>
+            <figure class="reel__frame">
+              <img src="assets/img/boulevard-hotel-neon.jpg" width="1920" height="1281" alt="The Boulevard Hotel's red neon sign on Ocean Drive." loading="lazy" decoding="async">
+            </figure>
+            <figure class="reel__frame">
+              <img src="assets/img/ocean-drive-night-3.jpg" width="1920" height="1199" alt="Hotels on Ocean Drive at night, their facades lit red, purple and white." loading="lazy" decoding="async">
+            </figure>
           </div>
         </div>
-      </article>
+        <p class="hero__lede">Grand Theft Auto VI is out now on PlayStation 5 and Xbox Series X|S. A fan-made welcome to the state of Leonida.</p>
+      </div>
+    </section>
 
-      <article class="card" data-reveal-card data-delay="0.16" data-hover data-spot>
-        <div class="card-in">
-          <span class="card-label">Play Anywhere</span>
-          <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M7 18.5h10.5a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.6 9.2 4.7 4.7 0 0 0 7 18.5z"/><path d="M10.5 12.5l3 2-3 2z"/></svg></div>
-          <h3 class="card-title">Cloud &amp; Remote Play.</h3>
-          <p class="card-text">Supports Xbox Cloud Gaming and Remote Play on PlayStation and Xbox consoles.</p>
+    <!-- 2 · intro: the state's sign holds while Ocean Drive passes behind its plaque -->
+    <section id="leonida" class="walk" aria-labelledby="leonida-title">
+      <div class="walk__stage">
+        <svg class="sign-svg sign--left" viewBox="0 0 100 598" aria-hidden="true" focusable="false"><rect class="cab" width="100" height="598"/><text class="l" style="--i:0" x="50" y="95">L</text><text class="l" style="--i:1" x="50" y="173">E</text><text class="l" style="--i:2" x="50" y="251">O</text><text class="l" style="--i:3" x="50" y="329">N</text><text class="l" style="--i:4" x="50" y="407">I</text><text class="l" style="--i:5" x="50" y="485">D</text><text class="l" style="--i:6" x="50" y="563">A</text></svg>
+        <div class="plaque" data-reveal>
+          <h2 id="leonida-title" class="head plaque__title">Leonida</h2>
+          <p class="statement">Grand Theft Auto VI heads to the state of Leonida, home to the neon-soaked streets of Vice City and beyond.</p>
         </div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- ============================== PLACES ============================== -->
-<section class="places-sec" id="leonida">
-  <div class="container">
-    <div class="sec-head">
-      <div>
-        <p class="eyebrow" data-reveal="fade">03 — Only in Leonida</p>
-        <h2 class="h2" data-split>Welcome to the <span class="serif-i">sunshine state.</span></h2>
       </div>
-      <p class="lede" data-reveal data-delay="0.2">Tour a few of the must-see destinations across the sunshine state — from Vice City to the Keys and beyond.</p>
-    </div>
-    <div class="places">
-      <a class="place" href="#leonida" data-reveal-card data-delay="0.00" data-hover><canvas data-art="vice"></canvas><div class="place-in"><span class="place-num">01</span><p class="place-name">Vice City</p><p class="place-more">Explore →</p></div></a>
-      <a class="place" href="#leonida" data-reveal-card data-delay="0.07" data-hover><canvas data-art="keys"></canvas><div class="place-in"><span class="place-num">02</span><p class="place-name">Leonida Keys</p><p class="place-more">Explore →</p></div></a>
-      <a class="place" href="#leonida" data-reveal-card data-delay="0.14" data-hover><canvas data-art="grassrivers"></canvas><div class="place-in"><span class="place-num">03</span><p class="place-name">Grassrivers</p><p class="place-more">Explore →</p></div></a>
-      <a class="place" href="#leonida" data-reveal-card data-delay="0.21" data-hover><canvas data-art="port"></canvas><div class="place-in"><span class="place-num">04</span><p class="place-name">Port Gellhorn</p><p class="place-more">Explore →</p></div></a>
-      <a class="place" href="#leonida" data-reveal-card data-delay="0.28" data-hover><canvas data-art="ambrosia"></canvas><div class="place-in"><span class="place-num">05</span><p class="place-name">Ambrosia</p><p class="place-more">Explore →</p></div></a>
-      <a class="place" href="#leonida" data-reveal-card data-delay="0.35" data-hover><canvas data-art="kalaga"></canvas><div class="place-in"><span class="place-num">06</span><p class="place-name">Mount Kalaga</p><p class="place-more">Explore →</p></div></a>
-    </div>
-  </div>
-</section>
+      <figure class="pass pass--a">
+        <img src="assets/img/mcalpin-ocean-plaza.jpg" width="1920" height="1285" alt="Pastel Art Deco hotel facades on Ocean Drive under a blue sky." loading="eager" decoding="async">
+        <figcaption>The McAlpin and Ocean Plaza, Ocean Drive, Miami Beach</figcaption>
+      </figure>
+      <figure class="pass pass--b">
+        <img src="assets/img/carlyle-neon.jpg" width="1920" height="1286" alt="The Carlyle's white Art Deco facade at dusk with its script neon sign lit in red." loading="eager" decoding="async">
+        <figcaption>The Carlyle, Ocean Drive, at dusk</figcaption>
+      </figure>
+      <figure class="pass pass--c">
+        <img src="assets/img/avalon-night.jpg" width="1920" height="1440" alt="The Avalon hotel on Ocean Drive at night, taxis and motorbikes streaking past." loading="eager" decoding="async">
+        <figcaption>The Avalon, Ocean Drive, at night</figcaption>
+      </figure>
+    </section>
 
-<!-- ============================== CAST ============================== -->
-<section class="cast-sec" id="cast">
-  <div class="container">
-    <div class="sec-head">
-      <div>
-        <p class="eyebrow" data-reveal="fade">04 — Characters</p>
-        <h2 class="h2" data-split>Everyone has something <span class="serif-i">to lose.</span></h2>
+    <!-- 3 · gallery: three night photographs, each slides up over the last -->
+    <section class="places" aria-labelledby="places-title">
+      <div class="places__intro">
+        <h2 id="places-title" class="head" data-reveal>Only in Leonida</h2>
+        <p class="places__text" data-reveal>Six places to start: <a href="https://www.rockstargames.com/VI/only-in-leonida">Vice City, the Leonida Keys, Grassrivers, Port Gellhorn, Ambrosia and Mount Kalaga</a>. Rockstar's own tour of each is one tap away; here is the real Florida coast at night.</p>
       </div>
-      <p class="lede" data-reveal data-delay="0.2">When the sun fades and the neon glows, everyone has something to gain — and more to lose.</p>
-    </div>
-    <div class="duo">
-      <article class="card duo-card" data-reveal-card data-hover data-spot>
-        <div class="duo-glow" style="background: radial-gradient(600px circle at 85% 110%, rgba(72,226,255,.14), transparent 60%);"></div>
-        <span class="duo-initials" aria-hidden="true">JD</span>
-        <div class="card-in">
-          <span class="card-label">Protagonist</span>
-          <h3 class="duo-name">Jason Duval</h3>
-          <p class="duo-quote">“Jason wants an easy life, but things just keep getting harder.”</p>
-          <p class="duo-text">He grew up around grifters and crooks. After a stint in the Army, he found himself in the Keys doing what he knows best — working for local drug runners.</p>
+      <div class="curtain">
+        <figure class="curtain__panel">
+          <img src="assets/img/ocean-drive-night-2.jpg" width="1920" height="1098" alt="Ocean Drive at night: the Colony and its neighbours lit blue, green and white above the cafe tables." loading="lazy" decoding="async">
+          <figcaption>Ocean Drive, Miami Beach, after dark</figcaption>
+        </figure>
+        <figure class="curtain__panel">
+          <img src="assets/img/ocean-drive-night.jpg" width="1920" height="1536" alt="Ocean Drive at night, its hotel signs lit in blue, pink and white." loading="lazy" decoding="async">
+          <figcaption>Hotels on Ocean Drive, lit for the night</figcaption>
+        </figure>
+        <figure class="curtain__panel">
+          <img src="assets/img/miami-night-panorama.jpg" width="1920" height="1280" alt="Downtown Miami's towers and a lit causeway reflected in the bay at blue hour." loading="lazy" decoding="async">
+          <figcaption>Downtown Miami at blue hour</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- 4 · about: two facades, two signs, in Rockstar's words -->
+    <section id="duo" class="duo" aria-labelledby="duo-title">
+      <h2 id="duo-title" class="head duo__title" data-reveal>Jason &amp; Lucia</h2>
+      <div class="duo__row">
+        <article class="facade facade--mint" aria-labelledby="jason-name">
+          <svg class="sign-svg sign--blade" viewBox="0 0 100 442" aria-hidden="true" focusable="false"><rect class="cab" width="100" height="442"/><text class="l" style="--i:0" x="50" y="95">J</text><text class="l" style="--i:1" x="50" y="173">A</text><text class="l" style="--i:2" x="50" y="251">S</text><text class="l" style="--i:3" x="50" y="329">O</text><text class="l" style="--i:4" x="50" y="407">N</text></svg>
+          <div class="facade__copy" data-reveal>
+            <h3 id="jason-name" class="facade__name">Jason Duval</h3>
+            <p class="facade__quote">“Jason wants an easy life, but things just keep getting harder.”</p>
+            <p>He grew up around grifters and crooks. After a stint in the Army, he found himself in the Keys doing what he knows best: working for local drug runners.</p>
+          </div>
+        </article>
+        <article class="facade facade--pink" aria-labelledby="lucia-name">
+          <svg class="sign-svg sign--blade" viewBox="0 0 100 442" aria-hidden="true" focusable="false"><rect class="cab" width="100" height="442"/><text class="l" style="--i:0" x="50" y="95">L</text><text class="l" style="--i:1" x="50" y="173">U</text><text class="l" style="--i:2" x="50" y="251">C</text><text class="l" style="--i:3" x="50" y="329">I</text><text class="l" style="--i:4" x="50" y="407">A</text></svg>
+          <div class="facade__copy" data-reveal>
+            <h3 id="lucia-name" class="facade__name">Lucia Caminos</h3>
+            <p class="facade__quote">“Lucia’s father taught her to fight as soon as she could walk.”</p>
+            <p>Fighting for her family landed her in the Leonida Penitentiary. Fresh out and ready to change the odds in her favor: only smart moves from here.</p>
+          </div>
+        </article>
+      </div>
+      <p class="statement duo__line" data-reveal>Jason and Lucia have always known the deck is stacked against them. But when an easy score goes wrong, they find themselves on the darkest side of the sunniest place in America.</p>
+    </section>
+
+    <!-- 5 · showcase: the films cross a held photograph -->
+    <section id="films" class="films" aria-labelledby="films-title" data-films>
+      <div class="films__stage">
+        <img class="films__ground" src="assets/img/miami-skyline-night.jpg" width="1920" height="1080" alt="" loading="lazy" decoding="async">
+        <h2 id="films-title" class="head films__title">The films</h2>
+        <div class="films__track" data-films-track>
+          <article class="film film--ours">
+            <button class="film__media" type="button" data-open-film aria-label="Play the fan film">
+              <video data-loop muted loop playsinline preload="metadata" poster="assets/video/causeway-night.jpg">
+                <source src="assets/video/causeway-night.webm" type="video/webm">
+                <source src="assets/video/causeway-night.mp4" type="video/mp4">
+              </video>
+              <span class="film__play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></svg></span>
+            </button>
+            <div class="film__panel">
+              <h3 class="film__name">Our fan film</h3>
+              <p class="film__text">Miami after dark, cut on the beat for launch week. Real footage, no game footage.</p>
+            </div>
+          </article>
+          <article class="film">
+            <p class="film__date" aria-hidden="true">10·15·26</p>
+            <div class="film__panel film__panel--b">
+              <h3 class="film__name">Launch Trailer</h3>
+              <p class="film__text">October 15, 2026. “Flower in a Hurricane”, Justice feat. Tame Impala, SZA and King Gizzard &amp; The Lizard Wizard.</p>
+            </div>
+          </article>
+          <article class="film">
+            <p class="film__date" aria-hidden="true">08·27·26</p>
+            <div class="film__panel film__panel--c">
+              <h3 class="film__name">An Extended Look</h3>
+              <p class="film__text">August 27, 2026. Captured entirely from in-game footage on PlayStation 5.</p>
+            </div>
+          </article>
+          <article class="film">
+            <p class="film__date" aria-hidden="true">05·06·25</p>
+            <div class="film__panel film__panel--d">
+              <h3 class="film__name">Trailer 2</h3>
+              <p class="film__text">May 6, 2025. Featuring “Hot Together” by The Pointer Sisters.</p>
+            </div>
+          </article>
+          <article class="film">
+            <p class="film__date" aria-hidden="true">12·05·23</p>
+            <div class="film__panel film__panel--e">
+              <h3 class="film__name">Trailer 1</h3>
+              <p class="film__text">December 5, 2023. Featuring “Love Is a Long Road” by Tom Petty.</p>
+            </div>
+          </article>
         </div>
-      </article>
-      <article class="card duo-card" data-reveal-card data-delay="0.1" data-hover data-spot>
-        <div class="duo-glow" style="background: radial-gradient(600px circle at 85% 110%, rgba(255,79,147,.16), transparent 60%);"></div>
-        <span class="duo-initials" aria-hidden="true">LC</span>
-        <div class="card-in">
-          <span class="card-label">Protagonist</span>
-          <h3 class="duo-name">Lucia Caminos</h3>
-          <p class="duo-quote">“Lucia’s father taught her to fight as soon as she could walk.”</p>
-          <p class="duo-text">Fighting for her family landed her in the Leonida Penitentiary. Fresh out and ready to change the odds in her favor — only smart moves from here.</p>
+      </div>
+    </section>
+
+    <!-- 6 · list: the road to launch, one type size -->
+    <section class="road" aria-labelledby="road-title">
+      <h2 id="road-title" class="road__title" data-reveal>The road to launch</h2>
+      <table class="road__table">
+        <caption class="sr-only">Official milestones of Grand Theft Auto VI, from the first trailer to launch day</caption>
+        <tbody>
+          <tr><th scope="row">Trailer 1</th><td>“Love Is a Long Road”</td><td>YouTube</td><td class="nums">Dec 5, 2023</td></tr>
+          <tr><th scope="row">Trailer 2</th><td>“Hot Together”</td><td>YouTube</td><td class="nums">May 6, 2025</td></tr>
+          <tr><th scope="row">Pre-orders open</th><td>Standard and Ultimate</td><td>PS5 · Xbox Series X|S</td><td class="nums">Jun 25, 2026</td></tr>
+          <tr><th scope="row">An Extended Look</th><td>Captured in-game</td><td>PlayStation 5</td><td class="nums">Aug 27, 2026</td></tr>
+          <tr><th scope="row">Launch Trailer</th><td>“Flower in a Hurricane”</td><td>YouTube</td><td class="nums">Oct 15, 2026</td></tr>
+          <tr><th scope="row">Pre-load</th><td>Digital copies</td><td>PS5 · Xbox Series X|S</td><td class="nums">Nov 10, 2026</td></tr>
+          <tr class="road__now"><th scope="row">Out now</th><td>Worldwide</td><td>PS5 · Xbox Series X|S</td><td class="nums">Nov 19, 2026</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 7 · cta: the last photograph, words on its calm side -->
+    <section class="close" aria-labelledby="close-title">
+      <img class="close__photo" src="assets/img/colony-and-boulevard-night.jpg" width="1920" height="1080" alt="The Colony and Boulevard hotels on Ocean Drive at night, their neon signs lit blue and red." loading="lazy" decoding="async">
+      <div class="close__copy">
+        <h2 id="close-title" class="close__line">See you in Leonida.</h2>
+        <p>Grand Theft Auto VI is available worldwide on PlayStation 5 and Xbox Series X|S since November 19, 2026.</p>
+        <a class="btn btn--paper" href="https://www.rockstargames.com/VI">Go to rockstargames.com</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot" aria-label="Vice City After Dark: places, sources and credits">
+    <p class="foot__mark" aria-hidden="true">Vice City After Dark</p>
+    <div class="foot__row">
+      <ul class="foot__places" aria-label="Places in Leonida">
+        <li><a href="https://www.rockstargames.com/VI/only-in-leonida">Vice City</a></li>
+        <li><a href="https://www.rockstargames.com/VI/only-in-leonida">Leonida Keys</a></li>
+        <li><a href="https://www.rockstargames.com/VI/only-in-leonida">Grassrivers</a></li>
+        <li><a href="https://www.rockstargames.com/VI/only-in-leonida">Port Gellhorn</a></li>
+        <li><a href="https://www.rockstargames.com/VI/only-in-leonida">Ambrosia</a></li>
+        <li><a href="https://www.rockstargames.com/VI/only-in-leonida">Mount Kalaga</a></li>
+      </ul>
+      <div class="foot__cols">
+        <div>
+          <h3 class="foot__head">Sources</h3>
+          <ul>
+            <li><a href="https://www.rockstargames.com/VI/out-now">Out now, Rockstar Games</a></li>
+            <li><a href="https://www.rockstargames.com/newswire/article/ak3ak31a49a221/grand-theft-auto-vi-is-now-set-to-launch-november-19-2026">Release date, Newswire</a></li>
+            <li><a href="https://www.rockstargames.com/VI/only-in-leonida">Only in Leonida</a></li>
+          </ul>
         </div>
-      </article>
-    </div>
-    <div class="supporting">
-      <div class="sup" data-reveal-card data-delay="0.00" data-hover><span class="sup-ini">CH</span><div><p class="sup-name">Cal Hampton</p><p class="sup-line">What if everything on the internet was true?</p></div></div>
-      <div class="sup" data-reveal-card data-delay="0.06" data-hover><span class="sup-ini">BI</span><div><p class="sup-name">Boobie Ike</p><p class="sup-line">It’s all about heart — the Jack of Hearts.</p></div></div>
-      <div class="sup" data-reveal-card data-delay="0.12" data-hover><span class="sup-ini">DP</span><div><p class="sup-name">Dre’Quan Priest</p><p class="sup-line">Only Raw… Records</p></div></div>
-      <div class="sup" data-reveal-card data-delay="0.18" data-hover><span class="sup-ini">RD</span><div><p class="sup-name">Real Dimez</p><p class="sup-line">Viral videos. Viral hooks.</p></div></div>
-      <div class="sup" data-reveal-card data-delay="0.24" data-hover><span class="sup-ini">RB</span><div><p class="sup-name">Raul Bautista</p><p class="sup-line">Experience counts.</p></div></div>
-      <div class="sup" data-reveal-card data-delay="0.30" data-hover><span class="sup-ini">BH</span><div><p class="sup-name">Brian Heder</p><p class="sup-line">Nothing better than a Mudslide at sunset.</p></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================== MEDIA ============================== -->
-<section class="media-sec" id="media">
-  <div class="container">
-    <div class="sec-head">
-      <div>
-        <p class="eyebrow" data-reveal="fade">05 — Cinematic Media</p>
-        <h2 class="h2" data-split>Watch Leonida <span class="serif-i">come alive.</span></h2>
-      </div>
-      <p class="lede" data-reveal data-delay="0.2">Every official film on the road to November 19, 2026 — from the first trailer to the launch trailer.</p>
-    </div>
-
-    <article class="feature-film" id="launchTrailer" data-reveal-card data-hover>
-      <canvas data-art="film"></canvas>
-      <div class="ff-dur"><i></i>Official Trailer</div>
-      <div class="ff-in">
-        <span class="ff-tag"><i></i>New · Launch Trailer</span>
-        <h3 class="ff-title">Launch Trailer</h3>
-        <p class="ff-meta">Released <b>October 15, 2026</b>. Featuring “Flower in a Hurricane” — Justice feat. Tame Impala, SZA and King Gizzard &amp; The Lizard Wizard.</p>
-      </div>
-      <div class="ff-play" id="ffPlay"><svg viewBox="0 0 24 24"><path d="M6 3.8v16.4a.8.8 0 0 0 1.2.7l13.6-8.2a.8.8 0 0 0 0-1.4L7.2 3.1A.8.8 0 0 0 6 3.8z"/></svg></div>
-    </article>
-
-    <div class="reel">
-      <article class="clip" data-reveal-card data-delay="0.00" data-hover>
-        <div class="clip-thumb"><canvas data-art="extended"></canvas><span class="clip-play"><svg viewBox="0 0 24 24"><path d="M6 3.8v16.4a.8.8 0 0 0 1.2.7l13.6-8.2a.8.8 0 0 0 0-1.4L7.2 3.1A.8.8 0 0 0 6 3.8z"/></svg></span><span class="clip-date">Aug 27, 2026</span></div>
-        <h4 class="clip-title">An Extended Look</h4>
-        <p class="clip-text">Captured entirely from in-game footage on PlayStation 5.</p>
-      </article>
-      <article class="clip" data-reveal-card data-delay="0.07" data-hover>
-        <div class="clip-thumb"><canvas data-art="preload"></canvas><span class="clip-play"><svg viewBox="0 0 24 24"><path d="M6 3.8v16.4a.8.8 0 0 0 1.2.7l13.6-8.2a.8.8 0 0 0 0-1.4L7.2 3.1A.8.8 0 0 0 6 3.8z"/></svg></span><span class="clip-date">Nov 10, 2026</span></div>
-        <h4 class="clip-title">Pre-Load Now</h4>
-        <p class="clip-text">Digital pre-load is live on PlayStation 5 and Xbox Series X|S.</p>
-      </article>
-      <article class="clip" data-reveal-card data-delay="0.14" data-hover>
-        <div class="clip-thumb"><canvas data-art="t2"></canvas><span class="clip-play"><svg viewBox="0 0 24 24"><path d="M6 3.8v16.4a.8.8 0 0 0 1.2.7l13.6-8.2a.8.8 0 0 0 0-1.4L7.2 3.1A.8.8 0 0 0 6 3.8z"/></svg></span><span class="clip-date">May 6, 2025</span></div>
-        <h4 class="clip-title">Trailer 2</h4>
-        <p class="clip-text">Featuring “Hot Together” by The Pointer Sisters.</p>
-      </article>
-      <article class="clip" data-reveal-card data-delay="0.21" data-hover>
-        <div class="clip-thumb"><canvas data-art="t1"></canvas><span class="clip-play"><svg viewBox="0 0 24 24"><path d="M6 3.8v16.4a.8.8 0 0 0 1.2.7l13.6-8.2a.8.8 0 0 0 0-1.4L7.2 3.1A.8.8 0 0 0 6 3.8z"/></svg></span><span class="clip-date">Dec 5, 2023</span></div>
-        <h4 class="clip-title">Trailer 1</h4>
-        <p class="clip-text">Featuring “Love Is a Long Road” by Tom Petty.</p>
-      </article>
-    </div>
-
-    <div class="timeline" id="timeline">
-      <div class="tl-head" data-reveal><h3>The road to launch</h3><span>Official milestones</span></div>
-      <div class="tl-track"><span class="tl-fill"></span></div>
-      <div class="tl-nodes">
-        <div class="tl-node"><div class="tl-dot"></div><p class="tl-date">Dec 5, 2023</p><p class="tl-what">Trailer 1</p></div>
-        <div class="tl-node"><div class="tl-dot"></div><p class="tl-date">May 6, 2025</p><p class="tl-what">Trailer 2</p></div>
-        <div class="tl-node"><div class="tl-dot"></div><p class="tl-date">Jun 25, 2026</p><p class="tl-what">Pre-orders open</p></div>
-        <div class="tl-node"><div class="tl-dot"></div><p class="tl-date">Aug 27, 2026</p><p class="tl-what">An Extended Look</p></div>
-        <div class="tl-node"><div class="tl-dot"></div><p class="tl-date">Oct 15, 2026</p><p class="tl-what">Launch Trailer</p></div>
-        <div class="tl-node"><div class="tl-dot"></div><p class="tl-date">Nov 10, 2026</p><p class="tl-what">Pre-load begins</p></div>
-        <div class="tl-node last"><div class="tl-dot"></div><p class="tl-date">Nov 19, 2026</p><p class="tl-what">Launch</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================== EDITIONS ============================== -->
-<section class="editions-sec" id="editions">
-  <div class="container">
-    <div class="sec-head">
-      <div>
-        <p class="eyebrow" data-reveal="fade">06 — Editions</p>
-        <h2 class="h2" data-split>Choose your <span class="serif-i">edition.</span></h2>
-      </div>
-      <p class="lede" data-reveal data-delay="0.2">Pre-order now on PlayStation 5 and Xbox Series X|S. Standard Edition owners can add the Ultimate Edition Upgrade at any time.</p>
-    </div>
-
-    <div class="editions">
-      <article class="edition" data-reveal-card data-hover>
-        <div class="ed-top"><span class="ed-format">Digital or Code in Box</span></div>
-        <h3 class="ed-name">Standard Edition</h3>
-        <p class="ed-desc">Get the standard edition of Grand Theft Auto VI along with pre-order bonuses.</p>
-        <ul class="ed-list">
-          <li>Grand Theft Auto VI</li>
-          <li class="bonus">Vintage Vice City Pack <small>Limited-time bonus</small></li>
-          <li class="bonus">One Month of GTA+ Membership <small>Limited-time bonus</small></li>
-        </ul>
-        <div class="ed-formats">
-          <div><b>Digital</b><span>PlayStation Store &amp; Microsoft Store. Pre-load from Nov 10.</span></div>
-          <div><b>Code in Box</b><span>Download code inside. A disc is not included.</span></div>
+        <div>
+          <h3 class="foot__head">Footage</h3>
+          <ul>
+            <li><a href="https://www.pexels.com/license/">Pexels License</a></li>
+            <li><a href="https://mixkit.co/license/">Mixkit License</a></li>
+          </ul>
         </div>
-        <div class="ed-upgrade">
-          <span class="lbl"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Upgrade anytime</span>
-          <p>Standard Edition owners can purchase the Ultimate Edition Upgrade separately at any time from the PlayStation or Microsoft stores.</p>
+        <div>
+          <h3 class="foot__head">Photographs</h3>
+          <ul>
+            <li><a href="#credits">Credits and licences</a></li>
+          </ul>
         </div>
-        <div class="ed-cta">
-          <a class="btn btn-glass" href="#preorder" data-hover style="padding-left:28px">Pre-Order Standard</a>
-          <p class="note">Includes pre-order bonuses with digital pre-orders before Nov 20, 2026.</p>
-        </div>
-      </article>
-
-      <article class="edition ultimate" id="ultimate" data-reveal-card data-delay="0.1" data-hover>
-        <div class="edition-glow"></div>
-        <div class="ed-top"><span class="ed-format">Digital</span><span class="ed-badge">Ultimate</span></div>
-        <h3 class="ed-name gold-text">Ultimate Edition</h3>
-        <p class="ed-desc">An exclusive collection of items threaded across all aspects of Jason and Lucia’s story.</p>
-        <ul class="ed-list">
-          <li class="bonus">Vintage Vice City Pack</li>
-          <li class="bonus">Free Month of GTA+</li>
-          <li>’95 Grotti Cheetah</li>
-          <li>Hawk &amp; Little Morgan Revolvers</li>
-          <li>Personalized Weapon Variants</li>
-          <li>Vice City Style</li>
-          <li>Jason’s Safehouse Vehicles</li>
-          <li>Ganado Retro Build</li>
-          <li>Rideout Customs Mod Shop</li>
-          <li>Sara’s Unisex Salon</li>
-          <li>Shitzu Squalo</li>
-          <li>Stock 305 Clothing Store</li>
-          <li>’67 Vapid Dominator Buggy</li>
-          <li>Electric Fang Tattoo Parlor</li>
-          <li>One-Eyed Willie’s Mod Shop</li>
-          <li>Goodtime Gear</li>
-          <li>PTT Youngin$ Illegal Goods Store</li>
-          <li>Classic Car Collection</li>
-        </ul>
-        <div class="ed-cta">
-          <a class="btn btn-gold" id="ultimateBtn" href="#preorder" data-hover data-sweep><span>Pre-Order Ultimate</span></a>
-          <p class="note">New items uncovered behind each chapter of the story.</p>
-        </div>
-      </article>
-    </div>
-
-    <div class="bonus-strip glass" data-reveal-card>
-      <span class="bs-ico"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6.1L12 16.6 6.6 19.6l1.2-6.1-4.5-4.2 6.1-.7z"/></svg></span>
-      <div>
-        <h4>Vintage Vice City Pack</h4>
-        <p>Pre-order to get unique benefits that flash back to when the neon burned brightest — the ’55 Vapid Stanier Sedan and Garage, outfits and hairstyles, and an exclusive weapon pattern.</p>
-      </div>
-      <p class="deadline">Last chance<b>Before Nov 20, 2026</b>Digital pre-orders</p>
-    </div>
-    <p class="fineprint" data-reveal="fade">Limited-time bonuses apply to digital pre-orders and purchases of either edition prior to November 20, 2026. Physical pre-orders include the Vintage Vice City Pack via download code. A physical Ultimate Edition is not available.</p>
-  </div>
-</section>
-
-<!-- ============================== FINALE ============================== -->
-<section class="finale" id="preorder">
-  <div class="finale-glow"></div>
-  <div class="finale-line"></div>
-  <div class="container">
-    <p class="finale-quote" data-split>When the sun fades and the neon glows, everyone has something to gain — and more to lose.</p>
-    <div class="finale-date" id="finaleDate" aria-label="November 19, 2026">11.19.2026</div>
-    <p class="finale-sub" data-reveal="fade" data-delay="0.5">PlayStation 5 · Xbox Series X|S</p>
-    <div class="finale-ctas" data-reveal data-delay="0.6">
-      <a class="btn btn-gold" id="finalCta" href="#editions" data-hover data-sweep><span>Pre-Order Now</span></a>
-      <a class="btn btn-glass" href="#media" data-hover><span class="play-ico"></span><span>Watch the Launch Trailer</span></a>
-    </div>
-  </div>
-</section>
-
-<footer class="footer">
-  <div class="container">
-    <div class="foot-top">
-      <div class="foot-brand"><span class="brand-mark">VI</span><p>Grand Theft Auto VI arrives November 19, 2026<br>on PlayStation 5 and Xbox Series X|S.</p></div>
-      <div class="rating">
-        <span class="r-box">M<small>17+</small></span>
-        <p>Rated M for Mature (ESRB): Blood and Gore, Intense Violence, Mature Humor, Nudity, Strong Language, Strong Sexual Content, Use of Drugs and Alcohol. In-Game Purchases.</p>
       </div>
     </div>
-    <div class="foot-legal">
-      <p>Unofficial fan concept for design purposes only — not affiliated with, endorsed or sponsored by Rockstar Games or Take-Two Interactive. Grand Theft Auto, Grand Theft Auto VI and related names are trademarks of Take-Two Interactive Software, Inc. Game information sourced from rockstargames.com, as of November 18, 2026.</p>
-      <p>Concept Design · 2026</p>
+    <p id="credits" class="foot__credits">Photographs: <a href="https://commons.wikimedia.org/w/index.php?curid=152068355">“Miami Beach - Colony Hotel (2011)”</a> by P. Hughes, CC BY-SA 4.0; <a href="https://commons.wikimedia.org/w/index.php?curid=87488241">“Miami Beach, Ocean Drive Hotel, The Colony Hotel”</a> by Marcus, CC BY-SA 2.0; <a href="https://commons.wikimedia.org/wiki/File:Boulevard_Hotel_(Neon_sign),_Miami_Beach.jpg">“Boulevard Hotel (Neon sign), Miami Beach”</a> by Photograph: Radomianin, public domain; <a href="https://commons.wikimedia.org/w/index.php?curid=51285131">“Ocean Drive by night 1”</a> by Gzzz, CC BY-SA 4.0; <a href="https://commons.wikimedia.org/w/index.php?curid=51285129">“McAlpin-Ocean Plaza”</a> by Gzzz, CC BY-SA 4.0; <a href="https://commons.wikimedia.org/wiki/File:The_Carlyle_(neon_sign),_Miami_Beach,_east_view_up,_2018-08-21.jpg">“The Carlyle (neon sign), Miami Beach, east view up, 2018-08-21”</a> by Photograph: Radomianin, public domain; <a href="https://commons.wikimedia.org/wiki/File:AvalonSouthBeach.jpg">“AvalonSouthBeach”</a> by ABIJXY, CC BY 3.0; <a href="https://commons.wikimedia.org/w/index.php?curid=51285132">“Ocean Drive by night 3”</a> by Gzzz, CC BY-SA 4.0; <a href="https://commons.wikimedia.org/wiki/File:Ocean_Drive_at_Night_(3).jpg">“Ocean Drive at Night (3)”</a> by Tamanoeconomico, CC BY-SA 4.0; <a href="https://commons.wikimedia.org/wiki/File:Night_Panorama_Miami_Florida_5462.jpg">“Night Panorama Miami Florida 5462”</a> by Dori, CC BY-SA 3.0; <a href="https://commons.wikimedia.org/wiki/File:Miami_night_skyline_by_Don_Ramey_Logan.jpg">“Miami night skyline by Don Ramey Logan”</a> by Don Ramey Logan, CC BY 4.0; <a href="https://commons.wikimedia.org/wiki/File:Art_Deco_Colony_Hotel_Boulevard_Hotel_(Miami_Beach).jpg">“Art Deco Colony Hotel Boulevard Hotel (Miami Beach)”</a> by Nestor Galina, CC BY 2.0. Night footage: Pexels (videos 6345205, 40183132, 8576666, 19109600, 19109604) and Mixkit (clips 42042, 12028, 42034), royalty-free. Every photograph shows Miami or Miami Beach, Florida; no game imagery is used.</p>
+    <div class="foot__legal">
+      <p>Unofficial fan concept. Not affiliated with Rockstar Games or Take-Two Interactive. Grand Theft Auto is a trademark of Take-Two Interactive Software, Inc. Rated M for Mature (ESRB).</p>
+      <a href="#top">Back to top</a>
     </div>
-  </div>
-</footer>
+  </footer>
 
-<div id="rec-cursor" aria-hidden="true"></div>
+  <dialog class="player" data-player aria-label="Fan film">
+    <video data-player-video controls playsinline preload="none" poster="assets/video/causeway-night.jpg">
+      <source src="assets/video/causeway-night.webm" type="video/webm">
+      <source src="assets/video/causeway-night.mp4" type="video/mp4">
+    </video>
+    <button class="player__close" type="button" data-close-film>Close</button>
+  </dialog>
 
-<script src="js/art.js"></script>
-<script src="js/app.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>

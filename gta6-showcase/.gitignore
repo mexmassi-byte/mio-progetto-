@@ -4,3 +4,5 @@ preview/
 *.log
 output/*.png
 footage/
+.taste-skill/inspect/
+.impeccable/review/

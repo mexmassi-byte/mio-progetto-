@@ -19,7 +19,7 @@ const page = await browser.newPage({ viewport: { width: 1512, height: 906 }, dev
 page.on('pageerror', (e) => console.log('pageerror:', e.message));
 page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') console.log('console:', m.text()); });
 const t0 = Date.now();
-await page.goto(`http://127.0.0.1:${port}/site/index.html?rec`);
+await page.goto(`http://127.0.0.1:${port}/site-v1/index.html?rec`);
 await page.evaluate(() => window.__rec.ready);
 console.log('ready in', Date.now() - t0, 'ms');
 const info = await page.evaluate(() => window.__rec.info());
