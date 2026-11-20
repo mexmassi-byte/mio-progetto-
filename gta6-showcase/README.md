@@ -12,6 +12,36 @@ gleitet, Hover‑Effekte auslöst und gleichmäßig nach unten scrollt.
 > Logos oder Videos verwendet: Skyline, Palmen, Brücke, Motive und das MacBook sind
 > vollständig prozedural (Code) erzeugt.
 
+## „Vice City is open“ – neue Fan‑Seite + 9:16‑Film (v2)
+
+Neu gebaut mit den Design‑Skills *impeccable*, *design-taste-frontend* und *design-motion-principles*
+(Richtung: **Ocean Drive, after dark**). Die Seite in `site/` sieht aus wie die Art‑déco‑Hotels am
+Ocean Drive: jede Sektion ist eine Fassade mit einem senkrechten Leuchtschild, das sagt, was drin ist
+(LEONIDA, PLACES, JASON, LUCIA, DATES, OUT NOW). Ein einziger Lichtschalter macht aus dem Pastell‑Tag
+(Flamingo‑Rosa, Mint) die Neon‑Nacht (Atlantik‑Navy, ein Neon‑Azur). Vier Farben, eine Schrift
+(Big Shoulders), echte Fotos von Miami Beach (Wikimedia Commons, CC‑Lizenzen, Credits im Footer),
+keine Spielbilder. Design‑System: `DESIGN.md`. Die alte Seite liegt in `site-v1/`.
+
+**Film** `output/Vice-City-is-open-9x16.mp4` – 1080 × 1920, 60 fps, 30 s, loopt nahtlos, Original‑Score
+(−14,3 LUFS, True Peak −1,8 dBTP). Footage: dieselben lizenzfreien Pexels‑ und Mixkit‑Clips wie unten, keine Spielbilder:
+
+| Zeit | Bild | Ton |
+| --- | --- | --- |
+| 0 – 2 s | die Seite am Tag, ein Daumen legt „Lights“ um: Neon‑Nacht | Klick, Relais, die Röhren zünden, Half‑Time‑Beat |
+| 2 – 4 s | die Seite hebt sich als 3D‑Objekt vom Bildschirm | Whoosh, Riser, Snare‑Build |
+| 4 – 9 s | die ganze Seite als Band, die Kamera fliegt darüber | Four‑on‑the‑floor, langer Gleit‑Whoosh |
+| 9 – 13,5 s | Landung bei Jason & Lucia, Scroll zu den Filmen, Tipp auf „Play“ | Whoosh auf jedem Scroll, Filter schließt, Klick |
+| 13,5 – 14 s | die Film‑Karte öffnet sich zum Vollbild, aus ihrem eigenen Bildausschnitt | Riser, ein Atemzug Stille |
+| 14 – 26 s | echte Nacht‑Footage aus Miami, auf jedem Schnitt zündet ein Leuchtschild, OPEN baut sich auf | Drop, Lead, ein Hit pro Schnitt, eine Röhre pro Schild |
+| 26 – 30 s | der Film schließt sich in die Seite, Caption *„Our way to celebrate the launch of GTA VI.“*, Licht aus | weiter Dm9, Glocken, Strom aus – zurück zum ersten Frame |
+
+```bash
+node render/render_v2.mjs --out /tmp/v2 --stills 0.3,6,13.46,15,27.5     # Standbilder
+node render/render_v2.mjs --out /tmp/v2                                   # alle 1800 Frames
+BLOOM=0.08 VIGNETTE=0.3 render/encode.sh /tmp/v2 /tmp/v2.mp4 17 0 0
+python3 render/music_v2.py /tmp/score_v2.wav
+```
+
 ## Ergebnis
 
 ![Standbild aus dem Video](output/poster.jpg)
@@ -19,12 +49,13 @@ gleitet, Hover‑Effekte auslöst und gleichmäßig nach unten scrollt.
 | Datei | Inhalt |
 | --- | --- |
 | `output/GTA-VI-MacBook-Showcase.mp4` | finales Video: 2560 × 1440, 60 fps, 50 s, H.264 High (BT.709) + Original‑Soundtrack (AAC 192 kbit/s, −14,5 LUFS) |
+| `output/Vice-City-is-open-9x16.mp4` | **neu (v2):** der Film zur neuen Fan‑Seite, 1080 × 1920, 60 fps, 30 s, loopt, Original‑Score (AAC 256 kbit/s, −14,3 LUFS, True Peak −1,8 dBTP); Cover `output/vice-city-is-open-cover.jpg` |
 | `output/GTA-VI-Launch-Film-9x16.mp4` | Motion Graphic für TikTok / Reels / Shorts: 1080 × 1920, 60 fps, 32 s, H.264 + Original‑Soundtrack (−14 LUFS) |
 | `site/` | die Landingpage (läuft auch ganz normal im Browser) |
 | `scene/` | Three.js‑Szene: MacBook Pro, Tisch, Licht, Kamera |
 | `render/` | deterministischer Frame‑Renderer + ffmpeg‑Encoding |
 
-## Die Landingpage
+## Die Landingpage (v1, jetzt in `site-v1/`)
 
 * **Stil:** mattschwarz, Champagner‑Gold, Frosted Glass (Backdrop‑Blur), Typografie
   aus *Inter* (Display‑Optik) und *Bodoni Moda* (Kursiv‑Akzente, Gold‑Verläufe).

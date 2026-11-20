@@ -61,7 +61,7 @@ export function scroll(t) { return t >= T_BACK ? 0 : scrollA(Math.min(t, T_FILM)
 
 export function lights(t) {
   if (t < T_ON) return 0;
-  if (t < T_OFF) return E.io(clamp((t - T_ON) / 0.9, 0, 1));
+  if (t < T_OFF) return E.io(clamp((t - T_ON) / 0.3, 0, 1));   // a switch, not a dimmer: on the beat
   return 1 - E.io(clamp((t - T_OFF) / 0.45, 0, 1));
 }
 export const lightsAt = (t) => (t >= T_ON ? T_ON : null);
