@@ -61,7 +61,7 @@
           <p class="chap__text">Name the dinner, the wine and the playlist. The crew has it on board before you are.</p>
         </div>
         <div class="chap chap--low" data-chap="4" aria-hidden="true">
-          <p class="statement statement--sm"><span class="statement__a">Wheels up</span><span class="statement__b">while others queue.</span></p>
+          <p class="statement statement--sm"><span class="statement__a">Cleared</span><span class="statement__b">while others queue.</span></p>
           <p class="chap__text">No slot to wait for at the gate. When you are seated, the captain calls for take-off.</p>
         </div>
         <div class="chap chap--mid" data-chap="5" aria-hidden="true">
@@ -89,7 +89,7 @@
 
     <!-- the route: one gold line threads the page from here to the last call -->
     <div class="route-wrap" data-route-wrap>
-      <svg class="route" data-route aria-hidden="true"><path class="route__line" data-route-path d="M0 0"/><path class="route__done" data-route-done d="M0 0"/><g class="route__tip" data-route-tip><path d="M-7 -4 L3 0 L-7 4 L-4.5 0 Z"/></g></svg>
+      <svg class="route" data-route aria-hidden="true"></svg>
 
       <!-- 2 · plan a flight -->
       <section id="plan" class="plan" aria-labelledby="plan-title">
@@ -130,7 +130,7 @@
               </div>
             </div>
           </div>
-          <button class="pill pill--wide" type="submit">Get an instant quote</button>
+          <button class="pill pill--wide" type="submit" data-route-target="plan">Get an instant quote</button>
           <p class="book__note" data-book-note aria-live="polite">No account needed. Reply by phone or email, your choice.</p>
         </form>
       </section>
@@ -143,22 +143,22 @@
           <div class="race__row">
             <p class="race__name">Commercial</p>
             <ol class="race__bar race__bar--slow">
-              <li style="--w:30">Drive and park</li>
-              <li style="--w:25">Check-in and bags</li>
-              <li style="--w:30">Security</li>
-              <li style="--w:45">Gate and boarding</li>
-              <li style="--w:20">Taxi and queue</li>
+              <li style="--w:30" data-min="30">Drive and park</li>
+              <li style="--w:25" data-min="25">Check-in and bags</li>
+              <li style="--w:30" data-min="30">Security</li>
+              <li style="--w:45" data-min="45">Gate and boarding</li>
+              <li style="--w:20" data-min="20">Taxi and queue</li>
             </ol>
             <p class="race__total"><span>2 h 30</span></p>
           </div>
           <div class="race__row">
             <p class="race__name">Anima Fly</p>
             <ol class="race__bar race__bar--fast">
-              <li style="--w:30">Drive to the aircraft</li>
-              <li style="--w:15">Board</li>
-              <li style="--w:5">Take off</li>
+              <li style="--w:30" data-min="30">Drive to the aircraft</li>
+              <li style="--w:15" data-min="15">Board</li>
+              <li style="--w:5" data-min="5" class="race__short">Take off</li>
             </ol>
-            <p class="race__total"><span>50 min</span></p>
+            <p class="race__total" data-route-target="time"><span>50 min</span></p>
           </div>
           <p class="race__note">Illustrative minutes for a domestic departure. Drive times are the same on both rows.</p>
         </div>
@@ -243,12 +243,12 @@
               <path d="M230 82 Q467 101 575 314" style="--d:4"/>
             </g>
             <g class="map__pins">
-              <circle cx="230" cy="82" r="5.5" class="map__home"/>
+              <circle cx="230" cy="82" r="5.5" class="map__home" data-route-target="map"/>
               <circle cx="243" cy="51" r="3.5"/><circle cx="186" cy="134" r="3.5"/><circle cx="235" cy="213" r="3.5"/><circle cx="60" cy="272" r="3.5"/><circle cx="575" cy="314" r="3.5"/>
             </g>
             <g class="map__labels">
-              <text x="216" y="70" text-anchor="end">Milan Linate</text>
-              <text x="254" y="42">Engadin <tspan>35 min</tspan></text>
+              <text x="214" y="74" text-anchor="end">Milan Linate</text>
+              <text x="236" y="38" text-anchor="end">Engadin <tspan>35 min</tspan></text>
               <text x="176" y="139" text-anchor="end">Nice <tspan>50 min</tspan></text>
               <text x="247" y="218">Olbia <tspan>1 h 05</tspan></text>
               <text x="60" y="296" text-anchor="middle">Ibiza <tspan>1 h 50</tspan></text>
@@ -261,19 +261,13 @@
 
       <!-- 7 · the card -->
       <section id="card" class="card" aria-labelledby="card-title">
-        <div class="metal" aria-hidden="true" data-metal>
-          <div class="metal__face">
-            <svg class="metal__mark" viewBox="0 0 28 20"><path d="M1.5 18.5 14 1.5l12.5 17M7.2 11.8h13.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-            <p class="metal__brand">Anima Fly</p>
-            <p class="metal__chip"></p>
-            <p class="metal__hours">50 hours</p>
-            <p class="metal__kind">Jet Card</p>
-          </div>
+        <div class="metal" data-metal>
+          <img class="metal__img" src="assets/img/jet-card.webp" alt="The ANIMA FLY Jet Card in black brushed metal: 50 hours" width="1420" height="946" loading="lazy" decoding="async">
         </div>
         <div class="card__copy">
           <h2 id="card-title" class="statement statement--sm"><span class="statement__a">One card</span><span class="statement__b">one rate, every hour.</span></h2>
           <p class="body">Buy 25, 50 or 100 hours. The hourly rate is fixed for a year, an aircraft is guaranteed with 24 hours' notice, and there are no blackout dates.</p>
-          <a class="pill" href="#plan">Ask for the card terms</a>
+          <a class="pill" href="#plan" data-route-target="card">Ask for the card terms</a>
         </div>
       </section>
       <div class="ticker" aria-hidden="true"><p data-ticker>Fixed hourly rate · Guaranteed aircraft · 24-hour notice · No blackout dates · Catering on request · Pets welcome on board · Fixed hourly rate · Guaranteed aircraft · 24-hour notice · No blackout dates · Catering on request · Pets welcome on board ·&nbsp;</p></div>

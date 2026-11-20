@@ -1,0 +1,22 @@
+{
+  "surface": "index.html",
+  "authority": "owner comp: a screen recording of a reference site, supplied by the owner in this session",
+  "owner_words": "fallo uguale al video che ti ho mandato, più che puoi, magari migliora cose che trovi possibili da migliorare",
+  "seed": null,
+  "seed_note": "No concept roll: the owner supplied the comp and asked for it as close as possible, so no direction was dealt. Recorded in the surface brief under FORM.",
+  "comp_frames": ".impeccable/review/reference/ref_*.jpg (filmed at an angle, with a social caption on top)",
+  "measurements": [
+    {
+      "label": "hero",
+      "comp": ".impeccable/build/diff/comp-hero.png (ref_001 deskewed by hand: corners 28,188 / 720,128 / 720,640 / 28,640 onto 1340x900)",
+      "build": ".impeccable/build/diff/build-hero.png (desktop_hero_000, cropped to 1340x900)",
+      "report": ".impeccable/build/diff/report.json",
+      "overall": 0.4858,
+      "bands": 0.8839,
+      "structure": 0.2994,
+      "reading": "Bands match (nav, statement block, action row, instrument line). Structure and colour differ because the comp's hero film is a different, wider and bluer shot (a car at the left); this build uses the owner's own film as asked. Indicative only: the comp is a filmed screen."
+    }
+  ],
+  "unmeasured": "where-to, fleet and card frames are cropped by the laptop edge in the recording and cannot be deskewed to a full canvas; compared by eye against ref_025-ref_045.",
+  "updated": "2026-11-20T19:19:33Z"
+}

@@ -1,6 +1,19 @@
 {
   "note": "No direction was dealt for this page: the owner supplied the comp (a reel of a reference site) and asked for it as close as possible. These rules are allowed because the comp does exactly this; each has its reason.",
-  "allow": ["headline-lines", "mixed-font-headline", "numbering", "micro-label", "pinned-over-picture", "no-footage", "edge-text", "side-scroll", "shadow"],
+  "allow": [
+    "headline-lines",
+    "mixed-font-headline",
+    "numbering",
+    "micro-label",
+    "pinned-over-picture",
+    "no-footage",
+    "edge-text",
+    "side-scroll",
+    "shadow",
+    "gradient",
+    "button-fx",
+    "palette-cream"
+  ],
   "reasons": {
     "headline-lines": "The comp's statements are a heavy caps title over two lines answered by one italic serif line (STOP LOSING / DAYS / to the airport.). Kept as the comp sets them.",
     "mixed-font-headline": "The caps grotesque + italic serif answer is the comp's typographic signature.",
@@ -10,6 +23,9 @@
     "no-footage": "The hero is the owner's film, drawn frame by frame on a canvas as the page scrolls.",
     "edge-text": "The fleet is a carousel: the next aircraft is cut by the screen edge on purpose, as in the comp.",
     "side-scroll": "On phones the fleet is a swipe row with snap points.",
-    "shadow": "The framed prints in the light hall hang off the wall and cast a shadow on it, as in the comp."
+    "shadow": "The framed prints in the light hall hang off the wall and cast a shadow on it, as in the comp.",
+    "gradient": "The comp's gold actions are lit metal: a champagne-to-white gradient pill (ref_027, ref_029, ref_045). The impeccable finish review asked for it (FINISH: gold reads as metal, not yellow).",
+    "button-fx": "Same pill: the comp gives it a top light and a soft glow.",
+    "palette-cream": "The pale end of that metal gradient (#fbf3da) is the highlight on the gold, not a cream ground."
   }
 }

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ANIMA FLY jet card: render</title>
+  <!-- Renders assets/img/jet-card.webp: a black brushed-metal card in perspective, gold chip and mark.
+       Served from the repository root so three.js resolves from gta6-showcase/node_modules. -->
+  <script type="importmap">
+    { "imports": { "three": "/gta6-showcase/node_modules/three/build/three.module.js", "three/addons/": "/gta6-showcase/node_modules/three/examples/jsm/" } }
+  </script>
+  <style>
+    @font-face { font-family: 'Archivo'; src: url('/anima-fly/assets/fonts/archivo-latin-wdth-normal.woff2') format('woff2-variations'); font-weight: 100 900; font-stretch: 62% 125%; }
+    @font-face { font-family: 'Instrument Serif'; src: url('/anima-fly/assets/fonts/instrument-serif-latin-400-italic.woff2') format('woff2'); font-style: italic; }
+    html, body { margin: 0; background: transparent; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+const W = 1600, H = 1200;
+await document.fonts.load("800 80px 'Archivo'");
+await document.fonts.load("italic 60px 'Instrument Serif'");
+await document.fonts.ready;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(W, H);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.setClearColor(0x000000, 0);
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.85;
+const key = new THREE.DirectionalLight(0xfff1d6, 2.8); key.position.set(-4, 5, 4); scene.add(key);
+const rim = new THREE.DirectionalLight(0xe8d6a2, 1.4); rim.position.set(4, -1, 2); scene.add(rim);
+
+const camera = new THREE.PerspectiveCamera(26, W / H, 0.1, 100);
+camera.position.set(0, 0, 9.2); camera.lookAt(0, 0, 0);
+
+// the face: brushed black metal, the mark, the name, the hours (gold foil and engraving)
+const CW = 2048, CH = Math.round(2048 / 1.586);
+function faceTexture() {
+  const c = document.createElement('canvas'); c.width = CW; c.height = CH;
+  const g = c.getContext('2d');
+  g.fillStyle = '#16171b'; g.fillRect(0, 0, CW, CH);
+  // brushing: thousands of faint horizontal strokes
+  for (let i = 0; i < 9000; i++) {
+    const y = Math.random() * CH, x = Math.random() * CW, len = 200 + Math.random() * 900;
+    const v = Math.random() < 0.5 ? 255 : 0;
+    g.strokeStyle = `rgba(${v},${v},${v},${0.012 + Math.random() * 0.03})`;
+    g.lineWidth = 1 + Math.random() * 1.5;
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x + len, y + (Math.random() - 0.5) * 2); g.stroke();
+  }
+  const gold = '#e2cf98';
+  // mark
+  g.save(); g.translate(150, 150); g.scale(5.6, 5.6);
+  g.strokeStyle = gold; g.lineWidth = 1.35; g.lineJoin = 'round';
+  g.beginPath(); g.moveTo(1.5, 18.5); g.lineTo(14, 1.5); g.lineTo(26.5, 18.5); g.moveTo(7.2, 11.8); g.lineTo(20.8, 11.8); g.stroke();
+  g.restore();
+  // name
+  g.fillStyle = gold; g.font = "700 expanded 64px 'Archivo'";
+  g.textAlign = 'right'; g.letterSpacing = '18px';
+  g.fillText('ANIMA FLY', CW - 140, 232);
+  // hours, engraved (a dark cut with a light lower lip)
+  g.textAlign = 'left'; g.letterSpacing = '4px';
+  g.font = "800 expanded 122px 'Archivo'";
+  g.fillStyle = 'rgba(255,255,255,0.16)'; g.fillText('50 HOURS', 152, CH - 252);
+  g.fillStyle = '#e9e6df'; g.fillText('50 HOURS', 150, CH - 255);
+  g.letterSpacing = '0px';
+  g.font = "italic 96px 'Instrument Serif'"; g.fillStyle = gold;
+  g.fillText('Jet Card', 150, CH - 128);
+  // a hairline guilloché arc, the only ornament
+  g.strokeStyle = 'rgba(226,207,152,0.18)'; g.lineWidth = 2;
+  for (let k = 0; k < 14; k++) { g.beginPath(); g.arc(CW + 260, CH * 0.5, 620 + k * 26, Math.PI * 0.62, Math.PI * 1.38); g.stroke(); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+function roughTexture() {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 646;
+  const g = c.getContext('2d'); g.fillStyle = '#6e6e6e'; g.fillRect(0, 0, 1024, 646);
+  for (let i = 0; i < 5000; i++) { const y = Math.random() * 646; const v = 80 + Math.random() * 90; g.strokeStyle = `rgb(${v},${v},${v})`; g.globalAlpha = 0.25; g.beginPath(); g.moveTo(Math.random() * 1024, y); g.lineTo(Math.random() * 1024 + 300, y); g.stroke(); }
+  const t = new THREE.CanvasTexture(c); return t;
+}
+
+const cardW = 3.4, cardH = cardW / 1.586, depth = 0.05;
+// the body: a rounded rectangle extruded, with a small bevel that catches the light along the edge
+const R = 0.16;
+const shape = new THREE.Shape();
+shape.moveTo(-cardW / 2 + R, -cardH / 2); shape.lineTo(cardW / 2 - R, -cardH / 2); shape.quadraticCurveTo(cardW / 2, -cardH / 2, cardW / 2, -cardH / 2 + R);
+shape.lineTo(cardW / 2, cardH / 2 - R); shape.quadraticCurveTo(cardW / 2, cardH / 2, cardW / 2 - R, cardH / 2);
+shape.lineTo(-cardW / 2 + R, cardH / 2); shape.quadraticCurveTo(-cardW / 2, cardH / 2, -cardW / 2, cardH / 2 - R);
+shape.lineTo(-cardW / 2, -cardH / 2 + R); shape.quadraticCurveTo(-cardW / 2, -cardH / 2, -cardW / 2 + R, -cardH / 2);
+const bodyGeo = new THREE.ExtrudeGeometry(shape, { depth: depth - 0.02, bevelEnabled: true, bevelThickness: 0.01, bevelSize: 0.012, bevelSegments: 4, curveSegments: 24 });
+bodyGeo.translate(0, 0, -(depth - 0.02) / 2);
+const body = new THREE.Mesh(bodyGeo, new THREE.MeshPhysicalMaterial({ color: 0x1a1b20, metalness: 0.95, roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.15 }));
+const face = new THREE.Mesh(new THREE.PlaneGeometry(cardW - 0.02, cardH - 0.02),
+  new THREE.MeshPhysicalMaterial({ map: faceTexture(), roughnessMap: roughTexture(), metalness: 0.85, roughness: 0.42, clearcoat: 0.6, clearcoatRoughness: 0.18 }));
+face.position.z = depth / 2 + 0.001;
+// rounded corners on the face: an alpha mask
+{
+  const c = document.createElement('canvas'); c.width = 512; c.height = Math.round(512 / 1.586);
+  const g = c.getContext('2d'); g.fillStyle = '#000'; g.fillRect(0, 0, c.width, c.height);
+  const r = 512 * (0.16 / cardW); g.fillStyle = '#fff'; g.beginPath(); g.roundRect(0, 0, c.width, c.height, r); g.fill();
+  face.material.alphaMap = new THREE.CanvasTexture(c); face.material.transparent = true;
+}
+const chipMat = new THREE.MeshPhysicalMaterial({ color: 0xd9c08a, metalness: 1, roughness: 0.28 });
+const chip = new THREE.Mesh(new RoundedBoxGeometry(0.42, 0.32, 0.02, 4, 0.05), chipMat);
+chip.position.set(-cardW / 2 + 0.52, 0.02, depth / 2 + 0.01);
+const chipLines = new THREE.Group();
+for (const [x, y, w, h] of [[0, 0, 0.42, 0.006], [0, 0.07, 0.42, 0.006], [0, -0.07, 0.42, 0.006], [-0.07, 0, 0.006, 0.32], [0.07, 0, 0.006, 0.32]]) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: 0x8a7444 }));
+  m.position.set(chip.position.x + x, chip.position.y + y, depth / 2 + 0.0215); chipLines.add(m);
+}
+const card = new THREE.Group(); card.add(body, face, chip, chipLines);
+card.rotation.set(THREE.MathUtils.degToRad(16), THREE.MathUtils.degToRad(-30), THREE.MathUtils.degToRad(-7), 'YXZ');
+scene.add(card);
+
+// a soft shadow under the card, on nothing: the card floats (taste-skill-ignore: a rendered object's own shadow)
+{
+  const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+  const g = c.getContext('2d'); const grd = g.createRadialGradient(128, 128, 10, 128, 128, 128);
+  grd.addColorStop(0, 'rgba(0,0,0,0.55)'); grd.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = grd; g.fillRect(0, 0, 256, 256);
+  const sh = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 1.1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+  sh.position.set(0.15, -1.62, -0.6); scene.add(sh);
+}
+
+renderer.render(scene, camera);
+window.__done = true;
+</script>
+</body>
+</html>

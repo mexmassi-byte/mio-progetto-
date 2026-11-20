@@ -178,7 +178,7 @@
   const words4 = $$('.jet__word');
   const hall = $$('.frame');
   const map = $('[data-map]'), arcs = $$('.map__arcs path');
-  const metal = $('[data-metal] .metal__face');
+  const metal = $('[data-metal] .metal__img');
   const race = $('[data-race]');
   const lastSky = $('.last__sky');
   const rise = $$('.plan__copy, .book, .time > .statement, .time > .body, .race, .fleet__head, .details__copy, .runways__copy, .map, .card__copy, .metal, .last__copy');
@@ -193,52 +193,67 @@
     buildRoute();
   }
 
-  /* ------------------------------------------------ the route: one gold line, drawn as you fly down */
-  const wrap = $('[data-route-wrap]'), svg = $('[data-route]'), path = $('[data-route-path]'), done = $('[data-route-done]'), tip = $('[data-route-tip]');
-  let samples = [], total = 0;
+  /* ------------------------------------------------ the route: gold legs that draw as you fly down and land on things */
+  // one leg per section, each ends with an arrowhead on its target: the quote button, the minutes you get
+  // back, Linate on the map, the card's call and the last pill. The line is drawn up to the point that
+  // sits 62% down the screen, so it advances exactly with the scroll.
+  const wrap = $('[data-route-wrap]'), svg = $('[data-route]');
+  const NS = 'http://www.w3.org/2000/svg';
+  let legs = [];
+  function leg() {
+    const line = document.createElementNS(NS, 'path'); line.setAttribute('class', 'route__line');
+    const done = document.createElementNS(NS, 'path'); done.setAttribute('class', 'route__done');
+    const tip = document.createElementNS(NS, 'g'); tip.setAttribute('class', 'route__tip');
+    const head = document.createElementNS(NS, 'path'); head.setAttribute('d', 'M-7 -4 L3 0 L-7 4 L-4.5 0 Z'); tip.appendChild(head);
+    svg.append(line, done, tip);
+    return { line, done, tip, samples: [], total: 0 };
+  }
   function buildRoute() {
-    const W = wrap.clientWidth, H = wrap.clientHeight;
-    const top = wrap.getBoundingClientRect().top + window.scrollY;
-    const y = (el, f = 0) => { const b = el.getBoundingClientRect(); return b.top + window.scrollY - top + b.height * f; };
+    const W = wrap.clientWidth;
+    const wr = wrap.getBoundingClientRect(), top = wr.top + window.scrollY;
+    const box = (el) => { const b = el.getBoundingClientRect(); return { l: b.left - wr.left, r: b.right - wr.left, t: b.top - wr.top, b: b.bottom - wr.top, cx: (b.left + b.right) / 2 - wr.left, cy: (b.top + b.bottom) / 2 - wr.top }; };
     const narrow = W < 700;
-    const rx = narrow ? W - 10 : W - Math.max(18, parseFloat(getComputedStyle(html).getPropertyValue('--margin')) / 2 || 32);
-    const plan = $('#plan'), time = $('.time'), details = $('#details'), runways = $('#runways'), card = $('#card'), last = $('.last');
-    const pill = $('[data-last-pill]').getBoundingClientRect();
-    const pillX = pill.right - wrap.getBoundingClientRect().left + 26, pillY = pill.top + window.scrollY - top + pill.height / 2;
-    const x0 = narrow ? W * 0.8 : W * 0.56;
-    const cardTop = y($('[data-book]'), 0) - 24;
-    const d = [
-      `M${x0} 0`,
-      `C${x0} ${cardTop * 0.55}, ${rx} ${cardTop * 0.22}, ${rx} ${cardTop}`,
-      `L${rx} ${y(plan, 0.6)}`,
-      `L${rx} ${y(time, 0.5)}`,
-      `C${rx} ${y(time, 0.85)}, ${rx - 40} ${y(time, 0.95)}, ${rx} ${y(details, 0.05)}`,
-      `L${rx} ${y(runways, 0.5)}`,
-      `C${rx} ${y(runways, 0.8)}, ${rx - 30} ${y(card, 0.1)}, ${rx} ${y(card, 0.3)}`,
-      `L${rx} ${y(last, 0.25)}`,
-      `C${rx} ${y(last, 0.5)}, ${pillX + 80} ${pillY}, ${pillX} ${pillY}`,
-    ].join(' ');
-    path.setAttribute('d', d); done.setAttribute('d', d);
-    total = path.getTotalLength();
-    done.style.strokeDasharray = `${total} ${total}`;
-    samples = [];
-    for (let l = 0; l <= total; l += 6) { const pt = path.getPointAtLength(l); samples.push([l, pt.y, pt.x]); }
+    const gutter = narrow ? W - 10 : W - Math.max(18, (parseFloat(getComputedStyle(html).getPropertyValue('--margin')) || 64) / 2);
+    const T = (k) => box($(`[data-route-target="${k}"]`));
+    const plan = box($('#plan')), time = box($('.time')), runways = box($('#runways')), card = box($('#card')), last = box($('.last'));
+    const quote = T('plan'), mins = T('time'), home = T('map'), call = T('card'), pill = box($('[data-last-pill]'));
+    const book = box($('[data-book]'));
+    const ds = [
+      // over the booking card, down its side, into the quote button
+      `M${narrow ? gutter : W * 0.56} ${plan.t} C${narrow ? gutter : W * 0.56} ${plan.t + (book.t - plan.t) * 0.6}, ${gutter} ${book.t - 60}, ${gutter} ${book.t - 10} L${gutter} ${quote.cy - 70} C${gutter} ${quote.cy - 20}, ${quote.r + 50} ${quote.cy}, ${quote.r + 12} ${quote.cy}`,
+      // down from the top of the time section onto the minutes you get back
+      `M${gutter} ${time.t + 30} L${gutter} ${mins.cy - 90} C${gutter} ${mins.cy - 20}, ${mins.r + 60} ${mins.cy}, ${mins.r + 14} ${mins.cy}`,
+      // into the map, landing on Linate where the arcs begin
+      `M${gutter} ${narrow ? box($('[data-map]')).t - 30 : runways.t + 20} C${gutter} ${narrow ? home.cy - 60 : home.cy - 150}, ${home.cx + 150} ${home.cy - 70}, ${home.cx + 10} ${home.cy - 6}`,
+      // onto the card's call
+      `M${gutter} ${card.t + 20} L${gutter} ${call.cy - 80} C${gutter} ${call.cy - 20}, ${call.r + 50} ${call.cy}, ${call.r + 12} ${call.cy}`,
+      // the last call: an arc to the pill
+      `M${gutter} ${last.t + last.b * 0 + (pill.cy - last.t) * 0.25} C${gutter} ${pill.cy - 40}, ${pill.r + 90} ${pill.cy}, ${pill.r + 14} ${pill.cy}`,
+    ];
+    while (legs.length < ds.length) legs.push(leg());
+    legs.forEach((g, i) => {
+      g.line.setAttribute('d', ds[i]); g.done.setAttribute('d', ds[i]);
+      g.total = g.line.getTotalLength();
+      g.done.style.strokeDasharray = `${g.total} ${g.total}`;
+      g.samples = [];
+      for (let l = 0; l <= g.total; l += 4) { const pt = g.line.getPointAtLength(l); g.samples.push([l, pt.y]); }
+    });
     M.wrapTop = top;
   }
   function routeAt(scrollY) {
-    if (!samples.length) return;
     const yLine = scrollY + M.vh * 0.62 - M.wrapTop;
-    let lo = 0, hi = samples.length - 1;
-    // the path only moves downwards, so the samples are ordered by y
-    while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (samples[mid][1] <= yLine) lo = mid; else hi = mid - 1; }
-    let len = samples[lo][0];
-    if (yLine <= 0) len = 0;
-    if (yLine >= samples[samples.length - 1][1]) len = total;
-    done.style.strokeDashoffset = (total - len).toFixed(1);
-    const a = path.getPointAtLength(Math.max(0, len - 2)), b = path.getPointAtLength(Math.min(total, len + 0.01));
-    const ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
-    tip.setAttribute('transform', `translate(${b.x.toFixed(1)} ${b.y.toFixed(1)}) rotate(${ang.toFixed(1)})`);
-    tip.style.opacity = len > 4 ? 1 : 0;
+    for (const g of legs) {
+      const s = g.samples; if (!s.length) continue;
+      // the drawn length: the furthest sample at or above the line (legs only travel downwards)
+      let len = 0;
+      if (yLine >= s[s.length - 1][1]) len = g.total;
+      else for (const [l, y] of s) { if (y <= yLine) len = l; }
+      if (reduce.matches) len = g.total;
+      g.done.style.strokeDashoffset = (g.total - len).toFixed(1);
+      const a = g.line.getPointAtLength(Math.max(0, len - 2)), b = g.line.getPointAtLength(Math.min(g.total, len + 0.01));
+      g.tip.setAttribute('transform', `translate(${b.x.toFixed(1)} ${b.y.toFixed(1)}) rotate(${(Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI).toFixed(1)})`);
+      g.tip.style.opacity = len > 4 ? 1 : 0;
+    }
   }
 
   /* ------------------------------------------------ one frame of the page */
@@ -297,8 +312,8 @@
       if (reduce.matches) return;
       const b = host.getBoundingClientRect();
       const x = (e.clientX - b.left) / b.width - 0.5, y = (e.clientY - b.top) / b.height - 0.5;
-      metal.style.setProperty('--tilt-y', (-16 + x * 18).toFixed(2));
-      metal.style.setProperty('--tilt-x', (8 - y * 14).toFixed(2));
+      metal.style.setProperty('--tilt-y', (x * 12).toFixed(2));
+      metal.style.setProperty('--tilt-x', (-y * 9).toFixed(2));
     });
     host.addEventListener('pointerleave', () => { metal.style.removeProperty('--tilt-y'); metal.style.removeProperty('--tilt-x'); });
   }
