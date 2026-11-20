@@ -27,7 +27,7 @@ Cinematic and calm, never flashy. The film does the persuading and the type stay
 ## Brand commitments
 - Dusk aviation: dark ground, a champagne-gold accent, warm white type.
 - A heavy wide grotesque for statements, paired with an italic serif line.
-- One continuous flight path (a gold line) threads the page from the hero to the last call.
+- A gold flight path threads the page after the hero: one leg per section, each drawn with the scroll and landing on what you can act on.
 
 ## Principles
 1. The film leads; text sits where the picture is calm.

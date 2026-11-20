@@ -1,0 +1,463 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-20T00:00:00Z",
+  "title": "Design System: ANIMA FLY",
+  "extensions": {
+    "colorMeta": {
+      "champagne-gold": {
+        "role": "primary",
+        "displayName": "Champagne Gold",
+        "canonical": "oklch(87.8% 0.070 91)",
+        "tonalRamp": [
+          "#100a00",
+          "#292106",
+          "#483c17",
+          "#6c5c2b",
+          "#907f4e",
+          "#b5a371",
+          "#d8caa1",
+          "#f9eece"
+        ],
+        "note": "Flat for lines, pins, mark and focus; the centre stop of the metal gradient on actions."
+      },
+      "gold-deep": {
+        "role": "primary",
+        "displayName": "Gold Deep",
+        "canonical": "oklch(75.9% 0.088 88)",
+        "tonalRamp": [
+          "#120a00",
+          "#2c2000",
+          "#4c3a05",
+          "#725a16",
+          "#967d3e",
+          "#bba262",
+          "#dec996",
+          "#feedc6"
+        ],
+        "note": "Shadow stop of the metal gradient."
+      },
+      "gold-highlight": {
+        "role": "primary",
+        "displayName": "Gold Highlight",
+        "canonical": "#fbf3da",
+        "tonalRamp": [
+          "#100a00",
+          "#292106",
+          "#483c17",
+          "#6c5c2b",
+          "#907f4e",
+          "#b5a371",
+          "#d8caa1",
+          "#fbf3da"
+        ],
+        "note": "Lit edge of the metal gradient; never a ground."
+      },
+      "gold-ink": {
+        "role": "primary",
+        "displayName": "Gold Ink",
+        "canonical": "oklch(20.8% 0.028 88)",
+        "tonalRamp": [
+          "#0d0b06",
+          "#252118",
+          "#423d30",
+          "#645d4c",
+          "#87806e",
+          "#aca491",
+          "#d0caba",
+          "#f3eee2"
+        ]
+      },
+      "night-ground": {
+        "role": "neutral",
+        "displayName": "Night Ground",
+        "canonical": "oklch(16.3% 0.023 276)",
+        "tonalRamp": [
+          "#0a0b10",
+          "#202129",
+          "#3a3c47",
+          "#5a5d6b",
+          "#7c7f8f",
+          "#a0a4b4",
+          "#c7cad7",
+          "#ebeef9"
+        ]
+      },
+      "violet-night": {
+        "role": "neutral",
+        "displayName": "Violet Night",
+        "canonical": "oklch(19.8% 0.047 283)",
+        "tonalRamp": [
+          "#0a0a14",
+          "#20202f",
+          "#3a3b51",
+          "#5a5a78",
+          "#7c7d9c",
+          "#a0a1c2",
+          "#c6c8e3",
+          "#ebecff"
+        ]
+      },
+      "blue-night": {
+        "role": "neutral",
+        "displayName": "Blue Night",
+        "canonical": "oklch(20.6% 0.054 270)",
+        "tonalRamp": [
+          "#070b16",
+          "#1b2132",
+          "#343c54",
+          "#525c7d",
+          "#737fa1",
+          "#97a4c8",
+          "#bfcae8",
+          "#e6eeff"
+        ]
+      },
+      "booking-surface": {
+        "role": "neutral",
+        "displayName": "Booking Surface",
+        "canonical": "#1b1a35",
+        "tonalRamp": [
+          "#0a0a14",
+          "#1b1a35",
+          "#3a3b51",
+          "#5a5a78",
+          "#7c7d9c",
+          "#a0a1c2",
+          "#c6c8e3",
+          "#ebecff"
+        ]
+      },
+      "warm-white": {
+        "role": "neutral",
+        "displayName": "Warm White",
+        "canonical": "oklch(96.1% 0.004 91)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#222220",
+          "#3e3d3b",
+          "#5e5d5b",
+          "#81807d",
+          "#a5a4a2",
+          "#cbcac8",
+          "#f3f2ef"
+        ]
+      },
+      "warm-white-soft": {
+        "role": "neutral",
+        "displayName": "Warm White 74%",
+        "canonical": "rgba(243, 242, 239, 0.74)",
+        "tonalRamp": [],
+        "note": "Body, nav, secondary values."
+      },
+      "warm-white-faint": {
+        "role": "neutral",
+        "displayName": "Warm White 56%",
+        "canonical": "rgba(243, 242, 239, 0.56)",
+        "tonalRamp": [],
+        "note": "Labels, notes, captions."
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "rgba(244, 239, 230, 0.14)",
+        "tonalRamp": [],
+        "note": "Field borders and control rings, 8-20% in use."
+      },
+      "light-hall": {
+        "role": "neutral",
+        "displayName": "Light Hall",
+        "canonical": "oklch(92.7% 0.004 106)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#222220",
+          "#3d3d3b",
+          "#5e5e5b",
+          "#80807e",
+          "#a5a5a2",
+          "#cbcbc8",
+          "#e7e7e4"
+        ]
+      },
+      "hall-ink": {
+        "role": "neutral",
+        "displayName": "Hall Ink",
+        "canonical": "oklch(20.5% 0.014 292)",
+        "tonalRamp": [
+          "#0b0b0e",
+          "#17161d",
+          "#3d3c43",
+          "#5d5c65",
+          "#807f88",
+          "#a4a3ad",
+          "#cac9d1",
+          "#eeedf4"
+        ]
+      },
+      "hall-grey": {
+        "role": "neutral",
+        "displayName": "Hall Grey",
+        "canonical": "oklch(46.8% 0.023 295)",
+        "tonalRamp": [
+          "#0b0a0f",
+          "#222028",
+          "#3e3b46",
+          "#5b5866",
+          "#817e8d",
+          "#a5a2b2",
+          "#cbc8d5",
+          "#efedf7"
+        ]
+      },
+      "error-coral": {
+        "role": "tertiary",
+        "displayName": "Error Coral",
+        "canonical": "#e98a7a",
+        "tonalRamp": [],
+        "note": "Validation border only."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display Statement",
+        "purpose": "Hero opener, the finale chapter and the last call. Uppercase, Archivo 800 at width 125%."
+      },
+      "display-answer": {
+        "displayName": "Display Answer",
+        "purpose": "Instrument Serif italic line answering a display statement."
+      },
+      "headline": {
+        "displayName": "Headline Statement",
+        "purpose": "Section statements and later hero chapters. Uppercase, Archivo 800 at width 125%."
+      },
+      "headline-answer": {
+        "displayName": "Headline Answer",
+        "purpose": "Instrument Serif italic line answering a headline."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Aircraft names, uppercase."
+      },
+      "figure": {
+        "displayName": "Instrument Figure",
+        "purpose": "Altitude readout; same voice for fleet position and race totals. Tabular."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "One supporting paragraph per statement, 40-46ch."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Notes, captions, legal."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Nav, HUD labels, field labels, spec terms, pill text, ticker. Uppercase, 0.1-0.16em."
+      }
+    },
+    "shadows": [
+      {
+        "name": "metal-pill",
+        "value": "inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 0 24px rgba(232, 214, 162, 0.28)",
+        "purpose": "Top light and soft glow of the gold metal action. Comp-driven exception recorded in .taste-skill/direction.json."
+      },
+      {
+        "name": "hung-print",
+        "value": "0 30px 50px -24px rgba(23, 22, 29, 0.45), 0 4px 10px rgba(23, 22, 29, 0.08)",
+        "purpose": "A framed print hanging off the light hall's wall. Only there."
+      },
+      {
+        "name": "ghost-ring",
+        "value": "inset 0 0 0 1px rgba(243, 242, 239, 0.4)",
+        "purpose": "Ring of the ghost pill over film."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "State transitions: pills 220ms, bar 400ms, swap 300ms, card tilt 600ms."
+      },
+      {
+        "name": "ease-io",
+        "value": "cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "The scroll cue's drawing line, 1.8s loop."
+      },
+      {
+        "name": "flight-scrub",
+        "value": "289 frames, pinned 900svh (820svh phones)",
+        "purpose": "Hero canvas scrubs the owner's film in legs with the scroll; two cabin stills crossfade in between."
+      },
+      {
+        "name": "chapter-in",
+        "value": "opacity 0-1, translateY 26px, blur up to 6px",
+        "purpose": "Hero chapters arrive and leave with the scroll."
+      },
+      {
+        "name": "reveal-once",
+        "value": "opacity 0.3 to 1, translateY 24px to 0, ease-out cubic",
+        "purpose": "Section blocks rise from a visible default and never hide again on scroll-up."
+      },
+      {
+        "name": "route-draw",
+        "value": "draw head at 62% of viewport height",
+        "purpose": "Gold legs advance exactly with the scroll and end in arrowheads on their targets."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "one still per leg (frames 20, 80, 130, 205, 262)",
+        "purpose": "Film holds a still per leg; reveals, arcs and route render complete; loops and tilt stop."
+      },
+      {
+        "name": "record-mode",
+        "value": "?rec -> window.__af.step({scroll, t})",
+        "purpose": "Disables transitions and animations; capture scripts step scroll and clock deterministically."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "700px"
+      },
+      {
+        "name": "tablet",
+        "value": "1024px"
+      }
+    ],
+    "gradients": [
+      {
+        "name": "metal-gold",
+        "value": "linear-gradient(100deg, #fbf3da 0%, #e8d6a2 38%, #c8ae6e 72%, #f2e4b6 100%)",
+        "purpose": "Gold actions, the HUD progress fill and the private row of the time race."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Metal Pill",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The gold action: lit metal gradient, top light, soft glow.",
+      "html": "<a class=\"ds-pill\" href=\"#\">Plan a flight</a>",
+      "css": ".ds-pill{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 26px;border:0;border-radius:999px;background:linear-gradient(100deg, #fbf3da 0%, #e8d6a2 38%, #c8ae6e 72%, #f2e4b6 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 0 24px rgba(232,214,162,.28);color:#1d1708;font:600 13px/1 Archivo,'Helvetica Neue',Arial,sans-serif;font-stretch:112%;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:filter 220ms cubic-bezier(.22,1,.36,1),transform 220ms cubic-bezier(.22,1,.36,1)}.ds-pill:hover{filter:brightness(1.07);transform:translateY(-1px)}.ds-pill:active{transform:scale(.98)}.ds-pill:focus-visible{outline:2px solid #e8d6a2;outline-offset:3px}"
+    },
+    {
+      "name": "Ghost Pill",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Over film: night glass with a warm-white ring, turns to metal on hover.",
+      "html": "<div class=\"ds-night\"><a class=\"ds-ghost\" href=\"#\">Plan your first flight</a></div>",
+      "css": ".ds-night{background:#0b0d18;padding:24px}.ds-ghost{display:inline-flex;align-items:center;min-height:48px;padding:0 26px;border-radius:999px;background:rgba(11,13,24,.55);box-shadow:inset 0 0 0 1px rgba(243,242,239,.4);color:#f3f2ef;font:600 13px/1 Archivo,'Helvetica Neue',Arial,sans-serif;font-stretch:112%;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:filter 220ms cubic-bezier(.22,1,.36,1),transform 220ms cubic-bezier(.22,1,.36,1)}.ds-ghost:hover{background:linear-gradient(100deg, #fbf3da 0%, #e8d6a2 38%, #c8ae6e 72%, #f2e4b6 100%);color:#1d1708;transform:translateY(-1px)}.ds-ghost:focus-visible{outline:2px solid #e8d6a2;outline-offset:3px}"
+    },
+    {
+      "name": "Statement",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "Caps grotesque statement answered by one italic serif line.",
+      "html": "<div class=\"ds-night\"><h2 class=\"ds-st\"><span class=\"ds-st-a\">Four cabins</span><span class=\"ds-st-b\">one standard.</span></h2></div>",
+      "css": ".ds-night{background:#0e1530;color:#f3f2ef;padding:32px}.ds-st{margin:0;font-weight:400}.ds-st-a{display:block;font:800 56px/.9 Archivo,'Helvetica Neue',Arial,sans-serif;font-stretch:125%;text-transform:uppercase;letter-spacing:-.012em}.ds-st-b{display:block;font:italic 400 50px/1.02 'Instrument Serif','Times New Roman',serif;letter-spacing:-.01em;margin-top:.06em}"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Booking field: label on top, gold focus border, coral error.",
+      "html": "<div class=\"ds-panel\"><label class=\"ds-field\"><span class=\"ds-field-label\">From</span><input placeholder=\"Departure airport or city\"></label></div>",
+      "css": ".ds-panel{background:#1b1a35;padding:24px;border-radius:22px;border:1px solid rgba(244,239,230,.1)}.ds-field{display:grid;gap:8px;padding:14px 16px;background:rgba(0,0,0,.24);border:1px solid rgba(244,239,230,.08);border-radius:14px;transition:border-color 200ms}.ds-field:focus-within{border-color:rgba(232,214,162,.7)}.ds-field-label{font:600 13px/1 Archivo,'Helvetica Neue',Arial,sans-serif;font-stretch:112%;letter-spacing:.14em;text-transform:uppercase;color:rgba(243,242,239,.56)}.ds-field input{background:none;border:0;padding:0;color:#f3f2ef;font:500 16px/1.3 Archivo,'Helvetica Neue',Arial,sans-serif;caret-color:#e8d6a2;outline:none}.ds-field input::placeholder{color:rgba(243,242,239,.62)}"
+    },
+    {
+      "name": "Segment Tabs",
+      "kind": "chip",
+      "refersTo": "segment-selected",
+      "description": "Trip type: pill track, selected option fills warm white.",
+      "html": "<div class=\"ds-tabs\"><span class=\"ds-tab is-on\">One way</span><span class=\"ds-tab\">Round trip</span><span class=\"ds-tab\">Multi-leg</span></div>",
+      "css": ".ds-tabs{display:inline-flex;gap:6px;padding:5px;background:#13122a;box-shadow:inset 0 0 0 100px rgba(0,0,0,.25);border-radius:999px}.ds-tab{padding:10px 16px;border-radius:999px;font:600 13px/1 Archivo,'Helvetica Neue',Arial,sans-serif;font-stretch:112%;letter-spacing:.1em;text-transform:uppercase;color:rgba(243,242,239,.74);cursor:pointer;transition:background-color 220ms cubic-bezier(.22,1,.36,1),color 220ms}.ds-tab:hover{color:#f3f2ef}.ds-tab.is-on{background:#f3f2ef;color:#0b0d18}"
+    },
+    {
+      "name": "Top Bar",
+      "kind": "nav",
+      "refersTo": "",
+      "description": "Brand mark and name, four label anchors, the small metal pill. Solid night after the flight.",
+      "html": "<header class=\"ds-bar\"><span class=\"ds-brand\"><svg viewBox=\"0 0 28 20\" width=\"26\" height=\"19\"><path d=\"M1.5 18.5 14 1.5l12.5 17M7.2 11.8h13.6\" fill=\"none\" stroke=\"#e8d6a2\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/></svg>Anima Fly</span><nav class=\"ds-nav\"><a href=\"#\">Fleet</a><a href=\"#\">Experience</a><a href=\"#\">Jet Card</a></nav><a class=\"ds-pill-sm\" href=\"#\">Plan a flight</a></header>",
+      "css": ".ds-bar{display:flex;align-items:center;gap:32px;padding:12px 32px;background:rgba(11,13,24,.86);color:#f3f2ef}.ds-brand{display:inline-flex;align-items:center;gap:12px;font:700 14px/1 Archivo,'Helvetica Neue',Arial,sans-serif;font-stretch:125%;letter-spacing:.22em;text-transform:uppercase}.ds-nav{display:flex;gap:28px}.ds-nav a{font:600 13px/1 Archivo,'Helvetica Neue',Arial,sans-serif;font-stretch:112%;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:rgba(243,242,239,.74);transition:color 200ms}.ds-nav a:hover{color:#f3f2ef}.ds-nav a:focus-visible{outline:2px solid #e8d6a2;outline-offset:3px}.ds-pill-sm{margin-left:auto;display:inline-flex;align-items:center;min-height:40px;padding:0 20px;border-radius:999px;background:linear-gradient(100deg, #fbf3da 0%, #e8d6a2 38%, #c8ae6e 72%, #f2e4b6 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 0 24px rgba(232,214,162,.28);color:#1d1708;font:600 13px/1 Archivo,'Helvetica Neue',Arial,sans-serif;font-stretch:112%;letter-spacing:.1em;text-transform:uppercase;text-decoration:none}"
+    },
+    {
+      "name": "Flight HUD",
+      "kind": "custom",
+      "refersTo": "figure",
+      "description": "Instrument line on the pinned film: GS, HDG, ETE, ALTITUDE and the metal progress track.",
+      "html": "<div class=\"ds-hud\"><dl class=\"ds-hud-row\"><div><dt>GS</dt><dd>470 kt</dd></div><div><dt>HDG</dt><dd>251°</dd></div><div><dt>ETE</dt><dd>00:41</dd></div></dl><div class=\"ds-alt\"><span class=\"ds-hud-l\">Altitude</span><span class=\"ds-num\">45,000<small>ft</small></span></div><div class=\"ds-track\"><span></span></div></div>",
+      "css": ".ds-hud{display:grid;grid-template-columns:1fr auto;align-items:end;gap:0 24px;padding:24px;background:#0b0d18;color:#f3f2ef}.ds-hud-row{display:flex;gap:28px;margin:0}.ds-hud-row div{display:flex;gap:8px;align-items:baseline}.ds-hud-row dt,.ds-hud-l{font:600 13px/1 Archivo,'Helvetica Neue',Arial,sans-serif;font-stretch:112%;letter-spacing:.16em;text-transform:uppercase;color:rgba(243,242,239,.56)}.ds-hud-row dd{margin:0;font:600 13px/1 Archivo,'Helvetica Neue',Arial,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.04em}.ds-alt{display:grid;justify-items:end;gap:6px}.ds-num{font:700 44px/.9 Archivo,'Helvetica Neue',Arial,sans-serif;font-stretch:125%;font-variant-numeric:tabular-nums}.ds-num small{font:600 13px/1 Archivo,sans-serif;letter-spacing:.14em;text-transform:uppercase;margin-left:6px;color:rgba(243,242,239,.74)}.ds-track{grid-column:1/-1;height:2px;margin-top:14px;background:rgba(244,239,230,.16)}.ds-track span{display:block;height:100%;width:72%;background:linear-gradient(100deg, #fbf3da 0%, #e8d6a2 38%, #c8ae6e 72%, #f2e4b6 100%)}"
+    },
+    {
+      "name": "Route Leg",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "A gold leg over its faint dashed track, ending in an arrowhead on its target.",
+      "html": "<div class=\"ds-night\"><svg class=\"ds-route\" viewBox=\"0 0 320 160\" width=\"320\" height=\"160\"><path class=\"ds-route-line\" d=\"M300 0 L300 70 C300 120 220 130 150 130\"/><path class=\"ds-route-done\" d=\"M300 0 L300 70 C300 120 220 130 150 130\"/><path class=\"ds-route-tip\" transform=\"translate(150 130) rotate(180)\" d=\"M-7 -4 L3 0 L-7 4 L-4.5 0 Z\"/></svg></div>",
+      "css": ".ds-night{background:#13122a;padding:16px}.ds-route-line{fill:none;stroke:rgba(232,214,162,.16);stroke-width:1.2;stroke-dasharray:2 7}.ds-route-done{fill:none;stroke:#e8d6a2;stroke-width:1.6;stroke-linecap:round}.ds-route-tip{fill:#e8d6a2}"
+    },
+    {
+      "name": "Hung Print",
+      "kind": "card",
+      "refersTo": "",
+      "description": "A photograph in an off-white mat, hung on a wire in the light hall, casting its shadow on the wall.",
+      "html": "<div class=\"ds-hall\"><figure class=\"ds-frame\"><span class=\"ds-wire\"></span><div class=\"ds-print\"></div></figure></div>",
+      "css": ".ds-hall{background:#e7e7e4;padding:90px 40px 40px}.ds-frame{position:relative;margin:0;width:140px;rotate:-1.5deg;transform-origin:50% -60px}.ds-wire{position:absolute;left:50%;bottom:100%;width:1px;height:60px;background:rgba(23,22,29,.35)}.ds-print{aspect-ratio:3/4;border-radius:10px;border:8px solid #f8f6f1;background:linear-gradient(160deg,#9fc7cf,#3d6f86);box-shadow:0 30px 50px -24px rgba(23,22,29,.45),0 4px 10px rgba(23,22,29,.08)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Flight Deck at Dusk",
+    "overview": "The page is one flight, and the system is built from what a flight at dusk is made of: a night sky going from violet to blue, champagne light catching metal, warm white instrument type, and one gold course line that lands on its targets. The owner's film carries the persuasion; type sits where the picture is calm, on neutral scrims, and steps aside.\n\nDensity is low and cinematic. Each section is one statement and one supporting block, set wide on a single night ground that changes tone by chapter (violet for planning, blue for the runways), with one daylight interruption: the light hall where three framed prints hang on wires. Everything that moves is a pure function of scroll position, so the same scroll always draws the same frame.\n\nThe world follows the owner's comp (a reference reel) closely by request. Its gold metal pills, outlined fleet words, hanging gallery, route lines and jet card are the comp's devices, kept on purpose. The comp's small labels above the titles were removed and stay removed.",
+    "keyCharacteristics": [
+      "Statements in a heavy expanded caps grotesque, answered by one italic serif line.",
+      "Champagne gold as lit metal, reserved for actions, the flight's progress and the route.",
+      "Night grounds in three tones, plus one light hall.",
+      "Numbers are instruments: tabular, live, and always meaningful.",
+      "Scroll-scrubbed film, scroll-drawn lines, reveals that arrive once from a visible default."
+    ],
+    "rules": [
+      {
+        "name": "The Metal Gold Rule",
+        "section": "colors",
+        "body": "Gold on an action is lit metal: `linear-gradient(100deg, #fbf3da 0%, #e8d6a2 38%, #c8ae6e 72%, #f2e4b6 100%)` with an inset top light and a soft glow. This gradient is a deliberate, comp-driven exception (recorded in `.taste-skill/direction.json`), and it appears only on actions and on things that show the flight's progress (the HUD track, the private row of the time race). A flat yellow action is wrong."
+      },
+      {
+        "name": "The Night Has Three Tones Rule",
+        "section": "colors",
+        "body": "Sections change ground by chapter, never by decoration: night, violet night, blue night, and the one light hall. No gradients between grounds, no tinted cards beyond the booking panel."
+      },
+      {
+        "name": "The Statement and Answer Rule",
+        "section": "typography",
+        "body": "A section speaks once: one caps statement of two to four words over at most two lines, then one italic serif answer ending in a full stop. No third line, no subtitle stacked above it."
+      },
+      {
+        "name": "The Instrument Rule",
+        "section": "typography",
+        "body": "Every figure is set tabular in Archivo and means something: altitude, heading, ground speed, time en route, minutes, range, seats. No decorative numbers."
+      },
+      {
+        "name": "The Scrim Rule",
+        "section": "elevation",
+        "body": "Text over film or photograph sits on a neutral night scrim (rgba 8/9/16, gradients from the top, bottom and the text's side). The scrim follows the active chapter; it is never coloured."
+      }
+    ],
+    "dos": [
+      "Do pair every caps statement with one Instrument Serif italic answer, at 0.86 (display) or 0.9 (headline) of its size.",
+      "Do use the metal gradient with its top light and glow for gold actions, and flat champagne gold (#e8d6a2) only for lines, pins, the mark and focus.",
+      "Do set every figure tabular in Archivo and make it mean something.",
+      "Do put text over film or photographs on a neutral night scrim.",
+      "Do change ground by chapter between night (#0b0d18), violet night (#13122a), blue night (#0e1530) and the light hall (#e7e7e4).",
+      "Do start reveals from a visible default and play them once.",
+      "Do give reduced motion a complete, still version: one still per leg, lines drawn, loops stopped."
+    ],
+    "donts": [
+      "Don't put small labels or kickers above statements; the comp had them and they were removed.",
+      "Don't add a third type family or set display type in a system face.",
+      "Don't use the gold as a flat yellow fill on an action, or the gold highlight (#fbf3da) as a cream ground.",
+      "Don't use shadows for UI elevation; the only shadows are the metal pill's light and the hung prints.",
+      "Don't draw gold or hairline rules between sections; the route and the HUD track are the only long lines.",
+      "Don't let a revealed block disappear again on scroll-up."
+    ]
+  }
+}

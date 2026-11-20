@@ -156,9 +156,10 @@
       const vin = a < 0 ? 1 : seg(p, a, b), vout = 1 - seg(p, c, d);
       const v = Math.min(vin, vout);
       el.style.opacity = v.toFixed(3);
-      const y = (1 - vin) * 26 - (1 - vout) * 18;
-      el.style.transform = `translateY(${y.toFixed(1)}px)`;
-      el.style.filter = v < 0.999 ? `blur(${((1 - v) * 6).toFixed(1)}px)` : '';
+      // reduced motion: the words only fade, they do not travel or blur
+      const y = reduce.matches ? 0 : (1 - vin) * 26 - (1 - vout) * 18;
+      el.style.transform = y ? `translateY(${y.toFixed(1)}px)` : '';
+      el.style.filter = !reduce.matches && v < 0.999 ? `blur(${((1 - v) * 6).toFixed(1)}px)` : '';
       el.classList.toggle('is-on', v > 0.001);
       el.setAttribute('aria-hidden', v > 0.5 ? 'false' : 'true');
     });
@@ -267,7 +268,7 @@
     words(p);
     bar.classList.toggle('is-solid', scrollY > fl.top + fl.height - M.vh * 1.02);
     // the fleet: the track slides left while the stage is pinned
-    if (M.vw > 700) {
+    if (M.vw > 700 && !reduce.matches) {
       const fp = clamp((scrollY - M.fleet.top) / (M.fleet.height - M.vh));
       const travel = Math.max(0, M.trackW - M.vw);
       track.style.transform = `translate3d(${(-travel * ease(fp)).toFixed(1)}px, 0, 0)`;

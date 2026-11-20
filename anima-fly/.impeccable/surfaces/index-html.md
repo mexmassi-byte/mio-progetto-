@@ -7,7 +7,7 @@ Memorable moment: scrolling flies the jet: from the red carpet at sunset to the 
 
 THESIS: Scroll as one flight. The owner's sunset jet film scrubs with the scroll, from the carpet to the island, and the page's figures (altitude, heading, time) are the instruments of that flight.
 
-OWN-WORLD: Dusk over the apron: near-black navy-violet ground (#0b0d18 to #14122a), champagne gold (#e8d6a2) for the single action and the flight path, warm white type (#f4efe6). Archivo at expanded width 800 for statements, Instrument Serif italic for the answering line, Archivo for labels and tabular figures. Full-bleed film and photographs. Pill buttons, a gold hairline route that draws as you scroll.
+OWN-WORLD: Dusk over the apron: near-black navy-violet ground (#0b0d18 to #14122a), champagne gold (#e8d6a2) for the single action and the flight path, warm white type (#f4efe6). Archivo at expanded width 800 for statements, Instrument Serif italic for the answering line, Archivo for labels and tabular figures. Full-bleed film and photographs. Pill buttons in metal gold, and gold route legs that draw with the scroll and land on their targets (the quote, the minutes, Linate, the card, the last call).
 
 STORY: hero journey (no terminal, car at the stairs, cabin, menu, above the weather, anywhere by tonight), plan a flight, time returned, four cabins, the details, runways, one card at a fixed rate, final call.
 

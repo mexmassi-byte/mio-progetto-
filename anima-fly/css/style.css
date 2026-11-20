@@ -66,6 +66,9 @@ html { scrollbar-color: rgba(232, 214, 162, 0.5) var(--ground); }
 /* ---------- bar ---------- */
 .bar { position: fixed; inset: 0 0 auto; z-index: 30; display: flex; align-items: center; gap: clamp(16px, 2.6vw, 40px); padding: 18px var(--margin); color: var(--text); transition: background-color 400ms var(--ease-out), padding 400ms var(--ease-out); }
 .bar.is-solid { background: rgba(11, 13, 24, 0.86); padding-block: 12px; }
+/* the phone's status bar: the fixed bar starts below it */
+.bar { padding-top: calc(18px + env(safe-area-inset-top, 0px)); }
+.bar.is-solid { padding-top: calc(12px + env(safe-area-inset-top, 0px)); }
 .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
 .brand__mark { width: 26px; height: 19px; color: var(--gold); }
 .brand__name { font: 700 14px/1 var(--sans); font-stretch: 125%; letter-spacing: 0.22em; text-transform: uppercase; }
@@ -292,6 +295,12 @@ html.js [data-rise] { opacity: calc(0.3 + 0.7 * var(--in, 1)); transform: transl
 /* ---------- reduced motion: the flight becomes a sequence of stills ---------- */
 @media (prefers-reduced-motion: reduce) {
   .cue::after, .ticker p { animation: none; }
+  /* the fleet becomes a row you move yourself instead of a track the scroll pushes */
+  .fleet { height: auto; }
+  .fleet__stage { position: relative; height: auto; padding: 120px 0 56px; }
+  .fleet__count { display: none; }
+  .fleet__track { width: auto; overflow-x: auto; scroll-snap-type: x mandatory; padding-block: 24px; transform: none !important; }
+  .jet { scroll-snap-align: start; }
   .pill, .swap, .metal__img { transition: none; }
 }
 html.rec *, html.rec *::before, html.rec *::after { transition: none !important; animation: none !important; }
