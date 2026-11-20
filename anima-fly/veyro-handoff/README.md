@@ -1,6 +1,6 @@
 # ANIMA FLY nel sito VEYRO, al posto di Vela
 
-Questa cartella è una copia di sicurezza della modifica al sito VEYRO (`mexmassi-byte/pixel-perfect-render-0453`). La modifica è pronta nel clone locale, sul ramo `claude/loving-wozniak-lycww5` (commit `59f9315`), ma non è ancora stata caricata: manca il permesso di scrittura su quel repository.
+Questa cartella è una copia di sicurezza della modifica al sito VEYRO (`mexmassi-byte/pixel-perfect-render-0453`). **Pubblicata il 20 novembre 2026:** commit `5103e62` su `main` (unito dopo gli ultimi commit dei servizi), sincronizzato su Lovable e verificato sul sito pubblicato (EN e IT).
 
 - `veyro-anima-fly.patch`: le modifiche al codice e ai testi.
   - Il concept ANIMA FLY va al posto di Vela nella sezione "Selected work", nel nastro 3D, nell'anteprima dell'hero e nella finestra che si apre.
