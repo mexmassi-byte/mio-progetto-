@@ -51,10 +51,12 @@ const cdpScene = await scene.context().newCDPSession(scene);
   for (let k = 0; k < TL.RIBBON_TILES; k++) {
     // walk the page down to the tile so every reveal on the way has fired and settled
     for (let y = k === 0 ? 0 : TL.tileScroll(k - 1); y <= TL.tileScroll(k); y += 120) {
-      await rib.evaluate((s) => window.__rec.step(s), { t: 40 + k * 2 + y / 1e5, scroll: y, lights: 1, lightsAt: 0 });
+      await rib.evaluate((s) => window.__rec.step(s), { t: 40 + k * 2 + y / 1e5, tLoad: TL.T_LOAD, scroll: y, lights: 1, lightsAt: 0 });
     }
-    const sy = await rib.evaluate((s) => window.__rec.step(s), { t: 41.5 + k * 2, scroll: TL.tileScroll(k), lights: 1, lightsAt: 0 });
-    const r = await cdpRib.send('Page.captureScreenshot', { format: 'jpeg', quality: 92, clip: { x: 0, y: sy, width: TL.VW, height: TL.VH, scale: 1.6 } });
+    const sy = await rib.evaluate((s) => window.__rec.step(s), { t: 41.5 + k * 2, tLoad: TL.T_LOAD, scroll: TL.tileScroll(k), lights: 1, lightsAt: 0 });
+    // the landing tile matches the live page pixel for pixel; the others only fly past
+    const scale = k === TL.RIBBON_LAND ? TL.DPR : 1.6;
+    const r = await cdpRib.send('Page.captureScreenshot', { format: 'jpeg', quality: 92, clip: { x: 0, y: sy, width: TL.VW, height: TL.VH, scale } });
     tiles.push(r.data);
   }
   await scene.evaluate((list) => window.__v2.setRibbon(list), tiles);
@@ -102,10 +104,19 @@ function subTimes(t) {
 }
 
 // ---------------------------------------------------------------- site + scene
-let siteScrollY = 0;
+let siteScrollY = 0, walked = false;
 async function stepSite(ts) {
+  // before the landing, walk the live page down to it (off camera, a second early) so every reveal on
+  // the way has fired and settled, like the ribbon tile it replaces
+  if (!walked && ts >= TL.T_LAND) {
+    walked = true;
+    const tw = TL.T_LAND - 1.2, end = TL.scroll(TL.T_LAND);
+    for (let y = TL.scroll(TL.T_RIBBON); y < end; y += 100) {
+      await site.evaluate((s) => window.__rec.step(s), { t: tw, tLoad: TL.T_LOAD, scroll: y, lights: TL.lights(tw), lightsAt: TL.lightsAt(tw), lightsOffAt: null, press: null });
+    }
+  }
   siteScrollY = await site.evaluate((s) => window.__rec.step(s), {
-    t: ts, scroll: TL.scroll(ts), lights: TL.lights(ts), lightsAt: TL.lightsAt(ts), lightsOffAt: TL.lightsOffAt(ts), press: TL.pressTarget(ts),
+    t: ts, tLoad: TL.T_LOAD, scroll: TL.scroll(ts), lights: TL.lights(ts), lightsAt: TL.lightsAt(ts), lightsOffAt: TL.lightsOffAt(ts), press: TL.pressTarget(ts),
   });
 }
 async function captureSite() {

@@ -46,12 +46,15 @@ const seg = (t, a, b, e = E.ioq) => e(clamp((t - a) / (b - a), 0, 1));
 // ------------------------------------------------------------------ the page
 export const RIBBON_TILES = 8;                       // captures at scroll 720, 1440, ... 5760
 export const RIBBON_LAND = 6;                        // the camera lands on tile 6 = scroll 5040
+export const T_LOAD = 10;                            // the page's load sequence runs on its own clock, settled from frame 0
+// the fan film card sits at page y 6537.86 at 405 x 720 (window.__rec.info().anchors.filmOurs); held at viewport y 260
+export const CARD_SCROLL = 6537.86 - 260;
 export const tileScroll = (k) => VH * (k + 1);
 export function needsSite(t) { return t < T_RIBBON || (t >= T_LAND && t < T_FILM) || t >= T_BACK; }
 
 const SCROLL = [
   [0, 0], [T_TILT, 0], [3.8, 720], [T_RIBBON, 720],
-  [T_LAND, tileScroll(RIBBON_LAND)], [9.5, 5040], [10.0, 5330], [10.8, 5330], [11.3, 5690], [12.0, 5690], [12.6, 6202], [T_FILM, 6202],
+  [T_LAND, tileScroll(RIBBON_LAND)], [9.5, 5040], [10.0, 5330], [10.8, 5330], [11.3, 5700], [12.0, 5700], [12.6, CARD_SCROLL], [T_FILM, CARD_SCROLL],
 ];
 const scrollA = monotone(SCROLL.map((k) => k[0]), SCROLL.map((k) => k[1]));
 export function scroll(t) { return t >= T_BACK ? 0 : scrollA(Math.min(t, T_FILM)); }

@@ -195,7 +195,7 @@ async function drawFilm(t) {
       blade(s.text, x, y, w, (i) => letterOn(t, at, i));
     } else if (s.kind === 'plaque') {
       const size = s.lines.length > 1 ? 150 : 260;
-      plaque(s.lines, s.small, W / 2, 1180 + slide * 220, size, (i) => letterOn(t, at, i, 0.06));
+      plaque(s.lines, s.small, W / 2, 1180 + slide * 220, size, (i) => letterOn(t, at, i, Math.min(0.06, 0.5 / s.lines.join('').length)));
     } else if (s.kind === 'open') {
       // the OPEN sign builds across the cuts: one more letter lights on each beat
       const letters = 'OPEN';
@@ -255,7 +255,13 @@ async function drawFlip(t) {
   ctx.save();
   ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
   if (r.dir > 0) {
-    drawCover(await frameOf('flip', TL.flipLocal(t)), x, y, w, h);
+    // the card on the page shows a centred 4:3 cut of the centred 16:10 band of this portrait shot
+    // (site/assets/video/boulevard-night); as the card grows to the screen the cut widens to the whole
+    // frame, so the picture opens out from what the card showed instead of jumping to a new framing
+    const img = await frameOf('flip', TL.flipLocal(t));
+    const iw = img.width, ih = img.height;
+    const sh = lerp(iw * 10 / 16, ih, r.u), sw = Math.min(iw, sh * (r.w / r.h));
+    ctx.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, x, y, w, h);
   } else {
     // the film closes into the hero's first reel frame, which shows the Colony Hotel at night
     const last = TL.SHOTS[TL.SHOTS.length - 1];
@@ -267,9 +273,11 @@ async function drawFlip(t) {
 }
 
 // ---------------------------------------------------------------- frame
+// page captures become WebGL textures: WebGL ignores UNPACK_FLIP_Y for an ImageBitmap, so the bitmap
+// itself is decoded bottom-up to land the right way up on the plane
 async function decodeJpeg(b64) {
   const blob = await (await fetch('data:image/jpeg;base64,' + b64)).blob();
-  return createImageBitmap(blob);
+  return createImageBitmap(blob, { imageOrientation: 'flipY' });
 }
 let lastScreen = null;
 async function renderAt(s) {

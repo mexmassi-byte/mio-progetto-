@@ -1,0 +1,382 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-20T12:00:00Z",
+  "title": "Design System: Vice City After Dark",
+  "extensions": {
+    "colorMeta": {
+      "stucco": {
+        "role": "neutral",
+        "displayName": "Flamingo Stucco",
+        "canonical": "oklch(0.849 0.066 4.3)",
+        "tonalRamp": [
+          "#160609",
+          "#351c23",
+          "#58373f",
+          "#7e535d",
+          "#a5727d",
+          "#c597a1",
+          "#e6bdc5",
+          "#ffe4eb"
+        ],
+        "mix": "day endpoint of --bg and --field-pink; mixes toward night / stucco-night by --k"
+      },
+      "mint": {
+        "role": "neutral",
+        "displayName": "Ocean Mint",
+        "canonical": "oklch(0.890 0.045 169.4)",
+        "tonalRamp": [
+          "#030e0a",
+          "#172923",
+          "#30483f",
+          "#4b695e",
+          "#688b7e",
+          "#8eada1",
+          "#b6d0c6",
+          "#def5eb"
+        ],
+        "mix": "day endpoint of --field-mint; mixes toward mint-night by --k"
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Atlantic Night",
+        "canonical": "oklch(0.260 0.070 254.9)",
+        "tonalRamp": [
+          "#030b19",
+          "#162639",
+          "#2f435d",
+          "#496384",
+          "#6685ac",
+          "#8ca7cb",
+          "#b3cbeb",
+          "#dcf1ff"
+        ]
+      },
+      "enamel": {
+        "role": "neutral",
+        "displayName": "Sign Enamel",
+        "canonical": "oklch(0.976 0.012 4.7)",
+        "tonalRamp": [
+          "#0d0a0b",
+          "#282424",
+          "#464041",
+          "#675f60",
+          "#897f81",
+          "#aba2a4",
+          "#cfc7c8",
+          "#f3edee"
+        ]
+      },
+      "neon-azure": {
+        "role": "primary",
+        "displayName": "Neon Azure",
+        "canonical": "oklch(0.648 0.189 258.5)",
+        "tonalRamp": [
+          "#000530",
+          "#00205b",
+          "#033d8a",
+          "#195cbd",
+          "#307ef0",
+          "#62a4ff",
+          "#91caff",
+          "#c1f1ff"
+        ]
+      },
+      "mint-night": {
+        "role": "neutral",
+        "displayName": "Mint at Night",
+        "canonical": "oklch(0.305 0.070 247.6)",
+        "tonalRamp": [
+          "#020c18",
+          "#132739",
+          "#2b445c",
+          "#456482",
+          "#6086aa",
+          "#87a9c9",
+          "#b0cde9",
+          "#d9f2ff"
+        ]
+      },
+      "stucco-night": {
+        "role": "neutral",
+        "displayName": "Stucco at Night",
+        "canonical": "oklch(0.295 0.076 265.6)",
+        "tonalRamp": [
+          "#050a1a",
+          "#1a243c",
+          "#344160",
+          "#4f6087",
+          "#6d82b0",
+          "#92a5cf",
+          "#b8c9ee",
+          "#e0efff"
+        ]
+      },
+      "cabinet-night": {
+        "role": "neutral",
+        "displayName": "Cabinet at Night",
+        "canonical": "oklch(0.217 0.056 255.1)",
+        "tonalRamp": [
+          "#040b16",
+          "#1a2635",
+          "#334358",
+          "#4f637d",
+          "#6c84a4",
+          "#91a7c3",
+          "#b8cbe4",
+          "#e0f0ff"
+        ]
+      },
+      "tube-body": {
+        "role": "neutral",
+        "displayName": "Tube Body",
+        "canonical": "oklch(0.278 0.070 257.5)",
+        "tonalRamp": [
+          "#040b19",
+          "#18253a",
+          "#30435d",
+          "#4b6284",
+          "#6884ac",
+          "#8ea7cb",
+          "#b5cbeb",
+          "#def0ff"
+        ]
+      }
+    },
+    "colorEngine": {
+      "property": "--k",
+      "syntax": "<number>",
+      "day": 0,
+      "night": 1,
+      "space": "oklab",
+      "transition": "--k 1100ms cubic-bezier(0.76, 0, 0.24, 1); 300ms ease under reduced motion; none in record mode",
+      "formula": "color-mix(in oklab, <day>, <night> calc(var(--k) * 100%))",
+      "derived": {
+        "--bg": "stucco -> night",
+        "--field-mint": "mint -> #0b3150",
+        "--field-pink": "stucco -> #1a2a52",
+        "--ink": "night -> enamel",
+        "--cabinet": "enamel -> #061a33"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The hero sentence split to opposite corners and the footer wordmark.",
+        "phone": "clamp(64px, 19vw, 92px)"
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles and film-card dates.",
+        "phone": "clamp(40px, 11vw, 52px)"
+      },
+      "title": {
+        "displayName": "Statement",
+        "purpose": "Statements, quotes, facade and film names, the road-to-launch table, footer places.",
+        "phone": "24px"
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading copy, 34-44ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Navigation, captions, the Lights switch, buttons, footer columns and legal."
+      },
+      "sign-letter": {
+        "displayName": "Sign letter",
+        "purpose": "One letter per cell inside a blade sign, in a 100-unit-wide SVG, 78 units per letter."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Press feedback and reveal opacity."
+      },
+      {
+        "name": "ease-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Hero rise and reveal travel."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.76, 0, 0.24, 1)",
+        "purpose": "The day-to-night switch and the reel opening."
+      },
+      {
+        "name": "t-press",
+        "value": "140ms",
+        "purpose": "Press scale (0.96 buttons, 0.94 switch, 0.92 play)."
+      },
+      {
+        "name": "t-hover",
+        "value": "180ms",
+        "purpose": "Hover colour and underline fades."
+      },
+      {
+        "name": "t-reveal",
+        "value": "800ms",
+        "purpose": "Reveal: 24px rise, once."
+      },
+      {
+        "name": "t-open",
+        "value": "1200ms",
+        "purpose": "Reel frame opens from a centre slit (clip-path inset)."
+      },
+      {
+        "name": "lights",
+        "value": "1100ms",
+        "purpose": "--k day-to-night transition."
+      },
+      {
+        "name": "flicker",
+        "value": "620ms linear, 70ms stagger per letter, 260ms delay",
+        "purpose": "A neon tube catching: --on 0, 1, 0.15, 1, 0.35, 1 held."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "tablet",
+        "value": "1024px"
+      },
+      {
+        "name": "phone",
+        "value": "700px"
+      }
+    ],
+    "recordMode": {
+      "trigger": "?rec query adds html.rec",
+      "api": "window.__rec: ready, info(), step({t, tLoad, scroll, lights, lightsAt, lightsOffAt, press})",
+      "rule": "All CSS transitions and animations off; every moving thing is a pure function of time, scroll and lights."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single action, Watch the fan film; the only azure button.",
+      "html": "<a class=\"ds-btn\" href=\"#\">Watch the fan film</a>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;background:#3d8bff;color:#082445;font-family:'Big Shoulders Text','Arial Narrow',sans-serif;font-weight:700;font-size:15px;text-decoration:none;border-radius:0;transition:transform 140ms cubic-bezier(0.22,1,0.36,1),background-color 180ms ease}.ds-btn:hover{background:color-mix(in oklab,#3d8bff,white 18%)}.ds-btn:active{transform:scale(0.96)}.ds-btn:focus-visible{outline:3px solid #3d8bff;outline-offset:3px}"
+    },
+    {
+      "name": "Paper Button",
+      "kind": "button",
+      "refersTo": "button-paper",
+      "description": "Enamel slab for the outbound link at the close, on navy or photographs.",
+      "html": "<div style=\"background:#082445;padding:24px\"><a class=\"ds-btn-paper\" href=\"#\">Go to rockstargames.com</a></div>",
+      "css": ".ds-btn-paper{display:inline-flex;align-items:center;min-height:52px;padding:0 20px;background:#fff4f6;color:#082445;font-family:'Big Shoulders Text','Arial Narrow',sans-serif;font-weight:700;font-size:18px;text-decoration:none;border-radius:0;transition:transform 140ms cubic-bezier(0.22,1,0.36,1),background-color 180ms ease}.ds-btn-paper:hover{background:#ffffff}.ds-btn-paper:active{transform:scale(0.96)}.ds-btn-paper:focus-visible{outline:3px solid #3d8bff;outline-offset:3px}"
+    },
+    {
+      "name": "Navigation Bar",
+      "kind": "nav",
+      "refersTo": "",
+      "description": "Wordmark left; text links, the Lights switch and the single action right. Not fixed.",
+      "html": "<header class=\"ds-bar\"><a class=\"ds-mark\" href=\"#\">Vice City After Dark</a><nav class=\"ds-nav\"><a href=\"#\">Leonida</a><a href=\"#\">The duo</a><a href=\"#\">The films</a></nav></header>",
+      "css": ".ds-bar{display:flex;align-items:center;gap:24px;padding:18px 32px;background:#f4bcc8;color:#082445;font-family:'Big Shoulders Text','Arial Narrow',sans-serif;font-size:15px}.ds-mark{font-family:'Big Shoulders Display','Arial Narrow',sans-serif;font-weight:900;font-size:22px;letter-spacing:-0.01em;text-decoration:none;color:inherit;margin-right:auto}.ds-nav{display:flex;gap:22px}.ds-nav a{color:inherit;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:0.18em;transition:text-decoration-color 180ms ease}.ds-nav a:hover{text-decoration-color:currentColor}.ds-nav a:focus-visible{outline:3px solid #3d8bff;outline-offset:3px}"
+    },
+    {
+      "name": "Lights Switch",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "The page's one live control: a square track and knob that move with --k.",
+      "html": "<button class=\"ds-lights\" type=\"button\" aria-pressed=\"false\"><span class=\"ds-lights__t\"><span class=\"ds-lights__k\"></span></span>Lights <span style=\"font-weight:400\">7:42 pm in Vice City</span></button>",
+      "css": ".ds-lights{display:inline-flex;align-items:center;gap:10px;min-height:44px;background:none;border:0;padding:0;cursor:pointer;color:#082445;font-family:'Big Shoulders Text','Arial Narrow',sans-serif;font-size:15px;font-weight:600}.ds-lights__t{position:relative;width:46px;height:26px;background:#082445;flex:none;transition:transform 140ms cubic-bezier(0.22,1,0.36,1)}.ds-lights__k{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#f4bcc8;transition:transform 180ms ease}.ds-lights[aria-pressed=true] .ds-lights__k{transform:translateX(20px)}.ds-lights:active .ds-lights__t{transform:scale(0.94)}.ds-lights:focus-visible{outline:3px solid #3d8bff;outline-offset:3px}"
+    },
+    {
+      "name": "Blade Sign, day and lit",
+      "kind": "custom",
+      "refersTo": "sign-blade-lit",
+      "description": "Vertical name sign: enamel cabinet by day; lit, a dark cabinet with dark letter bodies and an azure stroke tube. Never a blur.",
+      "html": "<div class=\"ds-signs\"><svg class=\"ds-sign\" viewBox=\"0 0 100 392\"><path class=\"cab\" d=\"M8 30 V366 H38 L50 392 L62 366 H92 V30 H78 V14 H64 V0 H36 V14 H22 V30 Z\"/><text class=\"l\" x=\"50\" y=\"113\">J</text><text class=\"l\" x=\"50\" y=\"191\">A</text><text class=\"l\" x=\"50\" y=\"269\">S</text><text class=\"l\" x=\"50\" y=\"347\">O</text></svg><svg class=\"ds-sign ds-sign--lit\" viewBox=\"0 0 100 392\"><path class=\"cab\" d=\"M8 30 V366 H38 L50 392 L62 366 H92 V30 H78 V14 H64 V0 H36 V14 H22 V30 Z\"/><text class=\"l\" x=\"50\" y=\"113\">J</text><text class=\"l\" x=\"50\" y=\"191\">A</text><text class=\"l\" x=\"50\" y=\"269\">S</text><text class=\"l\" x=\"50\" y=\"347\">O</text></svg></div>",
+      "css": ".ds-signs{display:flex;gap:0;background:#bfe5d6}.ds-sign{padding:24px}.ds-sign{width:72px;height:auto}.ds-sign .cab{fill:#fff4f6}.ds-sign .l{font-family:'Big Shoulders Display','Arial Narrow',sans-serif;font-weight:900;font-size:92px;text-anchor:middle;fill:#082445;stroke:#3d8bff;stroke-width:5.5;stroke-linejoin:round;stroke-opacity:0;transition:stroke-opacity 300ms ease,fill 300ms ease}.ds-sign--lit{background:#0b3150}.ds-sign--lit .cab{fill:#061a33}.ds-sign--lit .l{fill:#10284a;stroke-opacity:1}",
+      "note": "Left: day on a mint field. Right: lit on mint at night."
+    },
+    {
+      "name": "Tube Title",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Plain-text sign (the films title, the footer wordmark): lit, a dark body with a 0.045em azure text stroke.",
+      "html": "<div class=\"ds-tube-wrap\"><span class=\"ds-tube\">The films</span></div>",
+      "css": ".ds-tube-wrap{background:#082445;padding:24px 32px}.ds-tube{font-family:'Big Shoulders Display','Arial Narrow',sans-serif;font-weight:900;font-size:88px;line-height:0.95;letter-spacing:-0.02em;color:#10284a;-webkit-text-stroke:0.045em #3d8bff}"
+    },
+    {
+      "name": "Film Card",
+      "kind": "card",
+      "refersTo": "film-card-panel",
+      "description": "68/32 card: date block on Cabinet at Night over a flat ink panel; square, no shadow.",
+      "html": "<article class=\"ds-film\"><p class=\"ds-film__date\">08·27·26</p><div class=\"ds-film__panel\"><h3 class=\"ds-film__name\">An Extended Look</h3><p class=\"ds-film__text\">August 27, 2026. Captured entirely from in-game footage on PlayStation 5.</p></div></article>",
+      "css": ".ds-film{width:480px;height:374px;display:grid;grid-template-rows:68fr 32fr;background:#082445;border-radius:0}.ds-film__date{margin:0;display:grid;place-items:center;font-family:'Big Shoulders Display','Arial Narrow',sans-serif;font-weight:900;font-size:72px;letter-spacing:-0.01em;background:#061a33;color:#fff4f6}.ds-film__panel{display:flex;justify-content:space-between;align-items:end;gap:24px;padding:24px 28px;background:#fff4f6;color:#082445}.ds-film__name{margin:0;font-family:'Big Shoulders Display','Arial Narrow',sans-serif;font-weight:900;font-size:30px;line-height:1;max-width:9ch}.ds-film__text{margin:0;font-family:'Big Shoulders Text','Arial Narrow',sans-serif;font-size:15px;line-height:1.35;max-width:34ch;text-align:right}"
+    },
+    {
+      "name": "Play Square",
+      "kind": "button",
+      "refersTo": "film-play",
+      "description": "64px azure square on the fan-film clip; part of the single action.",
+      "html": "<button class=\"ds-play\" type=\"button\" aria-label=\"Play the fan film\"><svg viewBox=\"0 0 24 24\" width=\"26\" height=\"26\"><path d=\"M7 4.5v15l12.5-7.5z\" fill=\"currentColor\"/></svg></button>",
+      "css": ".ds-play{width:64px;height:64px;display:grid;place-items:center;background:#3d8bff;color:#082445;border:0;border-radius:0;cursor:pointer;transition:transform 140ms cubic-bezier(0.22,1,0.36,1)}.ds-play:hover{background:color-mix(in oklab,#3d8bff,white 18%)}.ds-play:active{transform:scale(0.92)}.ds-play:focus-visible{outline:3px solid #3d8bff;outline-offset:3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Facade That Lights Up",
+    "overview": "Every section is the front of an Ocean Drive Art Deco hotel: a flat field of painted stucco carrying a vertical name sign that says literally what the section holds (LEONIDA, PLACES, JASON, LUCIA, DATES, OUT NOW). One switch turns the whole street from pastel day to neon night. The page is built so that this is one move, not a theme swap: a single registered number, `--k`, runs from 0 (day) to 1 (night), and every colour on the page is an oklab mix keyed to it, so fields, ink, sign cabinets and the browser's theme colour all travel together over 1100ms.\n\nThe surfaces are flat, square and printed-looking: four inks, no shadows, no blur, no glass, no gradients. Light is never painted as a glow. A sign lights the way a real neon tube does: its letters keep a dark body and gain an azure stroke tube, and they catch with a flicker, letter by letter. Real glow lives only in the real photographs of Ocean Drive and Miami at night, which carry the atmosphere the flat fields refuse to fake.\n\nType is one condensed family in two cuts: Big Shoulders Display, set huge and tight for statements and stacked one letter per cell inside the signs, and Big Shoulders Text for reading. Layout is a window-bay grid of square photographs and fields, with pinned stages that hold a sign while the street passes behind it.",
+    "keyCharacteristics": [
+      "One registered custom property, `--k`, drives every colour: 0 is day (pastel stucco), 1 is night (Atlantic navy), mixed in oklab.",
+      "Four inks: stucco, mint, night, enamel. Neon azure is the light, not a fifth field colour.",
+      "A lit sign is a dark body with an azure stroke tube, never a blur.",
+      "Square corners everywhere; no shadows; flat fields.",
+      "Vertical blade signs name the sections; the films stage is the one horizontal sign.",
+      "Real, credited photographs of Ocean Drive and Miami at night carry all photographic light.",
+      "Deterministic record mode (`?rec`, driven through `window.__rec`) for the 9:16 video."
+    ],
+    "rules": [
+      {
+        "name": "The One Number Rule",
+        "body": "Every colour is derived from `--k` with `color-mix(in oklab, <day>, <night> calc(var(--k) * 100%))`. Never hard-code a day-only or night-only colour on a field; add a mix instead, so the switch keeps moving the whole page at once.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Light Rule",
+        "body": "Neon Azure appears only on the signs and the single action. It is never a field, a border, a heading colour or a decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Four Inks Rule",
+        "body": "Fields and text use stucco, mint, night and enamel and their night shades. Colour in the page comes from the real photographs, not from new swatches.",
+        "section": "colors"
+      },
+      {
+        "name": "The Five Steps Rule",
+        "body": "There are five type sizes (15px, 18px, statement, head, display) and no more; new content picks one of them.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Family Rule",
+        "body": "Big Shoulders only. Display cut for anything that names, Text cut for anything that explains.",
+        "section": "typography"
+      },
+      {
+        "name": "The Painted Wall Rule",
+        "body": "Surfaces are flat paint. If something needs to sit in front, it sits on a different plane in the scroll, not on a shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do derive every new colour from `--k` with an oklab `color-mix`, so the Lights switch moves it with the rest of the page.",
+      "Do keep Neon Azure on the signs and the single action only; text on azure is night.",
+      "Do light a sign as a dark body with an azure stroke tube, and let it catch with the letter-by-letter flicker.",
+      "Do name each new section with a vertical blade sign that says literally what the section holds; set a sign horizontally only where the section itself moves sideways, as the films stage does.",
+      "Do keep corners square (0px) and fields flat.",
+      "Do use only the five type steps and the Big Shoulders family.",
+      "Do keep every moving thing a pure function of time, scroll and lights in record mode (`?rec`, `window.__rec.step()`), with CSS transitions and animations off."
+    ],
+    "donts": [
+      "Don't render light as blur, glow, text-shadow or box-shadow; the real glow belongs to the photographs.",
+      "Don't add gradients, frosted glass, shadows or rounded corners.",
+      "Don't introduce a fifth field colour or a second accent.",
+      "Don't use Rockstar artwork, screenshots, trailers or logos; any wordmark is our own.",
+      "Don't make the header fixed; it sits on the first facade."
+    ]
+  }
+}
