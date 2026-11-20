@@ -197,8 +197,8 @@ html.js:not(.rec) .tube { transition: color 300ms ease, -webkit-text-stroke-colo
 .road__title { font-size: var(--step-statement); color: var(--enamel); margin-bottom: 28px; }
 .road__table { width: 100%; border-collapse: collapse; font-family: var(--font-display); font-weight: 800; font-size: var(--step-statement); }
 .road__table th, .road__table td { padding: 0; height: 1.5em; text-align: left; font-weight: 800; vertical-align: baseline; }
-.road__table th { width: 33%; }
-.road__table td:nth-of-type(1) { width: 33%; }
+.road__table th { width: 25%; }
+.road__table td:nth-of-type(1) { width: 30%; }
 .road__table td:last-child { text-align: right; }
 .road__now th, .road__now td { color: var(--stucco); }
 
