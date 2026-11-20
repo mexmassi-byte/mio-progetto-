@@ -15,17 +15,17 @@
   /* the four inks of the street, plus the enamel white of the sign cabinets */
   --stucco: #f4bcc8;
   --mint: #bfe5d6;
-  --night: #0e1626;
+  --night: #082445;   /* Atlantic navy, oklch(0.26 0.07 255) */
   --neon: #3d8bff;
   --enamel: #fff4f6;
 
   --k: 0;
   --mix: calc(var(--k) * 100%);
   --bg: color-mix(in oklab, var(--stucco), var(--night) var(--mix));
-  --field-mint: color-mix(in oklab, var(--mint), #13213a var(--mix));
-  --field-pink: color-mix(in oklab, var(--stucco), #1a1830 var(--mix));
+  --field-mint: color-mix(in oklab, var(--mint), #0b3150 var(--mix));
+  --field-pink: color-mix(in oklab, var(--stucco), #1a2a52 var(--mix));
   --ink: color-mix(in oklab, var(--night), var(--enamel) var(--mix));
-  --cabinet: color-mix(in oklab, var(--enamel), #0a101c var(--mix));
+  --cabinet: color-mix(in oklab, var(--enamel), #061a33 var(--mix));
   --accent: var(--neon);
   --accent-ink: var(--night);
 
@@ -108,8 +108,13 @@ html[data-lights='on'] .lights__knob { background: var(--night); }
 /* a vertical blade sign: an enamel cabinet, one letter per cell; lit, each letter turns neon */
 .sign-svg { display: block; width: calc(var(--step-head) * 1.05); height: auto; flex: none; }
 .sign-svg .cab { fill: var(--cabinet); }
-.sign-svg .l { font-family: var(--font-display); font-weight: 900; font-size: 92px; text-anchor: middle; fill: color-mix(in oklab, var(--sign-day, var(--night)), var(--neon) calc(var(--on, 0) * 100%)); }
-html[data-lights='on'] .sign-svg .l { --sign-day: #2a3550; }
+.sign-svg .l { font-family: var(--font-display); font-weight: 900; font-size: 92px; text-anchor: middle; fill: color-mix(in oklab, var(--sign-day, var(--night)), #10284a calc(var(--on, 0) * 100%)); stroke: var(--neon); stroke-width: 5.5; stroke-linejoin: round; stroke-opacity: var(--on, 0); }
+html[data-lights='on'] .sign-svg .l { --sign-day: #1c3150; }
+.sign--section { width: calc(var(--step-head) * 0.9); }
+/* plain-text signs (a title, the footer name) light the same way: dark body, azure tube */
+.tube { color: inherit; -webkit-text-stroke: 0 transparent; }
+html[data-lights='on'] .tube { color: #10284a; -webkit-text-stroke: 0.045em var(--neon); }
+html.js:not(.rec) .tube { transition: color 300ms ease, -webkit-text-stroke-color 300ms ease; }
 .plaque__title { margin-bottom: 18px; }
 
 /* ---------- 1 · hero ---------- */
@@ -121,7 +126,7 @@ html[data-lights='on'] .sign-svg .l { --sign-day: #2a3550; }
 .hero__b { right: var(--margin); bottom: clamp(40px, 7svh, 72px); }
 .reel { --fw: 42vw; --fh: calc(var(--fw) * 9 / 16); --gap: max(24px, calc((100svh - var(--fh)) / 2 - 60px)); position: absolute; left: 50%; top: 0; width: var(--fw); height: 100%; translate: -50% 0; }
 .reel__track { display: flex; flex-direction: column; gap: var(--gap); transform: translateY(calc((100svh - var(--fh)) / 2 - var(--reel, 0) * (var(--fh) + var(--gap)))); will-change: transform; }
-.reel__frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: var(--night); border-radius: 4px; }
+.reel__frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: var(--night); }
 .reel__frame img, .reel__frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .reel__frame--switch img.day { object-position: 50% 30%; }
 .reel__frame--switch img.night { object-position: 35% 50%; opacity: var(--k); }
@@ -143,9 +148,10 @@ html[data-lights='on'] .sign-svg .l { --sign-day: #2a3550; }
 
 /* ---------- 3 · places: three night photographs, each slides over the last ---------- */
 .places { background: var(--bg); }
-.places__intro { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); padding: var(--section) var(--margin) clamp(64px, 7vw, 112px); align-items: end; }
-.places__intro .head { grid-column: 1 / span 6; }
-.places__text { grid-column: 8 / span 5; font-size: var(--step-body); line-height: 1.5; max-width: 44ch; }
+.places__intro { display: grid; grid-template-columns: auto repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); padding: var(--section) var(--margin) clamp(64px, 7vw, 112px); align-items: end; }
+.places__intro .sign-svg { grid-column: 1; grid-row: 1 / span 2; align-self: start; }
+.places__intro .head { grid-column: 2 / span 6; }
+.places__text { grid-column: 9 / span 5; font-size: var(--step-body); line-height: 1.5; max-width: 44ch; }
 .curtain { position: relative; }
 .curtain__panel { position: sticky; top: 0; height: 100svh; overflow: hidden; background: var(--night); }
 .curtain__panel img { width: 100%; height: 100%; object-fit: cover; }
@@ -176,7 +182,7 @@ html[data-lights='on'] .sign-svg .l { --sign-day: #2a3550; }
 .film__play { position: absolute; left: 28px; bottom: 24px; width: 64px; height: 64px; display: grid; place-items: center; background: var(--neon); color: var(--night); transition: transform var(--t-press) var(--ease-out); }
 .film__play svg { width: 26px; height: 26px; fill: currentColor; }
 .film__media:active .film__play, .film__media.is-pressed .film__play { transform: scale(0.92); }
-.film__date { display: grid; place-items: center; font-family: var(--font-display); font-weight: 900; font-size: var(--step-head); letter-spacing: -0.01em; background: #0a101c; color: var(--neon); }
+.film__date { display: grid; place-items: center; font-family: var(--font-display); font-weight: 900; font-size: var(--step-head); letter-spacing: -0.01em; background: #061a33; color: var(--enamel); }
 .film__panel { display: flex; justify-content: space-between; align-items: end; gap: 24px; padding: 24px 28px; background: var(--stucco); color: var(--night); }
 .film__panel--b { background: var(--mint); }
 .film__panel--c { background: var(--enamel); }
@@ -186,19 +192,21 @@ html[data-lights='on'] .sign-svg .l { --sign-day: #2a3550; }
 .film__text { font-size: var(--step-body); line-height: 1.35; max-width: 34ch; text-align: right; }
 
 /* ---------- 6 · the road to launch: one type size ---------- */
-.road { background: var(--night); color: var(--enamel); padding: var(--section) var(--margin); }
-.road__title { font-size: var(--step-statement); color: var(--neon); margin-bottom: 28px; }
+.road { display: grid; grid-template-columns: auto 1fr; column-gap: clamp(24px, 4vw, 64px); align-items: start; background: var(--night); color: var(--enamel); padding: var(--section) var(--margin); }
+.road__sign { grid-row: 1 / span 2; }
+.road__title { font-size: var(--step-statement); color: var(--enamel); margin-bottom: 28px; }
 .road__table { width: 100%; border-collapse: collapse; font-family: var(--font-display); font-weight: 800; font-size: var(--step-statement); }
 .road__table th, .road__table td { padding: 0; height: 1.5em; text-align: left; font-weight: 800; vertical-align: baseline; }
 .road__table th { width: 33%; }
 .road__table td:nth-of-type(1) { width: 33%; }
 .road__table td:last-child { text-align: right; }
-.road__now { color: var(--neon); }
+.road__now th, .road__now td { color: var(--stucco); }
 
 /* ---------- 7 · the last photograph ---------- */
 .close { position: relative; height: 90svh; background: var(--night); color: var(--enamel); overflow: hidden; }
-.close__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 30% 50%; filter: brightness(0.8); }
-.close__copy { position: absolute; left: 58.5%; right: var(--margin); bottom: 14svh; }
+.close__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 78%; filter: brightness(0.8); }
+.close__sign { position: absolute; left: var(--margin); top: clamp(48px, 8svh, 96px); z-index: 1; }
+.close__copy { position: absolute; left: 58.5%; right: var(--margin); top: clamp(48px, 8svh, 96px); }
 .close__line { font-size: var(--step-head); margin-bottom: 20px; }
 .close__copy p { max-width: 34ch; font-weight: 600; margin-bottom: 28px; }
 
@@ -207,7 +215,7 @@ html[data-lights='on'] .sign-svg .l { --sign-day: #2a3550; }
 .foot__mark { font-family: var(--font-display); font-weight: 900; font-size: var(--step-display); line-height: 0.86; letter-spacing: -0.03em; margin-bottom: 72px; }
 .foot__row { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: 48px; }
 .foot__places { grid-column: 1 / span 5; }
-.foot__places a { font-family: var(--font-display); font-weight: 800; font-size: var(--step-statement); line-height: 1.3; color: var(--neon); text-decoration: none; }
+.foot__places a { font-family: var(--font-display); font-weight: 800; font-size: var(--step-statement); line-height: 1.3; color: var(--stucco); text-decoration: none; }
 .foot__cols { grid-column: 7 / span 6; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gutter); font-size: var(--step-small); }
 .foot__head { font-family: var(--font-text); font-weight: 700; font-size: var(--step-small); line-height: 1.4; margin-bottom: 8px; }
 .foot__cols li { margin-bottom: 6px; line-height: 1.4; }
@@ -240,7 +248,13 @@ html[data-lights='on'] .sign-svg .l { --sign-day: #2a3550; }
 html[data-lights='on'] .sign-svg .l { --on: 1; }
 @media (prefers-reduced-motion: reduce) {
   html:not(.rec) { transition: --k 300ms ease; }
-  .reel__track, .films__track { transform: none !important; }
+  .films { height: auto; }
+  .films__stage { position: relative; height: auto; overflow: visible; padding: 120px 0 80px; }
+  .films__ground { height: 100%; }
+  .films__title { position: relative; top: 0; left: auto; margin: 0 var(--margin); padding-bottom: 32px; }
+  .films__track { position: relative; top: 0; translate: none; transform: none !important; flex-direction: column; gap: 28px; padding: 0 var(--margin); }
+  .film { width: 100%; max-width: 960px; height: auto; grid-template-rows: auto auto; }
+  .film__media, .film__date { aspect-ratio: 16 / 9; height: auto; }
 }
 html.rec *, html.rec *::before, html.rec *::after { transition: none !important; animation: none !important; }
 
@@ -272,9 +286,9 @@ html.rec *, html.rec *::before, html.rec *::after { transition: none !important;
   .hero { height: 200svh; }
   .hero__a { top: 112px; }
   .hero__b { bottom: 150px; }
-  .reel { --fw: calc(100vw - 2 * var(--margin)); --fh: calc(var(--fw) * 3 / 4); --gap: max(16px, calc((100svh - var(--fh)) / 2 - 28px)); }
+  .reel { --fw: calc(100vw - 2 * var(--margin)); --fh: calc(var(--fw) * 3 / 4); --gap: calc((100svh - var(--fh)) / 2 + 12px); }
   .reel__frame { aspect-ratio: 4 / 3; }
-  .hero__lede { bottom: 28px; right: var(--margin); max-width: none; font-size: var(--step-body); }
+  .hero__lede { bottom: 32px; right: var(--margin); max-width: none; font-size: var(--step-body); }
   .walk { height: auto; padding: 96px 0 72px; }
   .walk__stage { position: relative; height: auto; display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; padding: 0 var(--margin); }
   .walk .sign--left { position: static; translate: none; }
@@ -284,7 +298,8 @@ html.rec *, html.rec *::before, html.rec *::after { transition: none !important;
   .pass--b { top: auto; right: auto; margin-left: auto; margin-right: var(--margin); width: 80vw; }
   .pass--c { top: auto; right: auto; margin-left: var(--margin); width: 56vw; }
   .curtain__panel { height: 88svh; }
-  .places__intro .head, .places__text { grid-column: 1 / -1; }
+  .places__intro { grid-template-columns: auto 1fr; }
+  .places__intro .head, .places__text { grid-column: 2 / -1; }
   .places__intro .head { margin-bottom: 20px; }
   .duo__row { grid-template-columns: 1fr; }
   .facade { min-height: 0; padding: 40px var(--margin); }
@@ -305,10 +320,13 @@ html.rec *, html.rec *::before, html.rec *::after { transition: none !important;
   .road__table td:nth-of-type(1) { grid-column: 1; }
   .road__table td:nth-of-type(2) { display: none; }
   .road__table td:last-child { grid-column: 2; }
-  .road__now td { color: var(--neon); }
+  .road__now td { color: var(--stucco); }
   .close { height: auto; }
   .close__photo { position: relative; height: 70svh; filter: none; }
   .close__copy { position: static; padding: 40px var(--margin) 72px; }
+  .close__sign { top: 24px; }
+  .road { grid-template-columns: 1fr; }
+  .road__sign { display: none; }
   .foot__mark { margin-bottom: 48px; }
   .foot__cols { grid-template-columns: 1fr 1fr; }
   .foot__legal { flex-direction: column; }

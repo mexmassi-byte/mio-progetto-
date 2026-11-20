@@ -24,7 +24,7 @@
   const setLights = (on) => {
     html.dataset.lights = on ? 'on' : 'off';
     toggle.setAttribute('aria-pressed', String(on));
-    $('meta[name="theme-color"]').setAttribute('content', on ? '#0e1626' : '#f4bcc8');
+    $('meta[name="theme-color"]').setAttribute('content', on ? '#082445' : '#f4bcc8');
   };
   function viceCityHour() {
     const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', hour12: true }).formatToParts(new Date());
@@ -166,7 +166,8 @@
     html.style.setProperty('--k', S.lights.toFixed(4));
     for (const l of letters) {
       const i = Number(l.style.getPropertyValue('--i')) || 0;
-      const on = S.lightsAt == null ? 0 : flicker((t - S.lightsAt - 0.26 - i * 0.07) / 0.62);
+      const off = S.lightsOffAt == null ? 1 : 1 - smooth(S.lightsOffAt, S.lightsOffAt + 0.25, t);
+      const on = (S.lightsAt == null ? 0 : flicker((t - S.lightsAt - 0.26 - i * 0.07) / 0.62)) * off;
       l.style.setProperty('--on', on.toFixed(3));
     }
     scrollFrame(S.scroll);
@@ -198,9 +199,9 @@
         },
       };
     },
-    // s: { t, scroll, lights (0..1), lightsAt (s or null), press: css selector or null }
+    // s: { t, scroll, lights (0..1), lightsAt / lightsOffAt (s or null), press: css selector or null }
     async step(s) {
-      S.t = s.t; S.scroll = s.scroll; S.lights = s.lights ?? 0; S.lightsAt = s.lightsAt ?? null;
+      S.t = s.t; S.scroll = s.scroll; S.lights = s.lights ?? 0; S.lightsAt = s.lightsAt ?? null; S.lightsOffAt = s.lightsOffAt ?? null;
       // device-pixel scrolling: native scroll to the whole pixel, the rest as a sub-pixel shift
       const yd = Math.round(s.scroll * 3) / 3, yi = Math.floor(yd), frac = (yd - yi).toFixed(2);
       window.scrollTo(0, yi);
