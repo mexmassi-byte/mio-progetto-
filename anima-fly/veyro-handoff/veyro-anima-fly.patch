@@ -1,0 +1,350 @@
+From 59f93152afd35f90001c6515fe813b56911feccf Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 20 Nov 2026 20:10:45 +0000
+Subject: [PATCH] Selected work: ANIMA FLY replaces Vela (owner's request)
+
+Private aviation concept: the owner's sunset jet film scrubbed by the scroll, booking, fleet,
+route map and a rendered metal jet card. New film anima-concept.{webm,mp4} (40 s, 1280x800),
+poster, EN/IT/ES/DE copy; source and recorder in docs/concepts/anima-fly/. Vela's media and
+source stay in the repository.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_011hTmpfZGUnaM8dUyFDqvM5
+---
+ AGENTS.md                                |  4 +-
+ CLAUDE.md                                |  2 +-
+ docs/concepts/anima-fly/README.md        | 40 ++++++++++++++++++
+ docs/concepts/anima-fly/rec.mjs          | 52 ++++++++++++++++++++++++
+ src/components/site/HeroBuildPreview.tsx | 12 +++---
+ src/components/site/ShowcaseVideo.tsx    | 12 +++---
+ src/components/site/Work.tsx             |  2 +-
+ src/components/site/WorkRibbon.tsx       | 14 +++----
+ src/data/site.ts                         |  8 ++--
+ src/lib/i18n-strings.ts                  | 28 ++++++-------
+ 10 files changed, 133 insertions(+), 41 deletions(-)
+ create mode 100644 docs/concepts/anima-fly/README.md
+ create mode 100644 docs/concepts/anima-fly/rec.mjs
+
+diff --git a/AGENTS.md b/AGENTS.md
+index 6f8c54e..e8961c8 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -13,7 +13,7 @@
+ 
+ - Official VeyroLogo uses inline paths with useId-scoped gradients, so multiple placements never collide.
+ - Brand palette (owner's choice, November 2026): ink `#1B191A` (background), warm paper `#E9E4E0` (text), rust `#943A1F` (buttons and fills; `#CC6A43` for small text, glows and lines, because the exact rust is too dark to read on ink). Tokens live in `:root` in `src/styles.css`; the logo SVGs, favicon, glass hero (`glass/glassScene.ts`, neutral graphite glass, no iridescence except a hint on hover) and footer use the same colours. The homepage background film (`public/media/veyro-scroll-rust-48.webm`, phone `veyro-scroll-rust-mobile.webm`, poster `src/assets/animation/veyro-scroll-rust-poster.webp`) is the original silk animation gradient-mapped frame by frame to this palette.
+-- FlowBackground owns the homepage's single scroll-seeked video decoder (desktop: `public/media/veyro-scroll-rust-48.webm`, 48 fps by motion interpolation, all keyframes; the shown time eases towards the scroll position so long pages glide), selects a lightweight phone asset after hydration and uses a poster for reduced motion, Save-Data or failure; HeroScrollVideo keeps only the CSS-first sticky copy/fade so the hero and rest of the page share one seamless animation. Its optional `aside` holds `HeroBuildPreview` (desktop ≥1280 px only): a tilted glass browser beside the headline in which a concept site builds itself every 10 s (wireframe → design printed top-down → status „Live“ → cursor clicks the main button → slow scroll → next concept: the six concepts of Selected work in the same order, 828, Vela, Lanterna, Crinale, Bruma, Ventisette; always labelled „concept“; the old Riverton Dental and Estately screenshots were removed in November 2026). All six are films: the poster sits in the window and the video plays from the start once the design is revealed (paused off-screen, never with Save-Data). Pure CSS keyframes restarted per cycle via `key`; JS only switches concepts and pauses while off-screen or the tab is hidden; reduced motion shows the finished page; decorative (`aria-hidden`, own copy in `data-i18n-static`).
++- FlowBackground owns the homepage's single scroll-seeked video decoder (desktop: `public/media/veyro-scroll-rust-48.webm`, 48 fps by motion interpolation, all keyframes; the shown time eases towards the scroll position so long pages glide), selects a lightweight phone asset after hydration and uses a poster for reduced motion, Save-Data or failure; HeroScrollVideo keeps only the CSS-first sticky copy/fade so the hero and rest of the page share one seamless animation. Its optional `aside` holds `HeroBuildPreview` (desktop ≥1280 px only): a tilted glass browser beside the headline in which a concept site builds itself every 10 s (wireframe → design printed top-down → status „Live“ → cursor clicks the main button → slow scroll → next concept: the six concepts of Selected work in the same order, 828, ANIMA FLY, Lanterna, Crinale, Bruma, Ventisette; always labelled „concept“; the old Riverton Dental and Estately screenshots were removed in November 2026). All six are films: the poster sits in the window and the video plays from the start once the design is revealed (paused off-screen, never with Save-Data). Pure CSS keyframes restarted per cycle via `key`; JS only switches concepts and pauses while off-screen or the tab is hidden; reduced motion shows the finished page; decorative (`aria-hidden`, own copy in `data-i18n-static`).
+ - Featured portfolio media is independent of the retained concept grid; Orsonero behavior remains unchanged and showcase-film playback is visibility-gated with manual controls.
+ - Keep starting-price data separate from packages and preserve budget options, so displayed pricing cannot imply obsolete fixed packages.
+ - Monthly subscription plans live only in `src/data/plans.ts` (prices in cents, EN/IT/ES names and one unique explanation per service, fixed rounded bundle prices); `plans.test.js` guards the exact prices and unique explanations. They are shown only on the pricing page (`/pricing`, `/it/prezzi`, `/de/preise`; `PricingPage.tsx`), no longer on the homepage. `PricingPlans.tsx` exports the unchanged building blocks (`PLAN_COPY` with EN/IT/ES/DE copy, `PlanCard`, `BundleSelector`, `GROUP_ICON`) inside `data-i18n-static`. The page has a glass TECH/DESIGN switch (tabs pattern, arrow keys; TECH by default, `#tech`/`#design` preselect; both groups stacked in one grid cell so the height never jumps, the inactive one `inert`), the two plans of the chosen group, the plan notes, then always the bundle (`#bundle`) and the €799 starting-price block (`NewProjectBlock` in Sections). Every service row has its own Radix popover info button (click/Escape/outside close, portal so cards never clip it). Plan, bundle and „Discuss your project“ CTAs keep their link to the homepage contact form of the same language (`/#contact`, `/it#contact`, `/de#contact`; no-JS fallback), but on the pricing page a plain click opens `PlanContactDialog` instead (Radix dialog: centred glass panel on desktop, bottom sheet under 640 px, opaque without blur; chosen plan + monthly price on top, prefilled message, the same `ContactForm` and `/api/public/contact` as the homepage, thank-you inside; closes with X, Esc, outside click or the browser back button via its own history entry, focus returns to the clicked button). The hand-off lives in `src/lib/plan-contact.ts` (`announceChoice`): homepage `#contact` present → `veyro:choose-plan` event; dialog marker `[data-plan-contact]` present → `veyro:open-plan-contact`; otherwise (Ctrl/Cmd/middle click) `sessionStorage` key `veyro:chosen-plan-message`, read once by `Contact`; never overwriting text the visitor typed. Never promise unlimited work, guaranteed rankings, zero downtime or instant support in plan copy.
+@@ -26,7 +26,7 @@
+ - Page end: `ClosingCta` (before Contact, tilted HTML code editor, CTA to #contact) and `SiteFooter` (four-part footer, copyright plate, then the signature; no sculptures or WebGL in the footer). Desktop/tablet signature: `footer/LayeredWord.tsx`, a giant getlayers-style VEYRO in Inter 800, tightly tracked so the letters overlap like stacked dark-glass plates (vertical warm-grey gradient, hairline edge drawn under the fill), cut by the page bottom. A soft circular lens follows the mouse: inside it the fill disappears and several stacked outline layers fan away from the cursor (deeper layers tinted with the glow colour); the lens sweeps across once whenever the word comes fully into view or the link gets focus. Pure SVG with masks, rAF only while moving, reduced motion skips the sweep. Phones (`(max-width: 767px), (pointer: coarse) and (max-height: 500px)`, same query in JS and CSS) show only the static thin SVG VEYRO built from the logo strokes and run no footer animation. The signature appears only here. All footer copy is EN/IT/ES/DE.
+ - SEO: per-page, per-language head (title, description, canonical, reciprocal hreflang between the same page in all languages + x-default, Open Graph/Twitter) is built by `pageHead(page, lang)` in `src/lib/seo.ts`; JSON-LD (Organization with areas served: Genova, Liguria, Italy, Barcelona, Frankfurt, Ireland — VEYRO Web has no office, so never add `location`/addresses or the founders' home address; WebSite, WebPage per page/language; homepage: web-design Service with the €799 starting price; pricing page: BreadcrumbList, care Service with the four plans and four bundles at their real prices, plus the starting price) is generated in `src/lib/structured-data.ts` from `data/site.ts` and `data/plans.ts`, so it always matches the visible prices. The footer says where the team works from („We work from Genova, Barcelona and Frankfurt, with a partner in Ireland.“) — never call these offices. Never add street addresses, ratings, reviews or clients to the schema unless they are visible on the site and confirmed by the owner. E-commerce is not offered. Strategy, keyword map and open decisions: `docs/seo/SEO-AEO-STRATEGY.md`. The visual design is locked: SEO work must not change layout, styles or visible text without approval.
+ - Selected work on desktop (≥1024 px, fine pointer, motion allowed, no Save-Data) is `WorkRibbon.tsx`: a 560vh sticky three.js scene (the brief had 900vh; the ribbon starts at .07 instead of .14) (three loaded on demand when the section is near) where the six concept films run as one ribbon of video cards along a fixed rail (shallow near arc, far runs), the two-line heading ("Selected / work", own copy per language) slides across in opposite directions, then each card flies into a 3×2 grid; a card can be opened as soon as it has landed in the grid (hit test against the canvas's current position at the moment of the click, so it stays right while the grid scrolls away); hovering one only shows the hand cursor (no name pill, the owner found it distracting) and a click opens the film large with its type, title and description (`WorkDialog`, Escape or the backdrop closes it). Driven only by smoothed scroll progress; videos play only while their card is visible. Phones, tablets, reduced motion and Save-Data get the `.work-list` carousel instead (horizontal scroll-snap, same six projects with text). CSS in `styles.css` decides which one shows.
+-- Selected work (`Work.tsx`): six featured projects from `featuredProjects` in `data/site.ts`, each naming its `media` — the before/after `HeroTransformation`, or a muted looping film through `ShowcaseVideo` (`SHOWCASE_VIDEOS`: CALCE, Lanterna, 828, Vela, Crinale; plays only when 40 % visible on desktop with fine pointer and no reduced motion/Save-Data, tap to play on phones and touch tablets, landscape iPads included). Lanterna („Motion website concept“) is a cinematic website about the lighthouse of Genoa rendered frame by frame from `docs/concepts/lanterna/` (source page, render script, public-domain pictures with credits, facts used); outputs `public/media/lanterna-concept.{webm,mp4}` and `src/assets/work/lanterna-poster.webp`. Its palette (night black, paper, lamp amber, Boska serif) is deliberately not VEYRO's own palette so it reads as a client concept. 828 („Cinematic scroll concept“) is the same technique for the Burj Khalifa, from `docs/concepts/burj/`: an altimeter on the right edge climbs 0 → 828 m as the page scrolls (night, glass silver, sunset orange, Barlow Condensed). Since November 2026 its hero is the owner's aerial film of Dubai (no sound): 242 full-bleed frames in `docs/concepts/burj/flight/` drawn on a canvas as if scrubbed by scroll, slowly (17 s; a fixed 16:10 band of the vertical film, no added camera tilt: the middle for the day, the top for the night so the lit spire shows), from the spire at sunrise past the facade and the desert sun to the tower lit at night; the 828 odometer lands while the night flight is still moving (no still frame) and the page continues as before. Outputs `public/media/burj-concept.{webm,mp4}` and `src/assets/work/burj-poster.webp`. Saffra („Airline website concept“, `docs/concepts/airline/`) is a fictional luxury airline (deliberately not Emirates): a real interactive page (scroll-scrubbed hero where a real cut-out aircraft climbs into real clouds, then an interactive three.js globe with routes and destination cards), recorded with `?rec=1`. Bruma („Luxury stay website concept“, replaced CALCE at the owner's request; CALCE's source stays in `docs/concepts/calce/`) is a website for a fictional A-frame cabin above the mist: a hero where the cabin sinks into a WebGL2 fog and rises at another hour (Sunset/Night, one rAF clock, colours mixed on `--k`), then eight card films on a three.js ribbon that bends with scroll speed over a reflecting grid floor. Real photographs by Jonathan Borba on Pexels (cut out with the open ISNet model). Source page and recorder in `docs/concepts/bruma/`; outputs `public/media/bruma-concept.{webm,mp4}` and `src/assets/work/bruma-poster.webp`. Crinale („Mountain data website concept“, replaced Vibetyper at the owner's request; Vibetyper's media were removed because its template licence did not allow commercial use) is a website for a fictional network of mountain field stations, on the owner's scroll spec: a pinned 640vh story where the scroll scrubs one drone flight (two real Pexels clips, 32390684 and 40732399, cached frame by frame and drawn on a canvas) from a wooded summit above a sea of clouds, through the cloud, to a sunlit rocky peak; then hotspots, a station card with count-up and sparkline, and a white solutions panel. Source page and recorder in `docs/concepts/crinale/`; outputs `public/media/crinale-concept.{webm,mp4}` (40 s, 1280×800) and `src/assets/work/crinale-poster.webp`. Ventisette („Espresso bar website concept“, replaced the Redesign/transformation card at the owner's request; `HeroTransformation.tsx` is no longer used by Selected work) is a website for a fictional espresso bar: a premium entrance, a 520vh scroll scrub of the owner's espresso film (frames in `docs/concepts/ventisette/frames/`) with four kinetic captions and a barista scale, then a WebGL section where a refractive glass cursive „crema“ floats over a warm Voronoi-streak field (own code on the owner's motion spec) and dissolves into a 4 px dot grid, then a menu (hovered rows bring their cup), a method section (18 g, 27 s, 36 g counting up) and an about section. Source page and recorder in `docs/concepts/ventisette/`; outputs `public/media/ventisette-concept.{webm,mp4}` and `src/assets/work/ventisette-poster.webp`. Featured order: 828, Vela, Lanterna, Crinale, Bruma, Ventisette; there is no other project grid or overlay.
++- Selected work (`Work.tsx`): six featured projects from `featuredProjects` in `data/site.ts`, each naming its `media` — the before/after `HeroTransformation`, or a muted looping film through `ShowcaseVideo` (`SHOWCASE_VIDEOS`: Ventisette, Bruma, Lanterna, 828, ANIMA FLY, Crinale; plays only when 40 % visible on desktop with fine pointer and no reduced motion/Save-Data, tap to play on phones and touch tablets, landscape iPads included). Lanterna („Motion website concept“) is a cinematic website about the lighthouse of Genoa rendered frame by frame from `docs/concepts/lanterna/` (source page, render script, public-domain pictures with credits, facts used); outputs `public/media/lanterna-concept.{webm,mp4}` and `src/assets/work/lanterna-poster.webp`. Its palette (night black, paper, lamp amber, Boska serif) is deliberately not VEYRO's own palette so it reads as a client concept. 828 („Cinematic scroll concept“) is the same technique for the Burj Khalifa, from `docs/concepts/burj/`: an altimeter on the right edge climbs 0 → 828 m as the page scrolls (night, glass silver, sunset orange, Barlow Condensed). Since November 2026 its hero is the owner's aerial film of Dubai (no sound): 242 full-bleed frames in `docs/concepts/burj/flight/` drawn on a canvas as if scrubbed by scroll, slowly (17 s; a fixed 16:10 band of the vertical film, no added camera tilt: the middle for the day, the top for the night so the lit spire shows), from the spire at sunrise past the facade and the desert sun to the tower lit at night; the 828 odometer lands while the night flight is still moving (no still frame) and the page continues as before. Outputs `public/media/burj-concept.{webm,mp4}` and `src/assets/work/burj-poster.webp`. Saffra („Airline website concept“, `docs/concepts/airline/`) is a fictional luxury airline (deliberately not Emirates): a real interactive page (scroll-scrubbed hero where a real cut-out aircraft climbs into real clouds, then an interactive three.js globe with routes and destination cards), recorded with `?rec=1`. Bruma („Luxury stay website concept“, replaced CALCE at the owner's request; CALCE's source stays in `docs/concepts/calce/`) is a website for a fictional A-frame cabin above the mist: a hero where the cabin sinks into a WebGL2 fog and rises at another hour (Sunset/Night, one rAF clock, colours mixed on `--k`), then eight card films on a three.js ribbon that bends with scroll speed over a reflecting grid floor. Real photographs by Jonathan Borba on Pexels (cut out with the open ISNet model). Source page and recorder in `docs/concepts/bruma/`; outputs `public/media/bruma-concept.{webm,mp4}` and `src/assets/work/bruma-poster.webp`. Crinale („Mountain data website concept“, replaced Vibetyper at the owner's request; Vibetyper's media were removed because its template licence did not allow commercial use) is a website for a fictional network of mountain field stations, on the owner's scroll spec: a pinned 640vh story where the scroll scrubs one drone flight (two real Pexels clips, 32390684 and 40732399, cached frame by frame and drawn on a canvas) from a wooded summit above a sea of clouds, through the cloud, to a sunlit rocky peak; then hotspots, a station card with count-up and sparkline, and a white solutions panel. Source page and recorder in `docs/concepts/crinale/`; outputs `public/media/crinale-concept.{webm,mp4}` (40 s, 1280×800) and `src/assets/work/crinale-poster.webp`. Ventisette („Espresso bar website concept“, replaced the Redesign/transformation card at the owner's request; `HeroTransformation.tsx` is no longer used by Selected work) is a website for a fictional espresso bar: a premium entrance, a 520vh scroll scrub of the owner's espresso film (frames in `docs/concepts/ventisette/frames/`) with four kinetic captions and a barista scale, then a WebGL section where a refractive glass cursive „crema“ floats over a warm Voronoi-streak field (own code on the owner's motion spec) and dissolves into a 4 px dot grid, then a menu (hovered rows bring their cup), a method section (18 g, 27 s, 36 g counting up) and an about section. Source page and recorder in `docs/concepts/ventisette/`; outputs `public/media/ventisette-concept.{webm,mp4}` and `src/assets/work/ventisette-poster.webp`. ANIMA FLY („Private aviation concept“, replaced Vela at the owner's request in November 2026; Vela's media and its source in `docs/concepts/vela/` stay) is a website for a fictional private jet brand, built on a reference reel the owner supplied, with the owner's own sunset jet film as the hero: 289 frames (FSRCNN 2x) scrubbed on a canvas through seven chapters with an altimeter to 45,000 ft, then booking, time saved, a pinned fleet carousel, a hanging gallery, a route map from Milan Linate, a three.js-rendered metal jet card and gold route legs that land on their targets. Source page, card renderer and recorder in `docs/concepts/anima-fly/`; outputs `public/media/anima-concept.{webm,mp4}` (40 s, 1280×800) and `src/assets/work/anima-poster.webp`. Featured order: 828, ANIMA FLY, Lanterna, Crinale, Bruma, Ventisette; there is no other project grid or overlay.
+ - Method page (`/approach`, `/it/metodo`, `/de/methode`; `MethodPage.tsx`, copy in `src/data/method.ts` for EN/IT/DE): reachable only from „Our approach“ in the homepage intro — deliberately no menu or footer link — but indexable (sitemap, hreflang, BreadcrumbList + HowTo built from the same copy). Five steps, each with what we do, what we need from the client and what they get; a rail on the left fills while scrolling (`--method-progress`) and step dots light up when reached. Then „After launch“ (link to pricing) and a project CTA that opens `PlanContactDialog`. Process copy stays general: no deadlines, revision counts or other promises the owner has not confirmed.
+ 
+ - Every "Start a project" link carries `data-start-project`: `PlanContactDialog` (mounted on the homepage, pricing and method pages) catches the click and opens the contact form in place instead of scrolling to `#contact`; plan and bundle buttons (`announceChoice`) also prefer the dialog whenever it is on the page. Ctrl/Cmd-click and no-JS still follow the link.
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 6674454..f786e9f 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -25,7 +25,7 @@ italiano (`/it`) e tedesco (`/de`).
+ uffici: non chiamarli mai uffici, non scrivere indirizzi e mai l'indirizzo di casa dei fondatori.
+ Contatti: email e WhatsApp sono in `AGENCY` in `src/data/site.ts`.
+ 
+-**Lavori mostrati.** Solo concept, dichiarati come concept: 828, Vela, Lanterna, Crinale, Bruma
++**Lavori mostrati.** Solo concept, dichiarati come concept: 828, ANIMA FLY, Lanterna, Crinale, Bruma
+ e Ventisette. Non inventare clienti, recensioni, statistiche o classifiche.
+ 
+ **Regole di lavoro.**
+diff --git a/docs/concepts/anima-fly/README.md b/docs/concepts/anima-fly/README.md
+new file mode 100644
+index 0000000..660c7d4
+--- /dev/null
++++ b/docs/concepts/anima-fly/README.md
+@@ -0,0 +1,40 @@
++# ANIMA FLY: private aviation on your schedule
++
++ANIMA FLY is a website for a fictional private jet charter brand. VEYRO Web built it as a concept from the reference reel the owner supplied, which set the structure, the rhythm and the motion. The hero is the owner's own jet film. The brand, the copy and the pictures are this project's own, and the site says on the page that it is a concept.
++
++## The page
++
++- **Hero (900svh pinned).** The owner's sunset jet film runs with the scroll: 289 frames, upscaled 2x with FSRCNN and drawn on a canvas. It plays in seven chapters:
++  1. the red carpet
++  2. the airstair
++  3. the cabin (Pexels photo)
++  4. the menu (Pexels photo)
++  5. take-off
++  6. above the clouds
++  7. an island runway
++
++  An instrument line shows GS, HDG and ETE, and the altimeter climbs to 45,000 ft and back to 0.
++- **Plan a flight.** A booking card with trip type, from and to (with a swap button), departure time and a passenger stepper. It validates the fields; nothing is sent, because it is a concept.
++- **Get back.** Two rows compare the minutes before take-off on a commercial flight and a private one; the times are labelled illustrative.
++- **Fleet.** A pinned horizontal carousel (light, midsize, super-midsize, heavy) with outlined class words, a 01/04 counter and typical figures for each class.
++- **Details.** A light hall of framed prints hung on wires.
++- **Runways.** A map to scale, with typical flight times from Milan Linate to Engadin, Nice, Olbia, Ibiza and Mykonos.
++- **Jet Card.** A black brushed-metal card rendered in three.js (`tools/card.html`), followed by a ticker.
++- **Last call.** Night clouds (frame 205 of the film, graded) and the final pill.
++- **Gold route.** One leg per section draws with the scroll and lands on its target: the quote button, the minutes, Linate, the card and the last pill.
++
++The type is Archivo (expanded 800) with Instrument Serif italic, both under the SIL OFL. The ground is night navy and violet, and the gold is a champagne metal.
++
++## Outputs
++
++- `public/media/anima-concept.{webm,mp4}` (40 s, 1280x800, 30 fps)
++- `src/assets/work/anima-poster.webp`
++
++## Credits
++
++- **Hero film:** supplied by the owner.
++- **Photographs:** Pexels, under the Pexels License: 20562278 (cabin), 35026952 (champagne), 20584536 (seat), 31378163 (window), 7739666, 15953920, 11935301 and 20640898 (fleet).
++
++## Recording
++
++Serve this folder with `python3 -m http.server 4321`, then run `node rec.mjs <frames dir> desktop 40`. The page in record mode (`?rec`) exposes `window.__af.step({ scroll, t })`. Encode the frames to 1280x800, as for the other concepts.
+diff --git a/docs/concepts/anima-fly/rec.mjs b/docs/concepts/anima-fly/rec.mjs
+new file mode 100644
+index 0000000..86ff7c7
+--- /dev/null
++++ b/docs/concepts/anima-fly/rec.mjs
+@@ -0,0 +1,52 @@
++// Records the showcase film of the ANIMA FLY concept, deterministically: record mode (?rec), a fixed scroll
++// curve, one screenshot per frame (CDP), 30 fps, 1280x800 at 1.5x (downscale when encoding).
++// Serve this folder first:  python3 -m http.server 4321   then:  node rec.mjs <frames dir> desktop 40
++import { createRequire } from 'node:module';
++const require = createRequire(import.meta.url);
++const { chromium } = require('playwright');
++import fs from 'node:fs';
++const OUT = process.argv[2]; fs.mkdirSync(OUT, { recursive: true });
++const mobile = process.argv[3] === 'mobile';
++const DUR = Number(process.argv[4] || 70), FPS = 30;
++const vp = mobile ? { width: 390, height: 844 } : { width: 1280, height: 800 };
++const scale = mobile ? 1080 / 390 : 1.5;
++const b = await chromium.launch();
++const p = await b.newPage({ viewport: vp, deviceScaleFactor: scale });
++await p.goto('http://127.0.0.1:4321/index.html?rec');
++await p.evaluate(() => window.__af.ready);
++const info = await p.evaluate(() => window.__af.info());
++const maxY = info.docH - info.vh;
++// the route of the scroll: [time s, scroll y]; holds where the page has something to read
++const fl = info.flight, hero = (u) => fl.top + u * (fl.height - info.vh);
++const sec = async (s, f = 0) => p.evaluate(([sel, ff]) => { const el = document.querySelector(sel); const r = el.getBoundingClientRect(); return r.top + scrollY + ff * r.height; }, [s, f]);
++const fleetTop = await sec('#fleet'), fleetEnd = fleetTop + info.fleet.height - info.vh;
++const K = [
++  [0, 0], [1.2, 0],
++  [5.5, hero(0.16)], [8, hero(0.3)], [11, hero(0.5)], [13.5, hero(0.62)], [16, hero(0.72)], [19, hero(0.86)], [21.5, hero(1.0)], [22.2, hero(1.0)],
++  [23.8, await sec('#plan')], [25.2, await sec('#plan')],
++  [26.6, await sec('.time')], [27.6, await sec('.time')],
++  [28.8, fleetTop], [32.2, fleetEnd], [32.6, fleetEnd],
++  [33.8, await sec('#details')], [34.8, await sec('#details')],
++  [35.9, await sec('#runways')], [36.8, await sec('#runways')],
++  [37.8, await sec('#card')], [38.5, await sec('#card')],
++  [39.4, await sec('.last')], [DUR, Math.min(maxY, await sec('.last'))],
++];
++// monotone cubic through the keys, eased at every hold
++const ys = (t) => {
++  for (let i = 0; i < K.length - 1; i++) {
++    const [t0, y0] = K[i], [t1, y1] = K[i + 1];
++    if (t <= t1) { const u = (t - t0) / (t1 - t0); const e = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; const lin = u; const w = Math.abs(y1 - y0) > info.vh * 3 ? 0.55 : 1; return y0 + (y1 - y0) * (w * e + (1 - w) * lin); }
++  }
++  return K[K.length - 1][1];
++};
++const cdp = await p.context().newCDPSession(p);
++const N = Math.round(DUR * FPS);
++for (let i = 0; i < N; i++) {
++  const t = i / FPS;
++  await p.evaluate((s) => window.__af.step(s), { scroll: Math.round(ys(t) * 2) / 2, t });
++  await p.evaluate(() => new Promise((r) => requestAnimationFrame(() => r())));
++  const r = await cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 90 });
++  fs.writeFileSync(`${OUT}/f_${String(i).padStart(5, '0')}.jpg`, Buffer.from(r.data, 'base64'));
++  if (i % 300 === 0) console.log('frame', i, '/', N);
++}
++await b.close();
+diff --git a/src/components/site/HeroBuildPreview.tsx b/src/components/site/HeroBuildPreview.tsx
+index 979de0f..a57fab8 100644
+--- a/src/components/site/HeroBuildPreview.tsx
++++ b/src/components/site/HeroBuildPreview.tsx
+@@ -3,7 +3,7 @@
+ import { useEffect, useRef, useState } from "react";
+ import lanternaPoster from "@/assets/work/lanterna-poster.webp";
+ import burjPoster from "@/assets/work/burj-poster.webp";
+-import velaPoster from "@/assets/work/vela-poster.webp";
++import animaPoster from "@/assets/work/anima-poster.webp";
+ import crinalePoster from "@/assets/work/crinale-poster.webp";
+ import brumaPoster from "@/assets/work/bruma-poster.webp";
+ import ventisettePoster from "@/assets/work/ventisette-poster.webp";
+@@ -43,13 +43,13 @@ const CONCEPTS: Concept[] = [
+     ],
+   },
+   {
+-    name: "Vela",
+-    src: velaPoster,
+-    cx: 94,
++    name: "Anima Fly",
++    src: animaPoster,
++    cx: 90,
+     cy: 5,
+     video: [
+-      { src: "/media/vela-concept.webm", type: "video/webm" },
+-      { src: "/media/vela-concept.mp4", type: "video/mp4" },
++      { src: "/media/anima-concept.webm", type: "video/webm" },
++      { src: "/media/anima-concept.mp4", type: "video/mp4" },
+     ],
+   },
+   {
+diff --git a/src/components/site/ShowcaseVideo.tsx b/src/components/site/ShowcaseVideo.tsx
+index 46a340f..197098b 100644
+--- a/src/components/site/ShowcaseVideo.tsx
++++ b/src/components/site/ShowcaseVideo.tsx
+@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
+ import brumaPoster from "@/assets/work/bruma-poster.webp";
+ import lanternaPoster from "@/assets/work/lanterna-poster.webp";
+ import burjPoster from "@/assets/work/burj-poster.webp";
+-import velaPoster from "@/assets/work/vela-poster.webp";
++import animaPoster from "@/assets/work/anima-poster.webp";
+ import crinalePoster from "@/assets/work/crinale-poster.webp";
+ import ventisettePoster from "@/assets/work/ventisette-poster.webp";
+ import { translate, useSiteLanguage } from "@/lib/i18n";
+@@ -55,15 +55,15 @@ export const SHOWCASE_VIDEOS = {
+       { src: "/media/burj-concept.mp4", type: "video/mp4" },
+     ],
+   },
+-  vela: {
+-    poster: velaPoster,
++  anima: {
++    poster: animaPoster,
+     width: 1280,
+     height: 800,
+-    alt: "Vela concept: a travel website with a portal from Earth to Dubai, the Sahara and London",
++    alt: "ANIMA FLY concept: a private jet website where the scroll flies the jet from a red carpet at sunset to an island runway",
+     className: "aspect-[16/10]",
+     sources: [
+-      { src: "/media/vela-concept.webm", type: "video/webm" },
+-      { src: "/media/vela-concept.mp4", type: "video/mp4" },
++      { src: "/media/anima-concept.webm", type: "video/webm" },
++      { src: "/media/anima-concept.mp4", type: "video/mp4" },
+     ],
+   },
+   crinale: {
+diff --git a/src/components/site/Work.tsx b/src/components/site/Work.tsx
+index 586a962..161792c 100644
+--- a/src/components/site/Work.tsx
++++ b/src/components/site/Work.tsx
+@@ -4,7 +4,7 @@ import { Reveal, SectionHeading } from "./Reveal";
+ import { WorkRibbon } from "./WorkRibbon";
+ 
+ /** Same order as the desktop ribbon */
+-const ORDER = ["burj", "vela", "lanterna", "crinale", "bruma", "ventisette"];
++const ORDER = ["burj", "anima", "lanterna", "crinale", "bruma", "ventisette"];
+ const projects = [...featuredProjects].sort(
+   (a, b) => ORDER.indexOf(a.media) - ORDER.indexOf(b.media),
+ );
+diff --git a/src/components/site/WorkRibbon.tsx b/src/components/site/WorkRibbon.tsx
+index 71a7911..5f8c615 100644
+--- a/src/components/site/WorkRibbon.tsx
++++ b/src/components/site/WorkRibbon.tsx
+@@ -32,10 +32,10 @@ const WORK: { name: string; type: string; src: string[]; media?: string }[] = [
+     src: ["/media/burj-concept.webm", "/media/burj-concept.mp4"],
+   },
+   {
+-    name: "Vela",
+-    media: "vela",
+-    type: "Travel portal concept",
+-    src: ["/media/vela-concept.webm", "/media/vela-concept.mp4"],
++    name: "Anima Fly",
++    media: "anima",
++    type: "Scroll film concept",
++    src: ["/media/anima-concept.webm", "/media/anima-concept.mp4"],
+   },
+   {
+     name: "Lanterna",
+@@ -67,9 +67,9 @@ const WORK: { name: string; type: string; src: string[]; media?: string }[] = [
+     src: ["/media/burj-concept.webm", "/media/burj-concept.mp4"],
+   },
+   {
+-    name: "Vela",
+-    type: "Travel portal concept",
+-    src: ["/media/vela-concept.webm", "/media/vela-concept.mp4"],
++    name: "Anima Fly",
++    type: "Scroll film concept",
++    src: ["/media/anima-concept.webm", "/media/anima-concept.mp4"],
+   },
+ ];
+ 
+diff --git a/src/data/site.ts b/src/data/site.ts
+index c56f659..2794c3a 100644
+--- a/src/data/site.ts
++++ b/src/data/site.ts
+@@ -81,11 +81,11 @@ export const featuredProjects = [
+       "A website about the world's tallest building: the scroll flies over Dubai from sunrise to night, then an altimeter climbs to 828 metres as the page continues.",
+   },
+   {
+-    media: "vela",
+-    title: "Immersive travel concept",
+-    type: "Travel portal concept",
++    media: "anima",
++    title: "Private aviation concept",
++    type: "Scroll film concept",
+     description:
+-      "A travel website you fly through: from space down to Earth, then through the portal into Dubai, the Sahara, London, Paris, Santorini, the Maldives and Tokyo.",
++      "A website for a private jet brand: the scroll flies the jet from the red carpet at sunset to an island runway as the altimeter climbs to 45,000 ft, then booking, the fleet and a metal jet card.",
+   },
+   {
+     media: "crinale",
+diff --git a/src/lib/i18n-strings.ts b/src/lib/i18n-strings.ts
+index 15ac790..3ce8913 100644
+--- a/src/lib/i18n-strings.ts
++++ b/src/lib/i18n-strings.ts
+@@ -165,17 +165,17 @@ const T: Record<string, [string, string]> = {
+       "Concept 828: un sito cinematografico su Dubai, con la camera che vola accanto al Burj Khalifa dall'alba alla notte",
+       "Concepto 828: una web cinematográfica sobre Dubái, con la cámara volando junto al Burj Khalifa del amanecer a la noche",
+     ],
+-  "Immersive travel concept": ["Concept di viaggio immersivo", "Concepto de viaje inmersivo"],
+-  "Travel portal concept": ["Concept di viaggio a portale", "Concepto de viaje con portal"],
++  "Private aviation concept": ["Concept di aviazione privata", "Concepto de aviación privada"],
++  "Scroll film concept": ["Concept film a scorrimento", "Concepto de película con scroll"],
+   Close: ["Chiudi", "Cerrar"],
+-  "A travel website you fly through: from space down to Earth, then through the portal into Dubai, the Sahara, London, Paris, Santorini, the Maldives and Tokyo.":
++  "A website for a private jet brand: the scroll flies the jet from the red carpet at sunset to an island runway as the altimeter climbs to 45,000 ft, then booking, the fleet and a metal jet card.":
+     [
+-      "Un sito di viaggi da attraversare: dallo spazio alla Terra, poi attraverso il portale dentro Dubai, il Sahara, Londra, Parigi, Santorini, le Maldive e Tokyo.",
+-      "Una web de viajes que se atraviesa: del espacio a la Tierra y, a través del portal, a Dubái, el Sáhara, Londres, París, Santorini, las Maldivas y Tokio.",
++      "Un sito per un marchio di jet privati: lo scroll fa volare il jet dal tappeto rosso al tramonto fino alla pista di un'isola mentre l'altimetro sale a 45.000 piedi, poi la prenotazione, la flotta e una jet card in metallo.",
++      "Una web para una marca de jets privados: el scroll hace volar el jet desde la alfombra roja al atardecer hasta la pista de una isla mientras el altímetro sube a 45.000 pies; después, la reserva, la flota y una jet card de metal.",
+     ],
+-  "Vela concept: a travel website with a portal from Earth to Dubai, the Sahara and London": [
+-    "Concept Vela: un sito di viaggi con un portale dalla Terra a Dubai, al Sahara e a Londra",
+-    "Concepto Vela: una web de viajes con un portal de la Tierra a Dubái, el Sáhara y Londres",
++  "ANIMA FLY concept: a private jet website where the scroll flies the jet from a red carpet at sunset to an island runway": [
++    "Concept ANIMA FLY: un sito di jet privati dove lo scroll fa volare il jet dal tappeto rosso al tramonto alla pista di un'isola",
++    "Concepto ANIMA FLY: una web de jets privados donde el scroll hace volar el jet desde la alfombra roja al atardecer hasta la pista de una isla",
+   ],
+   "Play showcase video": [
+     "Riproduci il video della presentazione",
+@@ -598,13 +598,13 @@ const DE: Record<string, string> = {
+     "Eine Website über das höchste Gebäude der Welt: Beim Scrollen fliegt sie vom Sonnenaufgang bis in die Nacht über Dubai, dann steigt ein Höhenmesser auf 828 Meter.",
+   "828 concept: a cinematic website about Dubai, the camera flying past the Burj Khalifa from sunrise to night":
+     "Konzept 828: eine filmische Website über Dubai, die Kamera fliegt vom Sonnenaufgang bis in die Nacht am Burj Khalifa vorbei",
+-  "Immersive travel concept": "Immersives Reisekonzept",
+-  "Travel portal concept": "Reisekonzept mit Portal",
++  "Private aviation concept": "Konzept für Privatflüge",
++  "Scroll film concept": "Konzept mit Scroll-Film",
+   Close: "Schließen",
+-  "A travel website you fly through: from space down to Earth, then through the portal into Dubai, the Sahara, London, Paris, Santorini, the Maldives and Tokyo.":
+-    "Eine Reise-Website zum Durchfliegen: aus dem All zur Erde, dann durch das Portal nach Dubai, in die Sahara, nach London, Paris, Santorini, auf die Malediven und nach Tokio.",
+-  "Vela concept: a travel website with a portal from Earth to Dubai, the Sahara and London":
+-    "Konzept Vela: eine Reise-Website mit einem Portal von der Erde nach Dubai, in die Sahara und nach London",
++  "A website for a private jet brand: the scroll flies the jet from the red carpet at sunset to an island runway as the altimeter climbs to 45,000 ft, then booking, the fleet and a metal jet card.":
++    "Eine Website für eine Privatjet-Marke: Beim Scrollen fliegt der Jet vom roten Teppich im Sonnenuntergang bis zur Piste einer Insel, während der Höhenmesser auf 45.000 Fuß steigt; dann Buchung, Flotte und eine Jet Card aus Metall.",
++  "ANIMA FLY concept: a private jet website where the scroll flies the jet from a red carpet at sunset to an island runway":
++    "Konzept ANIMA FLY: eine Privatjet-Website, auf der der Scroll den Jet vom roten Teppich im Sonnenuntergang bis zur Piste einer Insel fliegen lässt",
+   "Play showcase video": "Video der Präsentation abspielen",
+   "Pause showcase video": "Video der Präsentation pausieren",
+   "Professional websites": "Professionelle Websites",
+-- 
+2.43.0
+
